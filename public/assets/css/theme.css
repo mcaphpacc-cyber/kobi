@@ -1,0 +1,24 @@
+:root{
+
+    --kobi-primary:#0F766E;
+    --kobi-secondary:#2563EB;
+
+    --kobi-success:#16A34A;
+    --kobi-warning:#F59E0B;
+    --kobi-danger:#DC2626;
+
+    --kobi-bg:#F8FAFC;
+
+    --kobi-text:#1F2937;
+
+    --kobi-border:#E5E7EB;
+
+}
+
+body{
+
+    background:var(--kobi-bg);
+
+    color:var(--kobi-text);
+
+}

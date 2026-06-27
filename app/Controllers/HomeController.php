@@ -4,13 +4,22 @@ declare(strict_types=1);
 
 namespace App\Controllers;
 
+use App\Services\HomeService;
+
 class HomeController extends Controller
 {
+    public function __construct(
+        private HomeService $service
+    ) {
+    }
+
     public function index(): void
     {
+        $dashboard = $this->service->getDashboardData();
+
         $this->view('home/index', [
-            'title' => 'KOBI Core Framework',
-            'version' => config('version')
+            'title'     => 'KOBI',
+            'dashboard' => $dashboard,
         ]);
     }
 }

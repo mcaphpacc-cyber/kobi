@@ -1,35 +1,13 @@
-<!doctype html>
+<?php require __DIR__.'/header.php'; ?>
 
-<html lang="<?= e(config('locale')) ?>">
+<?php require __DIR__.'/navbar.php'; ?>
 
-<head>
-
-<meta charset="UTF-8">
-
-<meta
-    name="viewport"
-    content="width=device-width, initial-scale=1">
-
-<title><?= e($title ?? config('name')) ?></title>
-
-<link
-href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css"
-rel="stylesheet">
-
-</head>
-
-<body>
-
-<div class="container py-4">
+<main class="container py-4">
 
 <?= $content ?>
 
-</div>
+</main>
 
-<script
-src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.bundle.min.js">
-</script>
+<?php require __DIR__.'/footer.php'; ?>
 
-</body>
-
-</html>
+<?php require __DIR__.'/scripts.php'; ?>

@@ -80,4 +80,37 @@ abstract class BaseRepository
     {
         return $this->db->rollBack();
     }
+
+    /**
+     * Count all records in a table.
+     */
+    protected function countRecords(string $table): int
+    {
+        $row = $this->fetch(
+            "SELECT COUNT(*) AS total FROM {$table}"
+        );
+
+        return (int) ($row['total'] ?? 0);
+    }
+
+    /**
+     * Check whether a record exists.
+     */
+    protected function exists(
+        string $table,
+        string $column,
+        mixed $value
+    ): bool {
+
+        $row = $this->fetch(
+            "SELECT COUNT(*) AS total
+            FROM {$table}
+            WHERE {$column} = :value",
+            [
+                'value' => $value
+            ]
+        );
+
+        return ((int) ($row['total'] ?? 0)) > 0;
+    }
 }

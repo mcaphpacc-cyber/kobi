@@ -1,0 +1,35 @@
+.hero{
+
+    padding:80px 0;
+
+}
+
+.hero-title{
+
+    font-size:3.5rem;
+
+    font-weight:700;
+
+    color:var(--kobi-primary);
+
+}
+
+.hero-subtitle{
+
+    font-size:1.25rem;
+
+    color:#6B7280;
+
+}
+
+.stat-card{
+
+    transition:.25s;
+
+}
+
+.stat-card:hover{
+
+    transform:translateY(-4px);
+
+}

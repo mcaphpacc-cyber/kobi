@@ -1,0 +1,41 @@
+<?php
+
+declare(strict_types=1);
+
+namespace App\Repositories;
+
+class SymptomRepository extends BaseRepository
+{
+    protected string $table = 'symptoms';
+
+    public function getPopularSymptoms(): array
+    {
+        $sql = "
+            SELECT
+                id,
+                symptom_en,
+                symptom_hi,
+                slug
+            FROM symptoms
+            WHERE is_popular = 1
+            ORDER BY display_order, symptom_en
+        ";
+
+        return $this->fetchAll($sql);
+    }
+
+    public function search(string $keyword): array
+    {
+        return [];
+    }
+
+    public function findByIds(array $ids): array
+    {
+        return [];
+    }
+
+    public function findBySlug(string $slug): ?array
+    {
+        return null;
+    }
+}

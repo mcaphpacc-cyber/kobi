@@ -104,4 +104,37 @@ class DiseaseRepository extends BaseRepository
             'keyword' => '%' . $keyword . '%'
         ]);
     }
+
+    public function count(): int
+    {
+        return $this->countRecords('diseases');
+    }
+
+    public function getFeatured(int $limit = 8): array
+    {
+        $sql = "
+            SELECT
+                d.id,
+                d.disease_en,
+                d.disease_hi,
+                d.slug
+            FROM featured_diseases fd
+            INNER JOIN diseases d
+                ON d.id = fd.disease_id
+            ORDER BY fd.priority_order ASC
+            LIMIT :limit
+        ";
+
+        $statement = $this->db->prepare($sql);
+
+        $statement->bindValue(
+            ':limit',
+            $limit,
+            \PDO::PARAM_INT
+        );
+
+        $statement->execute();
+
+        return $statement->fetchAll();
+    }
 }

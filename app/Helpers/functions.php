@@ -63,3 +63,37 @@ function config(?string $key = null): mixed
 
     return $config[$key] ?? null;
 }
+
+/**
+ * Get application base URL.
+ */
+function baseUrl(): string
+{
+    return rtrim(config('url'), '/')
+        . rtrim(config('base_path'), '/');
+}
+
+/**
+ * Generate application URL.
+ */
+function url(string $path = ''): string
+{
+    return baseUrl() . '/' . ltrim($path, '/');
+}
+
+/**
+ * Generate asset URL.
+ */
+function asset(string $path): string
+{
+    return url('assets/' . ltrim($path, '/'));
+}
+
+/**
+ * Redirect to another page.
+ */
+function redirect(string $path): never
+{
+    header('Location: ' . url($path));
+    exit;
+}
