@@ -4,17 +4,17 @@ declare(strict_types=1);
 
 return [
 
-    /*
-    |--------------------------------------------------------------------------
-    | Application
-    |--------------------------------------------------------------------------
-    */
-
     'name' => 'KOBI',
 
     'version' => '0.1.0',
 
     'url' => 'http://localhost/kobi/public',
+
+    /*
+     * Project base path.
+     * Change this only if the application folder changes.
+     */
+    'base_path' => '/kobi/public',
 
     'timezone' => 'Asia/Kolkata',
 

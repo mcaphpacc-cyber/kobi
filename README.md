@@ -1,2 +1,0 @@
-# kobi
-Medical Project 
