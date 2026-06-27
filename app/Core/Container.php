@@ -16,50 +16,57 @@ class Container
     private array $instances = [];
 
     public function get(string $class): object
-    {
-        if (isset($this->instances[$class])) {
-            return $this->instances[$class];
-        }
+{
+    if (isset($this->instances[$class])) {
+        return $this->instances[$class];
+    }
 
-        if (!class_exists($class)) {
-            throw new RuntimeException("Class {$class} does not exist.");
-        }
+    if (!class_exists($class)) {
+        throw new RuntimeException("Class {$class} does not exist.");
+    }
 
-        $reflection = new ReflectionClass($class);
+    $reflection = new ReflectionClass($class);
 
-        if (!$reflection->isInstantiable()) {
-            throw new RuntimeException("Class {$class} is not instantiable.");
-        }
+    if (!$reflection->isInstantiable()) {
+        throw new RuntimeException("Class {$class} is not instantiable.");
+    }
 
-        $constructor = $reflection->getConstructor();
+    $constructor = $reflection->getConstructor();
 
-        if ($constructor === null) {
-            $instance = new $class();
+    if ($constructor === null) {
 
-            $this->instances[$class] = $instance;
-
-            return $instance;
-        }
-
-        $dependencies = [];
-
-        foreach ($constructor->getParameters() as $parameter) {
-
-            $type = $parameter->getType();
-
-            if (!$type instanceof ReflectionNamedType || $type->isBuiltin()) {
-                throw new RuntimeException(
-                    "Unable to resolve {$parameter->getName()}."
-                );
-            }
-
-            $dependencies[] = $this->get($type->getName());
-        }
-
-        $instance = $reflection->newInstanceArgs($dependencies);
+        $instance = new $class();
 
         $this->instances[$class] = $instance;
 
         return $instance;
     }
+
+    $dependencies = [];
+
+    foreach ($constructor->getParameters() as $parameter) {
+
+        $type = $parameter->getType();
+
+        if (!$type instanceof ReflectionNamedType || $type->isBuiltin()) {
+            throw new RuntimeException(
+                "Unable to resolve {$parameter->getName()}."
+            );
+        }
+
+        $dependencies[] = $this->get($type->getName());
+    }
+
+    $instance = $reflection->newInstanceArgs($dependencies);
+
+    /*
+     * Keep one shared Database instance.
+     */
+
+    if ($class === Database::class) {
+        $this->instances[$class] = $instance;
+    }
+
+    return $instance;
+}
 }
