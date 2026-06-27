@@ -1,12 +1,24 @@
+<?php
+
+declare(strict_types=1);
+
 return [
 
-    'app_name' => 'KOBI',
+    /*
+    |--------------------------------------------------------------------------
+    | Application
+    |--------------------------------------------------------------------------
+    */
 
-    'app_url' => 'http://localhost/kobi',
+    'name' => 'KOBI',
+
+    'version' => '0.1.0',
+
+    'url' => 'http://localhost/kobi/public',
 
     'timezone' => 'Asia/Kolkata',
 
-    'language' => 'en',
+    'locale' => 'en',
 
     'debug' => true,
 
