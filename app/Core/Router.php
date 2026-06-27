@@ -19,19 +19,24 @@ class Router
         ];
     }
 
-    public function dispatch(string $httpMethod, string $uri): void
-    {
+  public function dispatch(
+        string $httpMethod,
+        string $uri,
+        Container $container
+    ): void {
         $uri = $this->normalize($uri);
 
         if (!isset($this->routes[$httpMethod][$uri])) {
             http_response_code(404);
-            echo '<h1>404 - Page Not Found</h1>';
+
+            echo "<h1>404 - Page Not Found</h1>";
+
             return;
         }
 
         $route = $this->routes[$httpMethod][$uri];
 
-        $controller = new $route['controller']();
+        $controller = $container->get($route['controller']);
 
         $method = $route['method'];
 
