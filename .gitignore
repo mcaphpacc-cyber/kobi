@@ -1,12 +1,5 @@
+.env
 /vendor/
 /storage/cache/*
 /storage/logs/*
-.env
-
-.DS_Store
-Thumbs.db
-
-.idea/
-.vscode/
-
 *.log

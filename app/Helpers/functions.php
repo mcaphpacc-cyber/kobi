@@ -14,6 +14,38 @@ function e(?string $value): string
     );
 }
 
+function env(string $key, mixed $default = null): mixed
+{
+    static $loaded = false;
+
+    if (!$loaded) {
+
+        $file = dirname(__DIR__, 2) . '/.env';
+
+        if (is_file($file)) {
+
+            $lines = file($file, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
+
+            foreach ($lines as $line) {
+
+                $line = trim($line);
+
+                if ($line === '' || str_starts_with($line, '#')) {
+                    continue;
+                }
+
+                [$name, $value] = array_pad(explode('=', $line, 2), 2, '');
+
+                $_ENV[trim($name)] = trim($value);
+            }
+        }
+
+        $loaded = true;
+    }
+
+    return $_ENV[$key] ?? $default;
+}
+
 /**
  * Load configuration values.
  */
