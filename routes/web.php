@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use App\Controllers\HomeController;
+use App\Controllers\DiseaseController;
 
 /*
 |--------------------------------------------------------------------------
@@ -13,5 +14,12 @@ use App\Controllers\HomeController;
 $this->router()->get(
     '/',
     HomeController::class,
+    'index'
+);
+
+
+$this->router()->get(
+    '/diseases',
+    DiseaseController::class,
     'index'
 );

@@ -7,40 +7,56 @@ namespace App\Core;
 class Router
 {
     /**
-     * @var array<string, array<string, array{controller:string, method:string}>>
+     * @var array<string, array<int, array>>
      */
     private array $routes = [];
 
     public function get(string $uri, string $controller, string $method): void
     {
-        $this->routes['GET'][$this->normalize($uri)] = [
+        $this->routes['GET'][] = [
+            'uri'        => $this->normalize($uri),
             'controller' => $controller,
             'method'     => $method,
         ];
     }
 
-  public function dispatch(
+    public function dispatch(
         string $httpMethod,
         string $uri,
         Container $container
     ): void {
+
         $uri = $this->normalize($uri);
 
-        if (!isset($this->routes[$httpMethod][$uri])) {
-            http_response_code(404);
+        foreach ($this->routes[$httpMethod] ?? [] as $route) {
 
-            echo "<h1>404 - Page Not Found</h1>";
+            $pattern = preg_replace(
+                '/\{([a-zA-Z0-9_]+)\}/',
+                '([^/]+)',
+                $route['uri']
+            );
+
+            $pattern = '#^' . $pattern . '$#';
+
+            if (!preg_match($pattern, $uri, $matches)) {
+                continue;
+            }
+
+            array_shift($matches);
+
+            $controller = $container->get($route['controller']);
+
+            call_user_func_array(
+                [$controller, $route['method']],
+                $matches
+            );
 
             return;
         }
 
-        $route = $this->routes[$httpMethod][$uri];
+        http_response_code(404);
 
-        $controller = $container->get($route['controller']);
-
-        $method = $route['method'];
-
-        $controller->$method();
+        echo "<h1>404 - Page Not Found</h1>";
     }
 
     private function normalize(string $uri): string
