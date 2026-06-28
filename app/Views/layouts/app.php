@@ -10,4 +10,5 @@
 
 <?php require __DIR__.'/footer.php'; ?>
 
-<?php require __DIR__.'/scripts.php'; ?>
+<script src="<?= asset('js/app.js') ?>"></script>
+<script src="<?= asset('js/symptom-checker.js') ?>"></script>

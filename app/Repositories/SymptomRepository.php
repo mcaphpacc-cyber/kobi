@@ -6,8 +6,10 @@ namespace App\Repositories;
 
 class SymptomRepository extends BaseRepository
 {
-    protected string $table = 'symptoms';
-
+    public function count(): int
+    {
+        return $this->countRecords('symptoms');
+    }
     public function getPopularSymptoms(): array
     {
         $sql = "
@@ -26,7 +28,22 @@ class SymptomRepository extends BaseRepository
 
     public function search(string $keyword): array
     {
-        return [];
+        return $this->fetchAll(
+            "
+            SELECT
+                id,
+                symptom_en,
+                symptom_hi,
+                slug
+            FROM symptoms
+            WHERE symptom_en LIKE :keyword
+            ORDER BY symptom_en
+            LIMIT 10
+            ",
+            [
+                'keyword' => '%' . $keyword . '%'
+            ]
+        );
     }
 
     public function findByIds(array $ids): array

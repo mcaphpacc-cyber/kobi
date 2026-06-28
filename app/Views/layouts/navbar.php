@@ -43,6 +43,11 @@ Diseases
 </a>
 
 </li>
+<li class="nav-item">
+    <a class="nav-link" href="<?= url('/symptom-checker'); ?>">
+        Symptom Checker
+    </a>
+</li>
 
 <li class="nav-item">
 

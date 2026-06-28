@@ -35,4 +35,23 @@ class SymptomCheckerService
             $candidateDiseases
         );
     }
+    
+    public function search(string $keyword): array
+    {
+        return $this->symptoms->search($keyword);
+    }
+
+    public function match(array $symptomIds): array
+    {
+        $candidates =
+            $this->diseases
+                ->getCandidateDiseases(
+                    $symptomIds
+                );
+
+        return $this->matcher->match(
+            $symptomIds,
+            $candidates
+        );
+    }
 }

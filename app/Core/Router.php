@@ -76,4 +76,17 @@ class Router
 
         return $uri === '//' ? '/' : $uri;
     }
+
+    public function post(
+        string $uri,
+        string $controller,
+        string $method
+    ): void {
+
+        $this->routes['POST'][] = [
+            'uri'        => $this->normalize($uri),
+            'controller' => $controller,
+            'method'     => $method,
+        ];
+    }
 }

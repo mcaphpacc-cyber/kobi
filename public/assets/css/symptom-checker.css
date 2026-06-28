@@ -1,0 +1,277 @@
+/*****************************************************************
+ *
+ * KOBI Core v0.2.0
+ * Symptom Checker
+ *
+ *****************************************************************/
+
+/* ==========================================================
+   Page
+========================================================== */
+
+#resultsSummary,
+#matchResults {
+    margin-top: 1.5rem;
+}
+
+/* ==========================================================
+   Cards
+========================================================== */
+
+.card {
+    border: 1px solid #e9ecef;
+    border-radius: 12px;
+    transition: all .25s ease;
+}
+
+.card:hover {
+    box-shadow: 0 .5rem 1rem rgba(0,0,0,.08);
+}
+
+/* ==========================================================
+   Search Suggestions
+========================================================== */
+
+#searchResults {
+    position: absolute;
+    width: calc(100% - 2rem);
+    z-index: 1050;
+    max-height: 300px;
+    overflow-y: auto;
+    border-radius: .5rem;
+}
+
+#searchResults .list-group-item {
+    cursor: pointer;
+}
+
+#searchResults .list-group-item:hover {
+    background: #f8f9fa;
+}
+
+/* ==========================================================
+   Popular Symptoms
+========================================================== */
+
+.symptom-chip {
+    border-radius: 999px;
+    transition: .2s;
+}
+
+.symptom-chip:hover {
+    transform: translateY(-2px);
+}
+
+/* ==========================================================
+   Selected Symptoms
+========================================================== */
+
+.selected-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    padding: .75rem 1rem;
+
+    margin-bottom: .75rem;
+
+    border: 1px solid #dee2e6;
+
+    border-radius: .5rem;
+
+    background: #fff;
+}
+
+.remove-symptom {
+
+    color: #dc3545;
+
+    font-size: 1.2rem;
+
+    cursor: pointer;
+
+    font-weight: bold;
+
+}
+
+.remove-symptom:hover {
+
+    color: #a71d2a;
+
+}
+
+/* ==========================================================
+   Disease Card
+========================================================== */
+
+.disease-card h4 {
+
+    font-weight: 700;
+
+}
+
+.disease-card .badge {
+
+    font-size: .78rem;
+
+}
+
+/* ==========================================================
+   Symptom Badges
+========================================================== */
+
+.badge {
+
+    padding: .45rem .7rem;
+
+    border-radius: 999px;
+
+}
+
+.badge.bg-success {
+
+    font-weight: 500;
+
+}
+
+.badge.bg-light {
+
+    border: 1px solid #ced4da;
+
+}
+
+/* ==========================================================
+   Progress
+========================================================== */
+
+.progress {
+
+    height: 10px;
+
+    border-radius: 999px;
+
+    background: #edf1f5;
+
+}
+
+.progress-bar {
+
+    transition: width .6s ease;
+
+}
+
+/* ==========================================================
+   Results Summary
+========================================================== */
+
+#resultsSummary .card {
+
+    border-left: 5px solid #0d6efd;
+
+}
+
+/* ==========================================================
+   Ranking
+========================================================== */
+
+.ranking-score {
+
+    text-align: right;
+
+}
+
+.ranking-score small {
+
+    display: block;
+
+    color: #6c757d;
+
+}
+
+.ranking-score strong {
+
+    font-size: 1.1rem;
+
+}
+
+/* ==========================================================
+   Disease Action
+========================================================== */
+
+.disease-action {
+
+    text-align: right;
+
+}
+
+/* ==========================================================
+   Sticky Sidebar
+========================================================== */
+
+@media (min-width:992px){
+
+    .sticky-top{
+
+        top:90px;
+
+    }
+
+}
+
+/* ==========================================================
+   Mobile
+========================================================== */
+
+@media (max-width:991px){
+
+    .sticky-top{
+
+        position:static !important;
+
+    }
+
+    #searchResults{
+
+        position:relative;
+
+        width:100%;
+
+    }
+
+    .card{
+
+        margin-bottom:1rem;
+
+    }
+
+}
+
+/* ==========================================================
+   Animations
+========================================================== */
+
+.fade-in{
+
+    animation:fadeIn .3s ease;
+
+}
+
+@keyframes fadeIn{
+
+    from{
+
+        opacity:0;
+
+        transform:translateY(10px);
+
+    }
+
+    to{
+
+        opacity:1;
+
+        transform:none;
+
+    }
+
+}

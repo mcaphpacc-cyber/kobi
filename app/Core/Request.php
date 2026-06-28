@@ -45,4 +45,11 @@ class Request
     {
         return $this->method() === 'GET';
     }
+
+    public function input(string $key, mixed $default = null): mixed
+    {
+        return $_POST[$key]
+            ?? $_GET[$key]
+            ?? $default;
+    }
 }

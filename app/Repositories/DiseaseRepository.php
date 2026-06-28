@@ -137,4 +137,163 @@ class DiseaseRepository extends BaseRepository
 
         return $statement->fetchAll();
     }
+    public function findBySymptoms(array $symptomIds): array
+    {
+        if (empty($symptomIds)) {
+            return [];
+        }
+
+        $placeholders = implode(
+            ',',
+            array_fill(0, count($symptomIds), '?')
+        );
+
+        $sql = "
+            SELECT
+                d.id,
+                d.disease_en,
+                d.slug,
+                COUNT(*) AS matched
+            FROM diseases d
+            INNER JOIN disease_symptoms ds
+                ON ds.disease_id = d.id
+            WHERE ds.symptom_id IN ($placeholders)
+            GROUP BY d.id
+            ORDER BY matched DESC,
+                    d.disease_en
+        ";
+
+        return $this->fetchAll(
+            $sql,
+            $symptomIds
+        );
+    }
+
+    public function getSymptomsForDisease(int $diseaseId): array
+    {
+        return [];
+    }
+
+    public function findFeatured(): array
+    {
+        return [];
+    }
+
+    public function getCandidateDiseases(array $symptomIds): array
+{
+    if (empty($symptomIds)) {
+        return [];
+    }
+
+    $placeholders = implode(
+        ',',
+        array_fill(0, count($symptomIds), '?')
+    );
+
+    $sql = "
+        SELECT DISTINCT
+            d.id,
+            d.disease_en,
+            d.slug
+        FROM diseases d
+        INNER JOIN disease_symptoms ds
+            ON ds.disease_id = d.id
+        WHERE ds.symptom_id IN ($placeholders)
+        ORDER BY d.disease_en
+    ";
+
+    $diseases = $this->fetchAll(
+        $sql,
+        $symptomIds
+    );
+
+    if (empty($diseases)) {
+        return [];
+    }
+
+    $diseaseIds = array_column(
+        $diseases,
+        'id'
+    );
+
+    $symptomMap =
+        $this->getSymptomsForDiseases(
+            $diseaseIds
+        );
+
+    foreach ($diseases as &$disease) {
+
+        $disease['symptoms'] =
+            $symptomMap[$disease['id']] ?? [];
+
+    }
+
+    return $diseases;
+}
+
+    private function getSymptomsForDiseases(
+        array $diseaseIds
+    ): array {
+
+        if (empty($diseaseIds)) {
+            return [];
+        }
+
+        $placeholders = implode(
+            ',',
+            array_fill(0, count($diseaseIds), '?')
+        );
+
+        $sql = "
+            SELECT
+
+                ds.disease_id,
+
+                s.id,
+
+                s.symptom_en
+
+            FROM disease_symptoms ds
+
+            INNER JOIN symptoms s
+
+                ON s.id = ds.symptom_id
+
+            WHERE ds.disease_id IN ($placeholders)
+
+            ORDER BY
+                ds.disease_id,
+                s.symptom_en
+        ";
+
+        $rows = $this->fetchAll(
+            $sql,
+            $diseaseIds
+        );
+
+        return $this->groupSymptomsByDisease(
+            $rows
+        );
+    }
+
+    private function groupSymptomsByDisease(
+        array $rows
+    ): array {
+
+        $grouped = [];
+
+        foreach ($rows as $row) {
+
+            $grouped[$row['disease_id']][] = [
+
+                'id' => (int) $row['id'],
+
+                'symptom_en' => $row['symptom_en']
+
+            ];
+
+        }
+
+        return $grouped;
+    }
 }

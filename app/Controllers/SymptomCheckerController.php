@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Controllers;
 
-use App\Core\Controller;
 use App\Services\SymptomCheckerService;
 
 class SymptomCheckerController extends Controller
@@ -18,7 +17,7 @@ class SymptomCheckerController extends Controller
     {
         $popularSymptoms = $this->service->getPopularSymptoms();
 
-        $this->view('symptom-checker.index', [
+        $this->view('symptom-checker/index', [
             'title' => 'Symptom Checker',
             'popularSymptoms' => $popularSymptoms,
         ]);
@@ -30,10 +29,52 @@ class SymptomCheckerController extends Controller
 
         $results = $this->service->checkSymptoms($selectedSymptoms);
 
-        $this->view('symptom-checker.results', [
+        $this->view('symptom-checker/results', [
             'title' => 'Possible Conditions',
             'results' => $results,
             'selectedSymptoms' => $selectedSymptoms,
         ]);
+    }
+
+    public function search(): void
+    {
+        $keyword = trim($_GET['q'] ?? '');
+
+        if ($keyword === '') {
+            header('Content-Type: application/json');
+            echo json_encode([]);
+            return;
+        }
+
+        $results = $this->service->search($keyword);
+
+        header('Content-Type: application/json');
+
+        echo json_encode($results);
+    }
+
+    public function match(): void
+    {
+        $ids = $_GET['symptoms'] ?? '';
+
+        if ($ids === '') {
+
+            header('Content-Type: application/json');
+
+            echo json_encode([]);
+
+            return;
+        }
+
+        $symptomIds = array_map(
+            'intval',
+            explode(',', $ids)
+        );
+
+        $results = $this->service->match($symptomIds);
+
+        header('Content-Type: application/json');
+
+        echo json_encode($results);
     }
 }
