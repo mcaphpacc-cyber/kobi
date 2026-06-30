@@ -633,113 +633,140 @@ function renderDiseaseCard(item)
 {
     const badge = getMatchBadge(item.matchLevel);
 
+    const matched = item.matchedSymptoms
+        .map(symptom => `
+            <span class="badge bg-success me-1 mb-1">
+                ✓ ${symptom.symptom_en}
+            </span>
+        `)
+        .join("");
+
+    let missing = "None";
+
+    if (item.missingSymptoms.length > 0)
+    {
+        missing = item.missingSymptoms
+            .slice(0, 2)
+            .map(symptom => symptom.symptom_en)
+            .join(", ");
+
+        if (item.missingSymptoms.length > 2)
+        {
+            missing += ` +${item.missingSymptoms.length - 2} more`;
+        }
+    }
+
     return `
+<div class="card shadow-sm mb-3 disease-card">
 
-        <div class="card shadow-sm mb-4">
+    <div class="card-body">
 
-            <div class="card-body">
+        <div class="d-flex justify-content-between align-items-start mb-2">
 
-                <div class="d-flex justify-content-between align-items-start">
+            <div>
 
-                    <div>
+                <h5 class="mb-1">
+                    ${item.disease.disease_en}
+                </h5>
 
-                        <h4 class="mb-1">
+                <span class="badge ${badge.className} px-2 py-1">
+                    ${badge.text}
+                </span>
 
-                            ${item.disease.disease_en}
+            </div>
 
-                        </h4>
+            <div class="text-end">
 
-                        <span class="badge ${badge.className}">
+                <div
+                    class="fs-3 fw-bold">
 
-                            ${badge.text}
-
-                        </span>
-
-                    </div>
-
-                    <div class="text-end">
-
-                        <div class="small text-muted">
-
-                            Ranking
-
-                        </div>
-
-                        <strong>
-
-                            ${item.rankingScore}
-
-                        </strong>
-
-                    </div>
+                    ${Math.round(item.rankingScore)}%
 
                 </div>
 
-                <hr>
+                <small class="text-muted">
 
-                <div class="mb-3">
+                    Match Score
 
-                    <strong>
-
-                        Matched Symptoms
-
-                    </strong>
-
-                    <div class="mt-2">
-
-                        ${renderMatchedSymptoms(item)}
-
-                    </div>
-
-                </div>
-
-                <div class="mb-3">
-
-                    <strong>
-
-                        Missing Common Symptoms
-
-                    </strong>
-
-                    <div class="mt-2">
-
-                        ${renderMissingSymptoms(item)}
-
-                    </div>
-
-                </div>
-
-                ${renderProgress(
-                    "User Match",
-                    item.userMatchScore,
-                    "success"
-                )}
-
-                ${renderProgress(
-                    "Disease Coverage",
-                    item.coverage,
-                    "primary"
-                )}
-
-                <div class="mt-4 text-end">
-
-                    <a
-
-                        href="./disease/${item.disease.slug}"
-
-                        class="btn btn-outline-primary">
-
-                        View Disease →
-
-                    </a>
-
-                </div>
+                </small>
 
             </div>
 
         </div>
 
-    `;
+        <div class="mb-2">
+
+            <strong>Matched Symptoms</strong>
+
+            <div class="mt-1">
+
+                ${matched}
+
+            </div>
+
+        </div>
+
+        <div class="mb-3">
+
+            <strong>Missing Common Symptoms</strong>
+
+            <div>
+
+                <span
+                    class="badge bg-light text-dark border">
+
+                    ${missing}
+
+                </span>
+
+            </div>
+
+        </div>
+
+        <div class="mb-3">
+
+            <strong>
+
+                Why this matched
+
+            </strong>
+
+            <div class="mt-2">
+
+                ${renderExplanation(item)}
+
+            </div>
+
+        </div>
+
+        ${renderProgress(
+            "User Match",
+            item.userMatchScore,
+            "success"
+        )}
+
+        ${renderProgress(
+            "Disease Coverage",
+            item.coverage,
+            "primary"
+        )}
+
+        <div class="text-end">
+
+            <a
+                href="/disease/${item.disease.slug}"
+                class="btn btn-sm btn-outline-primary">
+
+                View Disease →
+
+            </a>
+
+        </div>
+
+    </div>
+
+</div>
+`;
 }
 
 /******************************************************************
@@ -795,15 +822,15 @@ function renderProgress(title, value, color)
         <div class="mb-3">
 
             <div
-                class="d-flex justify-content-between">
+                class="d-flex justify-content-between mb-1">
 
-                <small>
+                <small class="fw-semibold">
 
                     ${title}
 
                 </small>
 
-                <small>
+                <small class="text-muted">
 
                     ${value}%
 
@@ -811,7 +838,7 @@ function renderProgress(title, value, color)
 
             </div>
 
-            <div class="progress">
+            <div class="progress" style="height:8px;">
 
                 <div
 
@@ -867,6 +894,39 @@ function getMatchBadge(level)
             };
 
     }
+}
+
+function renderExplanation(item)
+{
+    let html = "";
+
+    item.matchedSymptoms.forEach(symptom => {
+
+        html += `
+            <div class="small text-success mb-1">
+
+                ✓ ${symptom.symptom_en} matched
+
+            </div>
+        `;
+
+    });
+
+    item.missingSymptoms
+        .slice(0,2)
+        .forEach(symptom => {
+
+            html += `
+                <div class="small text-muted">
+
+                    • ${symptom.symptom_en} is commonly associated
+
+                </div>
+            `;
+
+        });
+
+    return html;
 }
 
 /******************************************************************
