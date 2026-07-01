@@ -408,66 +408,96 @@ function removeSymptom(id)
 
 function loadMatches()
 {
-    if (
-        state.selectedSymptoms.length === 0
-    ) {
+    document
+    .getElementById("emptyState")
+    .classList.add("d-none");
+    
+    if (state.selectedSymptoms.length === 0)
+    {
+        showEmptyState(
+            "Select one or more symptoms to begin.",
+            "Start by searching for symptoms or choosing from the popular symptoms below."
+        );
 
         return;
-
     }
+
+    showLoading();
 
     dom.button.disabled = true;
 
     dom.button.innerHTML = `
-        <span
-            class="spinner-border spinner-border-sm me-2">
-        </span>
-
+        <span class="spinner-border spinner-border-sm me-2"></span>
         Finding Matches...
     `;
 
-    const ids =
+    const ids = state.selectedSymptoms
+        .map(symptom => symptom.id)
+        .join(",");
 
-        state.selectedSymptoms
+    fetch("./api/symptom-checker?symptoms=" + ids)
 
-            .map(symptom => symptom.id)
+        .then(response => response.json())
 
-            .join(",");
+        .then(data => {
 
-    fetch(
+            hideLoading();
 
-        "./api/symptom-checker?symptoms="
+            state.results = data;
 
-        +
+            if (data.length === 0)
+            {
+                hideLoading();
 
-        ids
+                showEmptyState(
+                    "No matching conditions found.",
+                    "Try adding more symptoms or removing one of your selected symptoms."
+                );
 
-    )
+                return;
+            }
 
-    .then(response => response.json())
+            renderMatches();
 
-    .then(data => {
+        })
 
-        state.results = data;
+        .catch(error => {
 
-        renderMatches();
+            hideLoading();
 
-    })
+            console.error(error);
 
-    .catch(error => {
+        })
 
-        console.error(error);
+        .finally(() => {
 
-    })
+            dom.button.disabled = true;
 
-    .finally(() => {
+            dom.button.innerHTML =
+                "Find Possible Conditions";
 
-        dom.button.disabled = false;
+        });
+}
 
-        dom.button.innerHTML =
-            "Find Possible Conditions";
+function updateResultsSummary(results)
+{
+    const summary =
+        document.getElementById("resultsSummary");
 
-    });
+    summary.classList.remove("d-none");
+
+    document.getElementById(
+        "summarySelected"
+    ).textContent = selectedSymptoms.length;
+
+    document.getElementById(
+        "summaryMatches"
+    ).textContent = results.length;
+
+    document.getElementById(
+        "summaryShowing"
+    ).textContent =
+        `Top ${Math.min(results.length, 10)}`;
 }
 
 /******************************************************************
@@ -484,6 +514,8 @@ function renderMatches()
 
     const results =
         response.results;
+    
+    //updateResultsSummary(results);
 
     dom.matchResults.innerHTML = "";
 
@@ -498,6 +530,10 @@ function renderMatches()
             </div>
 
         `;
+
+        document
+            .getElementById("resultsSummary")
+            .classList.add("d-none");
 
         return;
 
@@ -641,7 +677,13 @@ function renderDiseaseCard(item)
         `)
         .join("");
 
-    let missing = "None";
+    let missing = `
+            <span class="text-success">
+
+                No common symptoms missing
+
+            </span>
+            `;
 
     if (item.missingSymptoms.length > 0)
     {
@@ -677,61 +719,86 @@ function renderDiseaseCard(item)
 
             <div class="text-end">
 
-                <div
-                    class="fs-3 fw-bold">
+                <div class="fs-2 fw-bold text-primary">
 
                     ${Math.round(item.rankingScore)}%
 
                 </div>
 
-                <small class="text-muted">
+                <small class="text-muted d-block">
 
-                    Match Score
+                    Overall Match
 
                 </small>
 
-            </div>
-
-        </div>
-
-        <div class="mb-2">
-
-            <strong>Matched Symptoms</strong>
-
-            <div class="mt-1">
-
-                ${matched}
+                <!-- Removed duplicate badge -->
 
             </div>
 
         </div>
 
-        <div class="mb-3">
+        <div class="row mt-3">
 
-            <strong>Missing Common Symptoms</strong>
+            <div class="col-lg-6">
 
-            <div>
+                <strong>✓ Matched Symptoms</strong>
 
-                <span
-                    class="badge bg-light text-dark border">
+                <div class="mt-2">
 
-                    ${missing}
+                    ${matched}
 
-                </span>
+                </div>
+
+            </div>
+
+            <div class="col-lg-6">
+
+                ${renderProgress(
+                    "User Match",
+                    item.userMatchScore,
+                    "success"
+                )}
 
             </div>
 
         </div>
 
-        <div class="mb-3">
+        <div class="row mt-3">
 
-            <strong>
+            <div class="col-lg-6">
 
-                Why this matched
+                <strong>○ Missing Symptoms</strong>
 
-            </strong>
+                <div class="mt-2">
 
-            <div class="mt-2">
+                    <span class="badge bg-light text-dark border">
+
+                        ${missing}
+
+                    </span>
+
+                </div>
+
+            </div>
+
+            <div class="col-lg-6">
+
+                ${renderProgress(
+                    "Disease Coverage",
+                    item.coverage,
+                    "primary"
+                )}
+
+            </div>
+
+        </div>
+
+        <div class="mt-3">
+
+            <strong>Why this matched</strong>
+
+            <div
+                class="bg-light border rounded p-3 mt-2">
 
                 ${renderExplanation(item)}
 
@@ -739,25 +806,19 @@ function renderDiseaseCard(item)
 
         </div>
 
-        ${renderProgress(
-            "User Match",
-            item.userMatchScore,
-            "success"
-        )}
+        <div class="small text-muted fst-italic mt-3">
 
-        ${renderProgress(
-            "Disease Coverage",
-            item.coverage,
-            "primary"
-        )}
+            Educational information only.
+            This is not a medical diagnosis.
 
-        <div class="text-end">
+        </div>
+        <div class="text-end mt-4">
 
             <a
                 href="/disease/${item.disease.slug}"
-                class="btn btn-sm btn-outline-primary">
+                class="btn btn-primary btn-sm px-4">
 
-                View Disease →
+                Learn More →
 
             </a>
 
@@ -838,11 +899,10 @@ function renderProgress(title, value, color)
 
             </div>
 
-            <div class="progress" style="height:8px;">
+            <div class="progress rounded-pill" style="height:10px;">
 
                 <div
-
-                    class="progress-bar bg-${color}"
+                    class="progress-bar bg-${color} rounded-pill"
 
                     style="width:${value}%">
 
@@ -929,6 +989,50 @@ function renderExplanation(item)
     return html;
 }
 
+function showLoading()
+{
+    document
+        .getElementById("loadingState")
+        .classList.remove("d-none");
+
+    document
+        .getElementById("resultsSummary")
+        .classList.add("d-none");
+}
+
+function hideLoading()
+{
+    document
+        .getElementById("loadingState")
+        .classList.add("d-none");
+}
+
+function showEmptyState(title, message)
+{
+    document
+        .getElementById("loadingState")
+        .classList.add("d-none");
+
+    document
+        .getElementById("resultsSummary")
+        .classList.add("d-none");
+
+    document
+        .getElementById("matchResults")
+        .innerHTML = "";
+
+    document
+        .getElementById("emptyTitle")
+        .textContent = title;
+
+    document
+        .getElementById("emptyMessage")
+        .textContent = message;
+
+    document
+        .getElementById("emptyState")
+        .classList.remove("d-none");
+}
 /******************************************************************
  * End of File
  ******************************************************************/

@@ -94,10 +94,101 @@
                 </div>
 
             </div>
+            <div
+                id="loadingState"
+                class="alert alert-primary d-none text-center my-4">
 
+                <div class="spinner-border text-primary mb-3" role="status">
+
+                    <span class="visually-hidden">
+                        Loading...
+                    </span>
+
+                </div>
+
+                <h5 class="mb-2">
+
+                    Analyzing symptoms...
+
+                </h5>
+
+                <div class="text-muted">
+
+                    Finding possible conditions...
+
+                </div>
+
+            </div>
             <!-- Results Summary -->
-            <div id="resultsSummary"></div>
+            <div
+                id="resultsSummary"
+                class="alert alert-info d-none mt-4">
 
+                <h5 class="mb-3">
+
+                    Results Summary
+
+                </h5>
+
+                <div class="row">
+
+                    <div class="col-md-3">
+
+                        <strong>Selected Symptoms</strong>
+
+                        <div id="summarySelected">
+                            0
+                        </div>
+
+                    </div>
+
+                    <div class="col-md-3">
+
+                        <strong>Matching Diseases</strong>
+
+                        <div id="summaryMatches">
+                            0
+                        </div>
+
+                    </div>
+
+                    <div class="col-md-3">
+
+                        <strong>Showing</strong>
+
+                        <div id="summaryShowing">
+                            Top 10
+                        </div>
+
+                    </div>
+
+                    <div class="col-md-3">
+
+                        <strong>Sorted By</strong>
+
+                        <div>
+                            Overall Match
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+            
+            <div
+                id="emptyState"
+                class="alert alert-secondary d-none text-center my-4">
+
+                <h5 id="emptyTitle"></h5>
+
+                <p
+                    id="emptyMessage"
+                    class="mb-0 text-muted">
+
+                </p>
+
+            </div>
             <!-- Disease Results -->
             <div id="matchResults"></div>
 
