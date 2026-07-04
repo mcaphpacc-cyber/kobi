@@ -656,82 +656,86 @@ function renderDiseaseCards(results)
 {
     let html = "";
 
-    results.forEach(item => {
-
-        html += renderDiseaseCard(item);
-
+    results.forEach((item, index) => {
+        html += renderDiseaseCard(item, index + 1);
     });
 
     return html;
 }
 
-function renderDiseaseCard(item)
+function renderDiseaseCard(item, rank)
 {
     const badge = getMatchBadge(item.matchLevel);
+    const confidence = getConfidence(item.rankingScore);
+    const severity = getSeverity(item.disease.severity_level);
 
-    const matched = item.matchedSymptoms
-        .map(symptom => `
-            <span class="badge bg-success me-1 mb-1">
-                ✓ ${symptom.symptom_en}
-            </span>
-        `)
-        .join("");
+    const matched = item.matchedSymptoms.map(symptom => `
+        <div class="small mb-1 text-success">
+            ✓ ${symptom.symptom_en}
+        </div>
+        `).join("");
 
     let missing = `
-            <span class="text-success">
+        <div class="small text-success">
+            ✓ All major symptoms matched
+        </div>
+        `;
 
-                No common symptoms missing
+        if(item.missingSymptoms.length){
 
-            </span>
-            `;
-
-    if (item.missingSymptoms.length > 0)
-    {
-        missing = item.missingSymptoms
-            .slice(0, 2)
-            .map(symptom => symptom.symptom_en)
-            .join(", ");
-
-        if (item.missingSymptoms.length > 2)
-        {
-            missing += ` +${item.missingSymptoms.length - 2} more`;
+            missing = item.missingSymptoms
+                .slice(0,3)
+                .map(symptom => `
+                    <div class="small text-muted">
+                        ○ ${symptom.symptom_en}
+                    </div>
+                `)
+                .join("");
         }
-    }
+        let rankText = '';
+        if(rank == 1){
+            rankText = `#${rank} Best Match`;
+        }else{
+             rankText = `#${rank}`;
+        }
 
     return `
 <div class="card shadow-sm mb-3 disease-card">
 
     <div class="card-body">
 
-        <div class="d-flex justify-content-between align-items-start mb-2">
+        <div class="d-flex justify-content-between align-items-start">
 
             <div>
-
-                <h5 class="mb-1">
-                    ${item.disease.disease_en}
-                </h5>
-
-                <span class="badge ${badge.className} px-2 py-1">
-                    ${badge.text}
+                <span class="badge bg-dark">
+                    ${rankText}
                 </span>
+                <h4 class="mb-2 fw-bold">
+                    ${item.disease.disease_en}
+                </h4>
 
-            </div>
+                <div class="d-flex flex-wrap gap-2">
 
-            <div class="text-end">
+                    <span class="badge ${badge.className}">
+                        ${badge.text}
+                    </span>
 
-                <div class="fs-2 fw-bold text-primary">
+                    <span class="badge bg-primary">
+                        ${Math.round(item.rankingScore)}% Overall
+                    </span>
 
-                    ${Math.round(item.rankingScore)}%
+                    <span class="badge bg-info text-dark">
+                        ${item.coverage}% Coverage
+                    </span>
 
+                    <span class="badge bg-${confidence.color}">
+                        ${confidence.label}
+                    </span>
+                    <span class="badge bg-${severity.color} text-dark">
+                        <i class="${severity.icon} text-light"></i>
+                        ${severity.label}
+                    </span>
                 </div>
-
-                <small class="text-muted d-block">
-
-                    Overall Match
-
-                </small>
-
-                <!-- Removed duplicate badge -->
 
             </div>
 
@@ -741,7 +745,9 @@ function renderDiseaseCard(item)
 
             <div class="col-lg-6">
 
-                <strong>✓ Matched Symptoms</strong>
+                <h6 class="fw-semibold mb-2 text-success">
+                    ✓ Matched Symptoms
+                </h6>
 
                 <div class="mt-2">
 
@@ -754,7 +760,7 @@ function renderDiseaseCard(item)
             <div class="col-lg-6">
 
                 ${renderProgress(
-                    "User Match",
+                    "Your Symptoms Match",
                     item.userMatchScore,
                     "success"
                 )}
@@ -767,7 +773,9 @@ function renderDiseaseCard(item)
 
             <div class="col-lg-6">
 
-                <strong>○ Missing Symptoms</strong>
+                <h6 class="fw-semibold mb-2 text-secondary">
+                    ○ Common Missing Symptoms
+                </h6>
 
                 <div class="mt-2">
 
@@ -784,7 +792,7 @@ function renderDiseaseCard(item)
             <div class="col-lg-6">
 
                 ${renderProgress(
-                    "Disease Coverage",
+                    "Disease Symptom Coverage",
                     item.coverage,
                     "primary"
                 )}
@@ -792,6 +800,31 @@ function renderDiseaseCard(item)
             </div>
 
         </div>
+
+        <div class="row mt-3">
+
+            <div class="col-12">
+
+                ${renderConfidence(item)}
+
+            </div>
+
+        </div>
+
+        <div class="row mt-3">
+
+            <div class="col-12">
+
+                ${renderSeverity(item)}
+
+            </div>
+
+        </div>
+
+        ${renderSection(
+            "Overview",
+            renderOverview(item)
+        )}
 
         <div class="mt-3">
 
@@ -814,13 +847,43 @@ function renderDiseaseCard(item)
         </div>
         <div class="text-end mt-4">
 
-            <a
-                href="/disease/${item.disease.slug}"
-                class="btn btn-primary btn-sm px-4">
+            <div class="border-top mt-4 pt-3">
 
-                Learn More →
+                <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
 
-            </a>
+                    <div class="d-flex gap-2">
+
+                        <button
+                            class="btn btn-outline-secondary btn-sm" aria-label="Save disease"
+                            disabled>
+
+                            ♡ Save
+
+                        </button>
+
+                        <button
+                            class="btn btn-outline-primary btn-sm compare-btn"
+                            data-id="${item.disease.id}">
+
+                            ⇄ Compare
+
+                        </button>
+
+                    </div>
+
+                    <a
+                        href="/disease/${item.disease.slug}"
+                        class="btn btn-primary" aria-label="View disease details">
+
+                        View Details
+
+                    </a>
+
+                </div>
+
+            </div>
+
+            
 
         </div>
 
@@ -902,7 +965,7 @@ function renderProgress(title, value, color)
             <div class="progress rounded-pill" style="height:10px;">
 
                 <div
-                    class="progress-bar bg-${color} rounded-pill"
+                    class="progress-bar bg-${color} rounded-pill" role="progressbar"
 
                     style="width:${value}%">
 
@@ -956,39 +1019,6 @@ function getMatchBadge(level)
     }
 }
 
-function renderExplanation(item)
-{
-    let html = "";
-
-    item.matchedSymptoms.forEach(symptom => {
-
-        html += `
-            <div class="small text-success mb-1">
-
-                ✓ ${symptom.symptom_en} matched
-
-            </div>
-        `;
-
-    });
-
-    item.missingSymptoms
-        .slice(0,2)
-        .forEach(symptom => {
-
-            html += `
-                <div class="small text-muted">
-
-                    • ${symptom.symptom_en} is commonly associated
-
-                </div>
-            `;
-
-        });
-
-    return html;
-}
-
 function showLoading()
 {
     document
@@ -1032,6 +1062,367 @@ function showEmptyState(title, message)
     document
         .getElementById("emptyState")
         .classList.remove("d-none");
+}
+
+/******************************************************************
+ * UI Render Helpers
+ ******************************************************************/
+function renderExplanation(item)
+{
+    let html = "";
+
+    item.matchedSymptoms.forEach(symptom => {
+
+        html += `
+            <div class="small text-success mb-1">
+
+                ✓ ${symptom.symptom_en} matched
+
+            </div>
+        `;
+
+    });
+
+    item.missingSymptoms
+        .slice(0,2)
+        .forEach(symptom => {
+
+            html += `
+                <div class="small text-muted">
+
+                    • ${symptom.symptom_en} is commonly associated
+
+                </div>
+            `;
+
+        });
+
+    return html;
+}
+
+function renderOverview(item)
+{
+    if (!item.disease.overview) {
+
+        return `
+            <p class="text-muted mb-0">
+                Overview not available.
+            </p>
+        `;
+    }
+
+    let text = item.disease.overview.trim();
+
+    if (text.length > 220) {
+
+        text = text.substring(0, 220).trim() + "...";
+    }
+
+    return `
+        <p class="mb-2">
+            ${text}
+        </p>
+
+        <a
+            href="/disease/${item.disease.slug}"
+            class="btn btn-outline-primary btn-sm">
+
+            Read More
+
+        </a>
+    `;
+}
+
+document.addEventListener("click", function(event){
+
+    const button = event.target.closest(".compare-btn");
+
+    if(!button){
+        return;
+    }
+
+    alert(
+        "Disease comparison will be available in the next release."
+    );
+
+});
+
+function getScoreClass(score)
+{
+    if (score >= 90) return "text-success";
+    if (score >= 75) return "text-primary";
+    if (score >= 50) return "text-warning";
+    return "text-secondary";
+}
+
+function getConfidence(score)
+{
+    if (score >= 90)
+    {
+        return {
+            level: "very-high",
+            label: "Very High Match",
+            color: "success",
+            stars: 5,
+            icon: "bi bi-patch-check-fill"
+        };
+    }
+
+    if (score >= 75)
+    {
+        return {
+            level: "high",
+            label: "High Match",
+            color: "primary",
+            stars: 4,
+            icon: "bi bi-check-circle-fill"
+        };
+    }
+
+    if (score >= 60)
+    {
+        return {
+            level: "moderate",
+            label: "Moderate Match",
+            color: "info",
+            stars: 3,
+            icon: "bi bi-info-circle-fill"
+        };
+    }
+
+    if (score >= 40)
+    {
+        return {
+            level: "low",
+            label: "Low Match",
+            color: "warning",
+            stars: 2,
+            icon: "bi bi-exclamation-circle-fill"
+        };
+    }
+
+    return {
+        level: "weak",
+        label: "Weak Match",
+        color: "secondary",
+        stars: 1,
+        icon: "bi bi-dash-circle-fill"
+    };
+}
+
+function renderStars(count, color = "warning")
+{
+    let html = "";
+
+    for (let i = 1; i <= 5; i++)
+    {
+        html += i <= count
+            ? `<i class="bi bi-star-fill text-${color}"></i>`
+            : `<i class="bi bi-star text-muted"></i>`;
+    }
+
+    return html;
+}
+
+function renderConfidence(item)
+{
+    const score = item.rankingScore;
+
+    const confidence = getConfidence(score);
+
+    return `
+        <div class="confidence-box">
+
+            <div class="d-flex align-items-start">
+
+                <i class="${confidence.icon} text-${confidence.color} fs-2 me-3"></i>
+
+                <div class="flex-grow-1">
+
+                    <h6 class="mb-1">
+                        Clinical Confidence
+                    </h6>
+
+                    <div class="fw-bold text-${confidence.color}">
+                        ${confidence.label}
+                    </div>
+
+                    <div class="mt-1">
+                        ${renderStars(confidence.stars, confidence.color)}
+                    </div>
+
+                </div>
+
+                <div class="text-end">
+
+                    <span class="badge bg-${confidence.color}">
+                        ${Math.round(score)}%
+                    </span>
+
+                </div>
+
+            </div>
+
+            <div class="mt-3">
+
+                <div class="fw-semibold mb-2">
+
+                    Confidence Reason
+
+                </div>
+
+                ${renderConfidenceReason(item)}
+
+            </div>
+
+        </div>
+    `;
+}
+
+function renderConfidenceReason(item)
+{
+    const matched = item.matchedSymptoms.length;
+
+    const missing = item.missingSymptoms.length;
+
+    let html = "";
+
+    html += `
+        <div class="small">
+            <i class="bi bi-check-circle-fill text-success me-1"></i>
+            ${matched} selected symptom${matched !== 1 ? "s" : ""} matched.
+        </div>
+    `;
+
+    html += `
+        <div class="small mt-1">
+            <i class="bi bi-graph-up-arrow text-primary me-1"></i>
+            Disease coverage is ${item.coverage}%.
+        </div>
+    `;
+
+    if (missing === 0)
+    {
+        html += `
+            <div class="small mt-1 text-success">
+                <i class="bi bi-stars me-1"></i>
+                All major symptoms are present.
+            </div>
+        `;
+    }
+    else
+    {
+        html += `
+            <div class="small mt-1 text-muted">
+                <i class="bi bi-info-circle me-1"></i>
+                ${missing} common symptom${missing !== 1 ? "s are" : " is"} not present.
+            </div>
+        `;
+    }
+
+    return html;
+}
+
+function renderSection(title, content)
+{
+    return `
+        <div class="mt-4">
+
+            <h6 class="fw-semibold mb-2">
+
+                ${title}
+
+            </h6>
+
+            ${content}
+
+        </div>
+    `;
+}
+
+function getSeverity(level)
+{
+    switch(level)
+    {
+        case "emergency":
+            return {
+                label: "Emergency",
+                color: "danger",
+                icon: "bi bi-exclamation-triangle-fill"
+            };
+
+        case "urgent":
+            return {
+                label: "Urgent",
+                color: "warning",
+                icon: "bi bi-alarm-fill"
+            };
+
+        case "moderate":
+            return {
+                label: "Moderate",
+                color: "info",
+                icon: "bi bi-info-circle-fill"
+            };
+
+        default:
+            return {
+                label: "Mild",
+                color: "success",
+                icon: "bi bi-heart-fill"
+            };
+    }
+}
+
+function renderSeverity(item)
+{
+    const severity =
+        getSeverity(item.disease.severity_level);
+    const note =
+    item.disease.urgency_note
+    ??
+    "Consult a qualified healthcare professional if symptoms persist or worsen.";
+
+    return `
+
+        <div
+            class="severity-box border-start border-4 border-${severity.color}">
+
+            <div class="d-flex align-items-start">
+
+                <i class="${severity.icon}
+                          fs-2
+                          text-${severity.color}
+                          me-3"></i>
+
+                <div class="flex-grow-1">
+
+                    <h6 class="mb-1">
+
+                        Severity
+
+                    </h6>
+
+                    <div
+                        class="fw-bold text-${severity.color}">
+
+                        ${severity.label}
+
+                    </div>
+
+                    <p class="small text-muted mt-2 mb-0">
+
+                        ${note}
+
+                    </p>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    `;
 }
 /******************************************************************
  * End of File

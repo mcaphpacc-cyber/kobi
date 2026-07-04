@@ -275,3 +275,88 @@
     }
 
 }
+
+.disease-card{
+    border:0;
+    border-radius:14px;
+    transition:.2s;
+}
+
+.disease-card:hover{
+    transform:translateY(-2px);
+    box-shadow:0 .5rem 1rem rgba(0,0,0,.12);
+}
+
+.disease-card h4{
+    font-weight:700;
+}
+
+.disease-card .badge{
+    font-size:.8rem;
+}
+
+.disease-card .progress{
+    height:8px;
+}
+
+.disease-card .card-body{
+    padding:1.5rem;
+}
+
+.disease-card .overview-box{
+    background:#f8f9fa;
+    border:1px solid #e9ecef;
+    border-radius:.75rem;
+    padding:1rem;
+}
+
+.disease-card .overview-box p{
+    margin-bottom:.75rem;
+    line-height:1.6;
+}
+
+.confidence-box{
+
+    background:#f8f9fa;
+
+    border-left:5px solid var(--bs-success);
+
+    padding:1rem;
+
+    border-radius:.5rem;
+}
+
+.confidence-box{
+    background:#f8f9fa;
+    border-radius:12px;
+    padding:1rem;
+    transition:all .2s ease;
+}
+
+.confidence-box:hover{
+    box-shadow:0 .25rem .75rem rgba(0,0,0,.08);
+}
+
+.confidence-box h6{
+    margin-bottom:.25rem;
+}
+
+.disease-card .badge{
+
+    font-size:.78rem;
+
+    font-weight:600;
+
+    padding:.45rem .7rem;
+}
+
+.severity-box{
+
+    background:#fff;
+
+    border-radius:12px;
+
+    padding:1rem;
+
+    margin-top:1rem;
+}

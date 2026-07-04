@@ -194,7 +194,9 @@ class DiseaseRepository extends BaseRepository
         SELECT DISTINCT
             d.id,
             d.disease_en,
-            d.slug
+            d.slug,
+            d.severity_level,
+            d.urgency_note
         FROM diseases d
         INNER JOIN disease_symptoms ds
             ON ds.disease_id = d.id
