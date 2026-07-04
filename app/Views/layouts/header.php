@@ -35,6 +35,10 @@ href="<?= asset('css/components.css') ?>">
 rel="stylesheet"
 href="<?= asset('css/app.css') ?>">
 
+<link
+rel="stylesheet"
+href="<?= asset('css/symptom-checker.css') ?>">
+
 </head>
 
 <body>

@@ -801,15 +801,7 @@ function renderDiseaseCard(item, rank)
 
         </div>
 
-        <div class="row mt-3">
-
-            <div class="col-12">
-
-                ${renderConfidence(item)}
-
-            </div>
-
-        </div>
+        ${renderConfidence(item)}
 
         <div class="row mt-3">
 
@@ -822,9 +814,17 @@ function renderDiseaseCard(item, rank)
         </div>
 
         ${renderSection(
+            "Key Facts",
+            renderQuickFacts(item)
+        )}
+
+
+        ${renderSection(
             "Overview",
             renderOverview(item)
         )}
+
+        
 
         <div class="mt-3">
 
@@ -1102,34 +1102,47 @@ function renderExplanation(item)
 
 function renderOverview(item)
 {
-    if (!item.disease.overview) {
+    const overview =
+        item.disease.overview_en ??
+        item.disease.overview ??
+        "";
 
-        return `
-            <p class="text-muted mb-0">
-                Overview not available.
-            </p>
-        `;
-    }
-
-    let text = item.disease.overview.trim();
-
-    if (text.length > 220) {
-
-        text = text.substring(0, 220).trim() + "...";
-    }
+    const preview =
+        previewOverview(overview);
 
     return `
-        <p class="mb-2">
-            ${text}
-        </p>
 
-        <a
-            href="/disease/${item.disease.slug}"
-            class="btn btn-outline-primary btn-sm">
+        <div class="overview-box">
 
-            Read More
+            <p class="mb-2">
 
-        </a>
+                ${preview}
+
+            </p>
+
+            ${
+                overview &&
+                overview.length > preview.length
+                ?
+
+                `
+                    <a
+                        href="/disease/${item.disease.slug}"
+                        class="small fw-semibold text-primary text-decoration-none">
+
+                        Read More →
+
+                    </a>
+                `
+
+                :
+
+                ""
+
+            }
+
+        </div>
+
     `;
 }
 
@@ -1231,52 +1244,80 @@ function renderConfidence(item)
     const confidence = getConfidence(score);
 
     return `
-        <div class="confidence-box">
+
+<div class="row mt-4">
+
+    <div class="col-lg-6 mb-3">
+
+        <div class="confidence-box h-100">
 
             <div class="d-flex align-items-start">
 
-                <i class="${confidence.icon} text-${confidence.color} fs-2 me-3"></i>
+                <i class="${confidence.icon}
+                          text-${confidence.color}
+                          fs-2
+                          me-3"></i>
 
                 <div class="flex-grow-1">
 
                     <h6 class="mb-1">
+
                         Clinical Confidence
+
                     </h6>
 
                     <div class="fw-bold text-${confidence.color}">
+
                         ${confidence.label}
+
                     </div>
 
-                    <div class="mt-1">
-                        ${renderStars(confidence.stars, confidence.color)}
+                    <div class="mt-2">
+
+                        ${renderStars(
+                            confidence.stars,
+                            confidence.color
+                        )}
+
                     </div>
 
                 </div>
 
-                <div class="text-end">
+                <div>
 
                     <span class="badge bg-${confidence.color}">
+
                         ${Math.round(score)}%
+
                     </span>
 
                 </div>
 
             </div>
 
-            <div class="mt-3">
+        </div>
 
-                <div class="fw-semibold mb-2">
+    </div>
 
-                    Confidence Reason
+    <div class="col-lg-6 mb-3">
 
-                </div>
+        <div class="confidence-box h-100">
 
-                ${renderConfidenceReason(item)}
+            <h6 class="mb-3">
 
-            </div>
+                Confidence Reason
+
+            </h6>
+
+            ${renderConfidenceReason(item)}
 
         </div>
-    `;
+
+    </div>
+
+</div>
+
+`;
 }
 
 function renderConfidenceReason(item)
@@ -1323,12 +1364,14 @@ function renderConfidenceReason(item)
     return html;
 }
 
-function renderSection(title, content)
+function renderSection(title, content, icon = "")
 {
     return `
         <div class="mt-4">
 
-            <h6 class="fw-semibold mb-2">
+            <h6 class="fw-semibold mb-3">
+
+                ${icon ? `<i class="bi ${icon} me-2"></i>` : ""}
 
                 ${title}
 
@@ -1423,6 +1466,149 @@ function renderSeverity(item)
         </div>
 
     `;
+}
+
+function renderQuickFact(fact)
+{
+    return `
+
+        <div class="col-md-6 mb-3">
+
+            <div class="quick-fact-card h-100">
+
+                <div class="d-flex">
+
+                    <i class="bi ${fact.icon} fs-4 me-3"></i>
+
+                    <div>
+
+                        <div class="fw-semibold">
+
+                            ${fact.title}
+
+                        </div>
+
+                        <div class="small text-muted">
+
+                            ${previewText(fact.value)}
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    `;
+}
+
+function renderQuickFacts(item)
+{
+
+    let html = `
+        <div class="row mt-3">
+    `;
+
+    const facts = getQuickFacts(item);
+
+        if (facts.length === 0)
+        {
+            return "";
+        }
+
+        facts.forEach(fact => {
+
+            html += renderQuickFact(fact);
+
+        });
+
+    html += "</div>";
+
+    return html;
+}
+
+function previewText(text, limit = 70)
+{
+     if(!text)
+    {
+        return "Information coming soon";
+    }
+
+    text = text.replace(/\s+/g, " ").trim();
+
+    if (text.length <= limit)
+    {
+        return text;
+    }
+
+    return text.substring(0, limit).trim() + "...";
+}
+
+function getQuickFacts(item)
+{
+    const disease = item.disease;
+
+    return [
+
+        {
+            title: "Cause",
+            icon: "bi-bug",
+            value: disease.causes_en
+        },
+
+        {
+            title: "Risk Factors",
+            icon: "bi-exclamation-triangle",
+            value: disease.risk_factors_en
+        },
+
+        {
+            title: "Diagnosis",
+            icon: "bi-heart-pulse",
+            value: disease.diagnosis_en
+        },
+
+        {
+            title: "Prevention",
+            icon: "bi-shield-check",
+            value: disease.prevention_en
+        }
+
+    ].filter(fact => fact.value);
+}
+
+function previewOverview(text, limit = 220)
+{
+    if (!text)
+    {
+        return "Detailed overview will be available soon.";
+    }
+
+    text = text.replace(/\s+/g, " ").trim();
+
+    if (text.length <= limit)
+    {
+        return text;
+    }
+
+    let sentenceEnd = text.lastIndexOf(".", limit);
+
+    if (sentenceEnd > 100)
+    {
+        return text.substring(0, sentenceEnd + 1);
+    }
+
+    let space = text.lastIndexOf(" ", limit);
+
+    if (space > 100)
+    {
+        return text.substring(0, space) + "...";
+    }
+
+    return text.substring(0, limit) + "...";
 }
 /******************************************************************
  * End of File

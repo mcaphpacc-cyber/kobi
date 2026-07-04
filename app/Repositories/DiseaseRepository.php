@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 namespace App\Repositories;
+use App\Services\Disease\QuickFactsBuilder;
 
 class DiseaseRepository extends BaseRepository
 {
@@ -196,10 +197,17 @@ class DiseaseRepository extends BaseRepository
             d.disease_en,
             d.slug,
             d.severity_level,
-            d.urgency_note
+            d.urgency_note,
+            dc.risk_factors_en,
+            dc.causes_en,
+            dc.diagnosis_en,
+            dc.prevention_en,
+            dc.overview_en
         FROM diseases d
         INNER JOIN disease_symptoms ds
             ON ds.disease_id = d.id
+        INNER JOIN disease_content dc
+            ON dc.disease_id = d.id
         WHERE ds.symptom_id IN ($placeholders)
         ORDER BY d.disease_en
     ";
@@ -229,6 +237,9 @@ class DiseaseRepository extends BaseRepository
             $symptomMap[$disease['id']] ?? [];
 
     }
+
+    $disease['quickFacts'] =
+    QuickFactsBuilder::build($disease);
 
     return $diseases;
 }

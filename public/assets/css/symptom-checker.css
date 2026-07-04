@@ -154,10 +154,10 @@
 
 }
 
-.progress-bar {
+.progress-bar{
 
-    transition: width .6s ease;
-
+    transition:
+        width .8s ease-in-out;
 }
 
 /* ==========================================================
@@ -327,6 +327,7 @@
 }
 
 .confidence-box{
+    height:100%;
     background:#f8f9fa;
     border-radius:12px;
     padding:1rem;
@@ -359,4 +360,98 @@
     padding:1rem;
 
     margin-top:1rem;
+}
+.quick-fact-card{
+
+    border:1px solid #dee2e6;
+
+    border-radius:12px;
+
+    padding:1rem;
+
+    background:#f8f9fa;
+
+    transition:.2s;
+}
+
+.quick-fact-card:hover{
+
+    box-shadow:0 .25rem .75rem rgba(0,0,0,.08);
+
+    transform:translateY(-2px);
+}
+
+.quick-fact-card i{
+
+    width:32px;
+
+    font-size:1.4rem;
+
+    margin-top:2px;
+}
+
+.quick-fact-card:hover{
+
+    border-color:var(--bs-primary);
+
+    transform:translateY(-3px);
+
+    transition:.2s;
+}
+
+.quick-fact-card{
+
+    height:100%;
+
+    display:flex;
+
+    align-items:flex-start;
+}
+
+.overview-box p{
+
+    line-height:1.7;
+
+    color:#495057;
+
+}
+
+.overview-box{
+
+    position:relative;
+
+    overflow:hidden;
+
+}
+
+.quick-fact-card{
+
+    min-height:120px;
+
+    display:flex;
+
+    align-items:flex-start;
+
+    transition:.2s;
+}
+
+.quick-fact-card:hover{
+
+    border-color:var(--bs-primary);
+
+    box-shadow:0 .25rem .75rem rgba(13,110,253,.08);
+}
+
+.disease-header-badges{
+
+    display:flex;
+
+    flex-wrap:wrap;
+
+    gap:.5rem;
+}
+
+.disease-card .btn{
+
+    border-radius:8px;
 }
