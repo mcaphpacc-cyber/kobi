@@ -1,0 +1,55 @@
+html{
+    scroll-behavior:smooth;
+}
+
+section{
+    scroll-margin-top:80px;
+}
+
+.card-header{
+    background:#f8f9fa;
+}
+
+.card{
+    border-radius:12px;
+}
+
+.card-header h5{
+    font-weight:600;
+}
+
+.knowledge-content{
+
+    line-height:1.8;
+
+    color:#495057;
+}
+.card .fs-3{
+
+    font-weight:700;
+
+}
+
+.card i{
+
+    opacity:.9;
+
+}
+
+.disease-hero{
+
+    border-left:5px solid var(--bs-primary);
+
+}
+
+.disease-hero h1{
+
+    font-weight:700;
+
+}
+
+.disease-hero .badge{
+
+    font-size:.85rem;
+
+}

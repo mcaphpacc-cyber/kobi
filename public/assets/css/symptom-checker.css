@@ -455,3 +455,23 @@
 
     border-radius:8px;
 }
+
+.badge{
+    display: inline-flex;
+}
+
+.text-blue{
+    color: blue;
+}
+
+.text-red{
+    color: red;
+}
+
+.text-yellow{
+    color: #e8e806;
+}
+
+.text-green{
+    color: green;
+}

@@ -16,11 +16,11 @@
     content="<?= e($description ?? 'Medical Knowledge Platform') ?>">
 
 <link
-href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css"
+href="<?= asset('css/bootstrap.min.css') ?>"
 rel="stylesheet">
 
 <link
-href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.css"
+href="<?= asset('css/bootstrap-icons.css') ?>"
 rel="stylesheet">
 
 <link
@@ -38,6 +38,10 @@ href="<?= asset('css/app.css') ?>">
 <link
 rel="stylesheet"
 href="<?= asset('css/symptom-checker.css') ?>">
+
+<link
+    rel="stylesheet"
+    href="<?= asset('css/disease.css'); ?>">
 
 </head>
 

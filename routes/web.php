@@ -42,3 +42,8 @@ $this->router()->get(
     SymptomCheckerController::class,
     'match'
 );
+
+$this->router->get(
+    '/disease/{slug}',
+    DiseaseController::class, 'show'
+);

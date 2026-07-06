@@ -11,4 +11,19 @@
 <?php require __DIR__.'/footer.php'; ?>
 
 <script src="<?= asset('js/app.js') ?>"></script>
-<script src="<?= asset('js/symptom-checker.js') ?>"></script>
+<script>
+
+window.KOBI = {
+
+    baseUrl: "<?= url(); ?>",
+
+    apiBase: "<?= url('api'); ?>",
+
+    locale: "<?= config('locale'); ?>"
+
+};
+
+</script>
+<?php if (str_contains($_SERVER['REQUEST_URI'], "symptom-checker")) {?>
+    <script src="<?= asset('js/symptom-checker.js') ?>"></script>
+<?php }?>

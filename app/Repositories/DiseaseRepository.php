@@ -79,6 +79,124 @@ class DiseaseRepository extends BaseRepository
         ]);
     }
 
+    private function getCausesForDisease(
+        int $diseaseId
+    ): array
+    {
+        $sql = "
+
+            SELECT
+
+                c.id,
+
+                c.cause_en,
+
+                c.cause_hi
+
+            FROM disease_causes dc
+
+            INNER JOIN causes c
+
+                ON c.id = dc.cause_id
+
+            WHERE dc.disease_id = :id
+
+            ORDER BY c.cause_en
+
+        ";
+
+        return $this->fetchAll($sql, [
+
+            'id' => $diseaseId
+
+        ]);
+    }
+
+    private function getTreatmentsForDisease(
+        int $diseaseId
+    ): array
+    {
+        return [];
+    }
+
+    private function getFaqsForDisease(
+        int $diseaseId
+    ): array
+    {
+        return [];
+    }
+
+    public function findKnowledgeBySlug(
+        string $slug,
+        string $language = 'en'
+    ): ?array
+    {
+        $sql = "
+            SELECT
+
+                d.*,
+
+                dc.*
+
+            FROM diseases d
+
+            LEFT JOIN disease_content dc
+
+                ON dc.disease_id = d.id
+
+            WHERE d.slug = :slug
+
+            LIMIT 1
+        ";
+
+        $disease = $this->fetch($sql, [
+
+            'slug' => $slug
+
+        ]);
+
+        if (!$disease) {
+            return null;
+        }
+
+        $id = (int) $disease['id'];
+
+        $content = [
+
+            'overview_en'      => $disease['overview_en'] ?? '',
+            'overview_hi'      => $disease['overview_hi'] ?? '',
+
+            'causes_en'        => $disease['causes_en'] ?? '',
+            'causes_hi'        => $disease['causes_hi'] ?? '',
+
+            'risk_factors_en'  => $disease['risk_factors_en'] ?? '',
+            'risk_factors_hi'  => $disease['risk_factors_hi'] ?? '',
+
+            'diagnosis_en'     => $disease['diagnosis_en'] ?? '',
+            'diagnosis_hi'     => $disease['diagnosis_hi'] ?? '',
+
+            'prevention_en'    => $disease['prevention_en'] ?? '',
+            'prevention_hi'    => $disease['prevention_hi'] ?? ''
+
+        ];
+
+        return [
+
+            'disease' => $disease,
+
+            'content' => $content,
+
+            'symptoms' => $this->getSymptomsForDisease($id),
+
+            'causes' => $this->getCausesForDisease($id),
+
+            'treatments' => $this->getTreatmentsForDisease($id),
+
+            'faqs' => $this->getFaqsForDisease($id)
+
+        ];
+    }
+
     /**
      * Search diseases.
      */
@@ -170,9 +288,37 @@ class DiseaseRepository extends BaseRepository
         );
     }
 
-    public function getSymptomsForDisease(int $diseaseId): array
+    public function getSymptomsForDisease(
+        int $diseaseId
+    ): array
     {
-        return [];
+        $sql = "
+
+            SELECT
+
+                s.id,
+
+                s.symptom_en,
+
+                s.symptom_hi
+
+            FROM disease_symptoms ds
+
+            INNER JOIN symptoms s
+
+                ON s.id = ds.symptom_id
+
+            WHERE ds.disease_id = :id
+
+            ORDER BY s.symptom_en
+
+        ";
+
+        return $this->fetchAll($sql, [
+
+            'id' => $diseaseId,
+
+        ]);
     }
 
     public function findFeatured(): array

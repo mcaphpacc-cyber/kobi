@@ -82,6 +82,8 @@ function init()
     bindOutsideClick();
 
     renderSelected();
+
+    restoreSearchState();
 }
 
 /******************************************************************
@@ -488,7 +490,7 @@ function updateResultsSummary(results)
 
     document.getElementById(
         "summarySelected"
-    ).textContent = selectedSymptoms.length;
+    ).textContent = state.selectedSymptoms.length;
 
     document.getElementById(
         "summaryMatches"
@@ -670,7 +672,7 @@ function renderDiseaseCard(item, rank)
     const severity = getSeverity(item.disease.severity_level);
 
     const matched = item.matchedSymptoms.map(symptom => `
-        <div class="small mb-1 text-success">
+        <div class="small mb-1 text-success mx-1">
             ✓ ${symptom.symptom_en}
         </div>
         `).join("");
@@ -686,7 +688,7 @@ function renderDiseaseCard(item, rank)
             missing = item.missingSymptoms
                 .slice(0,3)
                 .map(symptom => `
-                    <div class="small text-muted">
+                    <div class="small text-muted mx-1">
                         ○ ${symptom.symptom_en}
                     </div>
                 `)
@@ -750,8 +752,11 @@ function renderDiseaseCard(item, rank)
                 </h6>
 
                 <div class="mt-2">
+                    <span class="badge bg-light text-dark border">
 
-                    ${matched}
+                        ${matched}
+
+                    </span>
 
                 </div>
 
@@ -872,7 +877,7 @@ function renderDiseaseCard(item, rank)
                     </div>
 
                     <a
-                        href="/disease/${item.disease.slug}"
+                        href="javascript:void(0)" onclick="openDetailPage('${item.disease.slug}')"
                         class="btn btn-primary" aria-label="View disease details">
 
                         View Details
@@ -1127,7 +1132,7 @@ function renderOverview(item)
 
                 `
                     <a
-                        href="/disease/${item.disease.slug}"
+                        href="${window.KOBI.baseUrl}/disease/${item.disease.slug}"
                         class="small fw-semibold text-primary text-decoration-none">
 
                         Read More →
@@ -1450,14 +1455,8 @@ function renderSeverity(item)
                         class="fw-bold text-${severity.color}">
 
                         ${severity.label}
-
+                        <span class="small text-muted mt-2 mb-0">${note}</span>
                     </div>
-
-                    <p class="small text-muted mt-2 mb-0">
-
-                        ${note}
-
-                    </p>
 
                 </div>
 
@@ -1478,7 +1477,7 @@ function renderQuickFact(fact)
 
                 <div class="d-flex">
 
-                    <i class="bi ${fact.icon} fs-4 me-3"></i>
+                    <i class="bi ${fact.icon} text-${fact.color} fs-4 me-3"></i>
 
                     <div>
 
@@ -1556,24 +1555,28 @@ function getQuickFacts(item)
         {
             title: "Cause",
             icon: "bi-bug",
+            color: "blue",
             value: disease.causes_en
         },
 
         {
             title: "Risk Factors",
             icon: "bi-exclamation-triangle",
+            color: "yellow",
             value: disease.risk_factors_en
         },
 
         {
             title: "Diagnosis",
             icon: "bi-heart-pulse",
+            color: "red",
             value: disease.diagnosis_en
         },
 
         {
             title: "Prevention",
             icon: "bi-shield-check",
+            color: "green",
             value: disease.prevention_en
         }
 
@@ -1609,6 +1612,56 @@ function previewOverview(text, limit = 220)
     }
 
     return text.substring(0, limit) + "...";
+}
+
+function saveSearchState()
+{
+    sessionStorage.setItem(
+        "kobi.symptomSearch",
+        JSON.stringify({
+
+            selectedSymptoms: state.selectedSymptoms,
+
+            results: state.results,
+
+            timestamp: Date.now()
+
+        })
+    );
+}
+function openDetailPage(slug){
+    saveSearchState();
+
+    window.location = `${window.KOBI.baseUrl}disease/${slug}`;
+}
+
+function restoreSearchState()
+{
+    const saved =
+        sessionStorage.getItem(
+            "kobi.symptomSearch"
+        );
+
+    if (!saved)
+    {
+        return;
+    }
+
+    const stateData =
+        JSON.parse(saved);
+
+    state.selectedSymptoms =
+    stateData.selectedSymptoms ?? [];
+
+    state.results =
+        stateData.results ?? null;
+
+    renderSelected();
+
+    if (state.results)
+    {
+        renderMatches();
+    }
 }
 /******************************************************************
  * End of File
