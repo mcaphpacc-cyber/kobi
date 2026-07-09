@@ -42,58 +42,88 @@
 
                 <div class="card-body">
 
-                    <h3 class="mb-3">
+                    <h2 class="h3 mb-3">
+
                         Search Symptoms
-                    </h3>
 
-                    <input
-                        id="symptomSearch"
-                        type="text"
-                        class="form-control"
-                        placeholder="Search symptoms...">
+                    </h2>
 
-                    <!-- Suggestions -->
-                    <div
-                        id="searchResults"
-                        class="list-group mt-2">
+                    <div class="search-wrapper">
+
+                        <div
+                            id="tagInput"
+                            class="tag-input">
+
+                            <div
+                                id="selectedTags"
+                                class="tag-list">
+                            </div>
+
+                            <input
+                                id="symptomSearch"
+                                type="text"
+                                autocomplete="off"
+                                placeholder="Search symptoms..."
+                                class="tag-search">
+
+                        </div>
+                        <div class="search-area">
+                            <div
+                                id="searchResults"
+                                class="search-results">
+                            </div>
+                        </div>
+
                     </div>
+                    <div
+                        id="recentSearches"
+                        class="mt-3 d-none">
+
+                    </div>
+
+                <div
+                    class="d-flex justify-content-between align-items-center mt-3">
+
+                    <small
+                        id="selectedCounter"
+                        class="text-muted">
+
+                        0 symptoms selected
+
+                    </small>
+
+                    <button
+
+                        id="clearSymptoms"
+
+                        class="btn btn-sm btn-outline-danger d-none">
+
+                        <i class="bi bi-trash"></i>
+
+                        Clear All
+
+                    </button>
+
+                </div>
+                <div class="mt-3">
+
+                    <button
+                        id="findConditions"
+                        class="btn btn-primary w-100">
+
+                        <i class="bi bi-search me-2"></i>
+
+                        Find Possible Conditions
+
+                    </button>
+
+                </div>
 
                 </div>
 
             </div>
 
-            <!-- Popular Symptoms -->
-            <div class="card shadow-sm mb-4">
-
-                <div class="card-body">
-
-                    <h3 class="mb-3">
-                        Popular Symptoms
-                    </h3>
-
-                    <div
-                        id="popularSymptoms"
-                        class="d-flex flex-wrap gap-2">
-
-                        <?php foreach ($popularSymptoms as $symptom): ?>
-
-                            <button
-                                type="button"
-                                class="btn btn-outline-primary symptom-chip"
-                                data-id="<?= $symptom['id'] ?>"
-                                data-name="<?= htmlspecialchars($symptom['symptom_en']) ?>">
-
-                                <?= htmlspecialchars($symptom['symptom_en']) ?>
-
-                            </button>
-
-                        <?php endforeach; ?>
-
-                    </div>
-
-                </div>
-
-            </div>
+            
             <div
                 id="loadingState"
                 class="alert alert-primary d-none text-center my-4">
@@ -195,82 +225,64 @@
         </div>
 
         <!-- RIGHT COLUMN -->
-        <div class="col-lg-4">
+        <!-- Popular Symptoms -->
+         <div class="col-lg-4">
+            <div class="card shadow-sm mb-4">
 
-            <div class="sticky-top" style="top:20px;">
+                <div class="card-body">
 
-                <!-- Selected Symptoms -->
-                <div class="card shadow-sm mb-3">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
 
-                    <div class="card-body">
+                        <h3 class="h3 mb-0">
 
-                        <h3 class="mb-3">
-                            Selected Symptoms
+                            🔥 Popular Symptoms
+
                         </h3>
 
-                        <div id="selectedSymptoms"></div>
+                        <span
+                            class="badge bg-primary"
+                            id="popularCount">
 
-                        <hr>
+                            <?= 'Top ' . count($popularSymptoms) ?>
 
-                        <div class="d-flex justify-content-between">
+                        </span>
 
-                            <strong>Selected</strong>
+                    </div>
 
-                            <span
-                                id="symptomCounter"
-                                class="badge bg-primary">
+                    <?php if (!empty($popularSymptoms)): ?>
 
-                                0
+                        <div class="d-flex flex-wrap gap-2">
 
-                            </span>
+                            <?php foreach ($popularSymptoms as $symptom): ?>
+
+                                <button
+                                    type="button"
+                                    class="btn btn-outline-primary popular-symptom"
+                                    data-id="<?= $symptom['id'] ?>"
+                                    data-name="<?= htmlspecialchars($symptom['symptom_en']) ?>">
+
+                                    <?= htmlspecialchars($symptom['symptom_en']) ?>
+
+                                </button>
+
+                            <?php endforeach; ?>
 
                         </div>
 
-                        <button
-                            id="findConditions"
-                            class="btn btn-primary w-100 mt-3"
-                            disabled>
+                    <?php else: ?>
 
-                            Find Possible Conditions
+                        <div class="text-muted">
 
-                        </button>
+                            No popular symptoms available.
 
-                    </div>
+                        </div>
 
-                </div>
-
-                <!-- Tips -->
-                <div class="card shadow-sm mb-3">
-
-                    <div class="card-body">
-
-                        <h5>
-
-                            Tip
-
-                        </h5>
-
-                        <p class="text-muted mb-0">
-
-                            Add more symptoms to improve educational matching.
-
-                        </p>
-
-                    </div>
-
-                </div>
-
-                <!-- Future Emergency Placeholder -->
-                <div
-                    id="emergencyWarning"
-                    class="alert alert-danger d-none">
+                    <?php endif; ?>
 
                 </div>
 
             </div>
-
         </div>
-
     </div>
 
 </div>

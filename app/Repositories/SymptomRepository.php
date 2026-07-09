@@ -19,8 +19,8 @@ class SymptomRepository extends BaseRepository
                 symptom_hi,
                 slug
             FROM symptoms
-            WHERE is_popular = 1
-            ORDER BY display_order, symptom_en
+            ORDER BY search_count DESC
+            LIMIT 20
         ";
 
         return $this->fetchAll($sql);
@@ -54,5 +54,27 @@ class SymptomRepository extends BaseRepository
     public function findBySlug(string $slug): ?array
     {
         return null;
+    }
+
+    public function incrementSearchCount(
+        array $ids
+    ): void
+    {
+        if (empty($ids)) {
+            return;
+        }
+
+        $placeholders = implode(
+            ',',
+            array_fill(0, count($ids), '?')
+        );
+
+        $sql = "
+            UPDATE symptoms
+            SET search_count = search_count + 1
+            WHERE id IN ($placeholders)
+        ";
+
+        $this->execute($sql, $ids);
     }
 }

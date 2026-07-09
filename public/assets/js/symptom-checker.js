@@ -35,7 +35,11 @@ const state = {
 
     timer: null,
 
-    results: null
+    results: null,
+
+    highlightedIndex: -1,
+
+    currentSuggestions: []
 
 };
 
@@ -45,8 +49,10 @@ const state = {
 
 const dom = {
 
-    selectedContainer:
-        document.getElementById("selectedSymptoms"),
+    tagList:
+    document.getElementById("selectedTags"),
+
+    //selectedContainer: document.getElementById("selectedSymptoms"),
 
     counter:
         document.getElementById("symptomCounter"),
@@ -61,7 +67,17 @@ const dom = {
         document.getElementById("matchResults"),
 
     button:
-        document.getElementById("findConditions")
+        document.getElementById("findConditions"),
+    
+    selectedCounter:
+        document.getElementById(
+            "selectedCounter"
+        ),
+
+    clearButton:
+        document.getElementById(
+            "clearSymptoms"
+        )
 
 };
 
@@ -75,15 +91,32 @@ function init()
 {
     bindSearch();
 
-    bindPopularSymptoms();
-
     bindButton();
 
     bindOutsideClick();
 
     renderSelected();
 
+    renderRecentSearches();
+
     restoreSearchState();
+
+    bindPopularSymptoms();
+
+    bindKeyboard();
+
+    document
+    .getElementById("tagInput")
+    ?.addEventListener("click", () => {
+
+        dom.searchBox.focus();
+
+    });
+
+    dom.clearButton.addEventListener(
+        "click",
+        clearSymptoms
+    );
 }
 
 /******************************************************************
@@ -94,7 +127,7 @@ function bindSearch()
 {
     dom.searchBox.addEventListener(
         "keyup",
-        onSearchKeyUp
+        (e) => onSearchKeyUp(e)
     );
 }
 
@@ -119,8 +152,49 @@ function bindPopularSymptoms()
         });
 }
 
+function bindRecentSearches()
+{
+    document
+        .querySelectorAll(".recent-search")
+        .forEach(button => {
+
+            button.addEventListener("click", () => {
+
+                addSymptom(
+                    Number(button.dataset.id),
+                    button.dataset.name
+                );
+
+            });
+
+        });
+
+    const clear =
+        document.getElementById(
+            "clearRecentSearches"
+        );
+
+    if (clear)
+    {
+        clear.addEventListener("click", () => {
+
+            localStorage.removeItem(
+                "kobi.recentSymptoms"
+            );
+
+            renderRecentSearches();
+
+        });
+    }
+}
+
 function bindButton()
 {
+    if (!dom.button)
+    {
+        return;
+    }
+
     dom.button.addEventListener(
         "click",
         loadMatches
@@ -138,6 +212,7 @@ function bindOutsideClick()
         ) {
 
             dom.searchResults.innerHTML = "";
+            dom.searchResults.classList.add("d-none");
 
         }
 
@@ -148,12 +223,33 @@ function bindOutsideClick()
  * Search
  ******************************************************************/
 
-function onSearchKeyUp()
+function onSearchKeyUp(e)
 {
+    const ignoredKeys = [
+        "ArrowUp",
+        "ArrowDown",
+        "Enter",
+        "Escape"
+    ];
+
+    if (ignoredKeys.includes(e.key))
+    {
+        return;
+    }
     clearTimeout(state.timer);
 
     const keyword =
         dom.searchBox.value.trim();
+
+    const recent =
+        document.getElementById(
+            "recentSearches"
+        );
+
+    recent.classList.toggle(
+        "d-none",
+        keyword.length > 0
+    );
 
     if (
         keyword.length
@@ -162,6 +258,7 @@ function onSearchKeyUp()
     ) {
 
         dom.searchResults.innerHTML = "";
+        dom.searchResults.classList.add("d-none");
 
         return;
 
@@ -205,20 +302,27 @@ function loadSymptoms(keyword)
 
 function renderSuggestions(items)
 {
+    state.currentSuggestions = items.filter(item => {
+
+        return !state.selectedSymptoms.find(
+            s => s.id == item.id
+        );
+
+    });
+
+    state.highlightedIndex = -1;
     dom.searchResults.innerHTML = "";
+    dom.searchResults.classList.add("d-none");
 
-    if (items.length === 0) {
-
+    if (items.length === 0)
+    {
         dom.searchResults.innerHTML = `
-
-            <div
-                class="list-group-item text-muted">
-
+            <div class="list-group-item text-muted">
                 No symptoms found.
-
             </div>
-
         `;
+
+        dom.searchResults.classList.remove("d-none");
 
         return;
     }
@@ -226,17 +330,11 @@ function renderSuggestions(items)
     items.forEach(item => {
 
         if (
-
             state.selectedSymptoms.find(
-
                 s => s.id == item.id
-
             )
-
         ) {
-
             return;
-
         }
 
         const button =
@@ -247,36 +345,43 @@ function renderSuggestions(items)
         button.className =
             "list-group-item list-group-item-action";
 
-        button.textContent =
-            item.symptom_en;
+        button.innerHTML = `
+            <i class="bi bi-activity me-2 text-primary"></i>
+            ${item.symptom_en}
+        `;
 
         button.addEventListener(
-
             "click",
-
             () => {
 
                 addSymptom(
-
                     item.id,
-
                     item.symptom_en
-
                 );
 
                 dom.searchBox.value = "";
 
                 dom.searchResults.innerHTML = "";
 
+                dom.searchResults.classList.add("d-none");
+
                 dom.searchBox.focus();
 
             }
-
         );
 
         dom.searchResults.appendChild(button);
 
     });
+
+    if (dom.searchResults.children.length > 0)
+    {
+        dom.searchResults.classList.remove("d-none");
+    }
+    else
+    {
+        dom.searchResults.classList.add("d-none");
+    }
 }
 
 /******************************************************************
@@ -307,6 +412,12 @@ function addSymptom(id, name)
 
     });
 
+    saveRecentSearch({
+        id,
+        name
+    });
+
+    dom.searchBox.focus();
     renderSelected();
 }
 
@@ -316,48 +427,27 @@ function addSymptom(id, name)
 
 function renderSelected()
 {
-    if (state.selectedSymptoms.length === 0) {
-
-        dom.selectedContainer.innerHTML = `
-            <p class="text-muted mb-0">
-                No symptoms selected.
-            </p>
-        `;
-
-    } else {
-
-        let html = "";
-
-        state.selectedSymptoms.forEach(symptom => {
-
-            html += `
-                <div class="selected-item">
-
-                    <span>${symptom.name}</span>
-
-                    <span
-                        class="remove-symptom"
-                        data-id="${symptom.id}">
-
-                        ×
-
-                    </span>
-
-                </div>
-            `;
-
-        });
-
-        dom.selectedContainer.innerHTML = html;
-    }
-
-    dom.counter.textContent =
+    const count =
         state.selectedSymptoms.length;
 
-    dom.button.disabled =
-        state.selectedSymptoms.length === 0;
+    if (dom.selectedCounter)
+    {
+        dom.selectedCounter.textContent =
+            `${count} symptom${count === 1 ? "" : "s"} selected`;
+    }
 
-    bindRemoveButtons();
+    dom.clearButton.classList.toggle(
+        "d-none",
+        count === 0
+    );
+
+    if (dom.button)
+    {
+        dom.button.disabled =
+            count === 0;
+    }
+
+    renderTags();
 }
 
 /******************************************************************
@@ -1662,6 +1752,317 @@ function restoreSearchState()
     {
         renderMatches();
     }
+}
+
+function renderTags()
+{
+    if (!dom.tagList)
+    {
+        return;
+    }
+
+    let html = "";
+
+    state.selectedSymptoms.forEach(symptom => {
+
+        html += `
+            <span class="symptom-tag">
+
+                <i class="bi bi-check-circle-fill"></i>
+
+                <span>
+
+                    ${symptom.name}
+
+                </span>
+
+                <button
+                    type="button"
+                    class="remove-tag"
+                    data-id="${symptom.id}">
+
+                    &times;
+
+                </button>
+
+            </span>
+        `;
+
+    });
+
+    dom.tagList.innerHTML = html;
+
+    bindRemoveTagButtons();
+}
+
+function bindRemoveTagButtons()
+{
+    document
+        .querySelectorAll(".remove-tag")
+        .forEach(button => {
+
+            button.addEventListener("click", () => {
+
+                removeSymptom(
+                    Number(button.dataset.id)
+                );
+
+            });
+
+        });
+}
+
+function clearSymptoms()
+{
+    state.selectedSymptoms = [];
+
+    state.results = null;
+
+    renderSelected();
+
+    dom.searchResults.innerHTML = "";
+    dom.searchResults.classList.add("d-none");
+
+    dom.matchResults.innerHTML = "";
+
+    dom.searchBox.focus();
+}
+
+function bindPopularSymptoms()
+{
+    document
+        .querySelectorAll(".popular-symptom")
+        .forEach(button => {
+
+            button.addEventListener("click", () => {
+
+                addSymptom(
+                    Number(button.dataset.id),
+                    button.dataset.name
+                );
+
+                dom.searchBox.focus();
+
+            });
+
+        });
+}
+
+function bindKeyboard()
+{
+    dom.searchBox.addEventListener("keydown", e => {
+
+        if (state.currentSuggestions.length === 0)
+        {
+            return;
+        }
+
+        if (
+            e.key === "Backspace" &&
+            dom.searchBox.value === "" &&
+            state.selectedSymptoms.length > 0
+        )
+        {
+            e.preventDefault();
+
+            state.selectedSymptoms.pop();
+
+            renderSelected();
+
+            return;
+        }
+
+        switch (e.key)
+        {
+            case "ArrowDown":
+
+                e.preventDefault();
+
+                state.highlightedIndex =
+                    Math.min(
+                        state.highlightedIndex + 1,
+                        state.currentSuggestions.length - 1
+                    );
+
+                updateHighlight();
+
+                break;
+
+            case "ArrowUp":
+
+                e.preventDefault();
+
+                state.highlightedIndex =
+                    Math.max(
+                        state.highlightedIndex - 1,
+                        0
+                    );
+
+                updateHighlight();
+
+                break;
+
+            case "Enter":
+
+                if (state.highlightedIndex >= 0)
+                {
+                    e.preventDefault();
+
+                    const symptom =
+                        state.currentSuggestions[
+                            state.highlightedIndex
+                        ];
+
+                    addSymptom(
+                        symptom.id,
+                        symptom.symptom_en
+                    );
+
+                    dom.searchBox.value = "";
+
+                    dom.searchResults.innerHTML = "";
+
+                    dom.searchResults.classList.add("d-none");
+                }
+
+                break;
+
+            case "Escape":
+
+                clearTimeout(state.timer);
+
+                dom.searchResults.innerHTML = "";
+
+                dom.searchResults.classList.add("d-none");
+
+                break;
+        }
+
+    });
+
+}
+
+function updateHighlight()
+{
+    const buttons =
+        dom.searchResults.querySelectorAll(
+            ".list-group-item"
+        );
+
+    buttons.forEach((button, index) => {
+
+        const active =
+            index === state.highlightedIndex;
+
+        button.classList.toggle(
+            "active",
+            active
+        );
+
+        if (active)
+        {
+            button.scrollIntoView({
+                block: "nearest"
+            });
+        }
+
+    });
+}
+
+function saveRecentSearch(symptom)
+{
+    let recent =
+        JSON.parse(
+            localStorage.getItem(
+                "kobi.recentSymptoms"
+            ) || "[]"
+        );
+
+    recent =
+        recent.filter(s => s.id !== symptom.id);
+
+    recent.unshift(symptom);
+
+    recent = recent.slice(0, 5);
+
+    localStorage.setItem(
+        "kobi.recentSymptoms",
+        JSON.stringify(recent)
+    );
+    renderRecentSearches();
+}
+
+function getRecentSearches()
+{
+    return JSON.parse(
+        localStorage.getItem("kobi.recentSymptoms") || "[]"
+    );
+}
+
+function renderRecentSearches()
+{
+    const recent =
+        getRecentSearches();
+
+    const container =
+        document.getElementById(
+            "recentSearches"
+        );
+
+    if (recent.length === 0)
+    {
+        container.classList.add("d-none");
+        container.innerHTML = "";
+
+        return;
+    }
+
+    let html = `
+        <div class="small text-muted mb-2">
+            <i class="bi bi-clock-history me-2"></i>
+            Recent Searches
+        </div>
+
+        <div class="d-flex flex-wrap gap-2">
+    `;
+
+    recent.forEach(item => {
+
+        html += `
+            <button
+                type="button"
+                class="btn btn-outline-secondary btn-sm recent-search"
+                data-id="${item.id}"
+                data-name="${item.name}">
+
+                ${item.name}
+
+            </button>
+        `;
+
+    });
+
+    html += `
+        </div>
+
+        <div class="mt-2">
+
+            <button
+                id="clearRecentSearches"
+                class="btn btn-link btn-sm text-danger p-0">
+
+                Clear History
+
+            </button>
+
+        </div>
+    `;
+
+    container.innerHTML = html;
+
+    container.classList.remove("d-none");
+
+    bindRecentSearches();
 }
 /******************************************************************
  * End of File

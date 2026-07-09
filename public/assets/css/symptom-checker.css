@@ -475,3 +475,210 @@
 .text-green{
     color: green;
 }
+
+.tag-input{
+
+    position: relative;
+
+    display:flex;
+
+    flex-wrap:wrap;
+
+    align-items:center;
+
+    gap:.5rem;
+
+    min-height:58px;
+
+    padding:.5rem;
+
+    border:1px solid #ced4da;
+
+    border-radius:.75rem;
+
+    background:#fff;
+}
+
+.tag-input:focus-within{
+
+    border-color:#0d6efd;
+
+    box-shadow:0 0 0 .2rem rgba(13,110,253,.15);
+
+}
+
+.tag-list{
+
+    display:flex;
+
+    flex-wrap:wrap;
+
+    gap:.5rem;
+
+}
+
+.symptom-tag{
+
+    display:flex;
+
+    align-items:center;
+
+    gap:.35rem;
+
+    background:#0d6efd;
+
+    color:#fff;
+
+    border-radius:50rem;
+
+    padding:.35rem .75rem;
+
+    font-size:.9rem;
+
+}
+
+.symptom-tag button{
+
+    border:none;
+
+    background:transparent;
+
+    color:#fff;
+
+    font-size:1rem;
+
+    line-height:1;
+
+    cursor:pointer;
+
+}
+
+.tag-search{
+
+    flex:1;
+
+    min-width:180px;
+
+    border:none;
+
+    outline:none;
+
+    padding:.35rem;
+
+}
+
+.search-wrapper{
+    position: relative;
+    z-index: 100;
+}
+
+.search-results{
+
+    position:absolute;
+
+    top:100%;
+
+    left:0;
+
+    width:100%;
+
+    margin-top:-1px;
+
+    background:#fff;
+
+    border:1px solid #0d6efd;
+
+    border-top:none;
+
+    border-radius:0 0 .75rem .75rem;
+
+    box-shadow:0 .5rem 1rem rgba(0,0,0,.15);
+
+    max-height:260px;
+
+    overflow-y:auto;
+
+    overflow-x:hidden;
+
+    z-index:1100;
+
+}
+.search-results .list-group-item{
+
+    border:none;
+
+    border-bottom:1px solid #f1f3f5;
+
+    padding:.75rem 1rem;
+
+    cursor:pointer;
+
+    transition:.15s;
+}
+
+.search-results .list-group-item:last-child{
+
+    border-bottom:none;
+
+}
+
+.search-results .list-group-item:hover{
+
+    background:#f8f9fa;
+
+}
+
+.search-area{
+
+    position:relative;
+
+    margin-bottom:1rem;
+
+}
+
+.symptom-tag{
+
+    background:#e7f1ff;
+
+    color:#0d6efd;
+
+    border:1px solid #b6d4fe;
+
+}
+
+.symptom-tag button{
+
+    color:#0d6efd;
+
+}
+
+.search-results .list-group-item{
+
+    transition:
+        background .15s ease,
+        color .15s ease,
+        transform .15s ease;
+
+}
+
+.search-results .list-group-item.active{
+
+    background:#0d6efd;
+
+    color:#fff;
+
+    transform:translateX(4px);
+
+}
+
+.search-results .list-group-item.active i{
+
+    color:#fff !important;
+
+}
+
+.search-results .list-group-item.active:hover{
+
+    background:#0b5ed7;
+
+}

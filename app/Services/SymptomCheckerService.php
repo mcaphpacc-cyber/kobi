@@ -54,4 +54,12 @@ class SymptomCheckerService
             $candidates
         );
     }
+
+    public function recordSearch(
+        array $ids
+    ): void
+    {
+        $this->symptoms
+            ->incrementSearchCount($ids);
+    }
 }

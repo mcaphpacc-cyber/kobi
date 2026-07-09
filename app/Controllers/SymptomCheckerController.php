@@ -71,6 +71,8 @@ class SymptomCheckerController extends Controller
             explode(',', $ids)
         );
 
+        $this->service->recordSearch($symptomIds);
+
         $results = $this->service->match($symptomIds);
 
         header('Content-Type: application/json');
