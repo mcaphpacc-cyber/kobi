@@ -43,6 +43,11 @@ class DiseaseController extends Controller
             abort(404);
         }
 
+        $relatedDiseases = $this->service
+        ->getRelatedDiseases(
+            $knowledge
+        );
+
         $this->view(
 
             'disease/show',
@@ -53,7 +58,9 @@ class DiseaseController extends Controller
 
                     $knowledge['disease']['disease_en'],
 
-                'knowledge' => $knowledge
+                'knowledge' => $knowledge,
+
+                'relatedDiseases' => $relatedDiseases
 
             ]
 

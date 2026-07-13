@@ -5,13 +5,15 @@ declare(strict_types=1);
 namespace App\Services;
 
 use App\Repositories\DiseaseRepository;
+use App\Algorithms\RelatedDiseaseMatcher;
 
 class DiseaseService
 {
     public function __construct(
-        private DiseaseRepository $repository
-    ) {
-    }
+    private DiseaseRepository $repository,
+    private RelatedDiseaseMatcher $matcher
+) {
+}
 
     /**
      * Return diseases for the selected language.
@@ -21,20 +23,10 @@ class DiseaseService
         $rows = $this->repository->findAll();
 
         return array_map(
-            function (array $row) use ($language): array {
-
-                return array_map(
-
-                    fn(array $row): array =>
-                        $this->mapDisease(
-                            $row,
-                            $language
-                        ),
-
-                    $rows
-
-                );
-            },
+            fn (array $row): array => $this->mapDisease(
+                $row,
+                $language
+            ),
             $rows
         );
     }
@@ -86,14 +78,66 @@ class DiseaseService
             );
     }
 
+    public function getRelatedDiseases(
+        array $knowledge,
+        int $limit = 6
+    ): array
+    {
+        if (
+            empty($knowledge['disease']) ||
+            empty($knowledge['disease']['id'])
+        ) {
+            return [];
+        }
+
+        $related = $this->repository->findRelatedDiseases(
+            (int) $knowledge['disease']['id'],
+            $limit
+        );
+
+        if (empty($related)) {
+            return [];
+        }
+
+        $currentDisease = [
+
+            'body_part_id' =>
+                $knowledge['disease']['body_part_id'] ?? null,
+
+            'symptoms' =>
+                $knowledge['symptoms'] ?? []
+
+        ];
+
+        return $this->matcher->rank(
+            $currentDisease,
+            $related
+        );
+    }
+
     private function mapDisease(
         array $row,
         string $language
     ): array
     {
-        return $this->mapDisease(
-            $row,
-            $language
-        );
+        return [
+
+            'id' => (int) $row['id'],
+
+            'name' => $language === 'hi'
+                ? $row['disease_hi']
+                : $row['disease_en'],
+
+            'slug' => $row['slug'],
+
+            'gender' => $row['gender'],
+
+            'body_part_id' => (int) $row['body_part_id'],
+
+            'icd_code' => $row['icd_code'],
+
+            'icd10_code' => $row['icd10_code']
+
+        ];
     }
 }

@@ -53,3 +53,53 @@ section{
     font-size:.85rem;
 
 }
+
+/* ==========================================================
+   Related Diseases
+========================================================== */
+
+.related-disease-card {
+    border: 0;
+    border-radius: 1rem;
+    transition:
+        transform .2s ease,
+        box-shadow .2s ease;
+}
+
+.related-disease-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 .75rem 1.5rem rgba(0,0,0,.12);
+}
+
+.related-disease-card .card-title {
+    font-size: 1.05rem;
+    font-weight: 600;
+    line-height: 1.35;
+}
+
+.related-disease-card .badge.bg-success {
+    font-size: .80rem;
+    min-width: 58px;
+}
+
+.related-disease-card .badge.bg-primary-subtle {
+    font-size: .75rem;
+    font-weight: 500;
+    border-radius: 999px;
+    padding: .45rem .70rem;
+}
+
+.related-disease-card .btn {
+    margin-top: auto;
+}
+
+#related-diseases h3 {
+    font-weight: 700;
+}
+
+#related-diseases .text-muted {
+    font-size: .92rem;
+}
+.related-disease-card .small.fw-semibold {
+    letter-spacing: .02em;
+}

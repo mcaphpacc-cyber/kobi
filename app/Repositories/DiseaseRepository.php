@@ -327,68 +327,68 @@ class DiseaseRepository extends BaseRepository
     }
 
     public function getCandidateDiseases(array $symptomIds): array
-{
-    if (empty($symptomIds)) {
-        return [];
-    }
+    {
+        if (empty($symptomIds)) {
+            return [];
+        }
 
-    $placeholders = implode(
-        ',',
-        array_fill(0, count($symptomIds), '?')
-    );
-
-    $sql = "
-        SELECT DISTINCT
-            d.id,
-            d.disease_en,
-            d.slug,
-            d.severity_level,
-            d.urgency_note,
-            dc.risk_factors_en,
-            dc.causes_en,
-            dc.diagnosis_en,
-            dc.prevention_en,
-            dc.overview_en
-        FROM diseases d
-        INNER JOIN disease_symptoms ds
-            ON ds.disease_id = d.id
-        INNER JOIN disease_content dc
-            ON dc.disease_id = d.id
-        WHERE ds.symptom_id IN ($placeholders)
-        ORDER BY d.disease_en
-    ";
-
-    $diseases = $this->fetchAll(
-        $sql,
-        $symptomIds
-    );
-
-    if (empty($diseases)) {
-        return [];
-    }
-
-    $diseaseIds = array_column(
-        $diseases,
-        'id'
-    );
-
-    $symptomMap =
-        $this->getSymptomsForDiseases(
-            $diseaseIds
+        $placeholders = implode(
+            ',',
+            array_fill(0, count($symptomIds), '?')
         );
 
-    foreach ($diseases as &$disease) {
+        $sql = "
+            SELECT DISTINCT
+                d.id,
+                d.disease_en,
+                d.slug,
+                d.severity_level,
+                d.urgency_note,
+                dc.risk_factors_en,
+                dc.causes_en,
+                dc.diagnosis_en,
+                dc.prevention_en,
+                dc.overview_en
+            FROM diseases d
+            INNER JOIN disease_symptoms ds
+                ON ds.disease_id = d.id
+            INNER JOIN disease_content dc
+                ON dc.disease_id = d.id
+            WHERE ds.symptom_id IN ($placeholders)
+            ORDER BY d.disease_en
+        ";
 
-        $disease['symptoms'] =
-            $symptomMap[$disease['id']] ?? [];
+        $diseases = $this->fetchAll(
+            $sql,
+            $symptomIds
+        );
 
+        if (empty($diseases)) {
+            return [];
+        }
+
+        $diseaseIds = array_column(
+            $diseases,
+            'id'
+        );
+
+        $symptomMap =
+            $this->getSymptomsForDiseases(
+                $diseaseIds
+            );
+
+        foreach ($diseases as &$disease) {
+
+            $disease['symptoms'] =
+                $symptomMap[$disease['id']] ?? [];
+
+        }
+
+        $disease['quickFacts'] =
+        QuickFactsBuilder::build($disease);
+
+        return $diseases;
     }
-
-    $disease['quickFacts'] =
-    QuickFactsBuilder::build($disease);
-
-    return $diseases;
-}
 
     private function getSymptomsForDiseases(
         array $diseaseIds
@@ -454,5 +454,174 @@ class DiseaseRepository extends BaseRepository
         }
 
         return $grouped;
+    }
+
+    /**
+     * Find diseases related to the current disease.
+     *
+     * Relation is currently based on:
+     * - Same body part
+     * - Shared symptoms
+     *
+     * The current disease is excluded.
+     */
+    public function findRelatedDiseases(
+        int $diseaseId,
+        int $limit = 6
+    ): array
+    {
+        /*
+        |--------------------------------------------------------------------------
+        | Get current disease
+        |--------------------------------------------------------------------------
+        */
+
+        $currentDisease = $this->fetch(
+            "
+            SELECT
+                id,
+                body_part_id
+            FROM diseases
+            WHERE id = :id
+            LIMIT 1
+            ",
+            [
+                'id' => $diseaseId
+            ]
+        );
+
+        if (!$currentDisease) {
+            return [];
+        }
+
+        /*
+        |--------------------------------------------------------------------------
+        | Current disease symptoms
+        |--------------------------------------------------------------------------
+        */
+
+        $currentSymptoms = $this->getSymptomsForDisease(
+            $diseaseId
+        );
+
+        if (empty($currentSymptoms)) {
+            return [];
+        }
+
+        $symptomIds = array_column(
+            $currentSymptoms,
+            'id'
+        );
+
+        $placeholders = implode(
+            ',',
+            array_fill(
+                0,
+                count($symptomIds),
+                '?'
+            )
+        );
+
+        /*
+        |--------------------------------------------------------------------------
+        | Candidate diseases
+        |--------------------------------------------------------------------------
+        */
+
+        $sql = "
+            SELECT
+
+                d.id,
+
+                d.slug,
+
+                d.disease_en,
+
+                d.disease_hi,
+
+                d.body_part_id,
+
+                COUNT(ds.symptom_id) AS shared_symptoms
+
+            FROM diseases d
+
+            INNER JOIN disease_symptoms ds
+
+                ON ds.disease_id = d.id
+
+            WHERE
+
+                d.id <> ?
+
+                AND
+
+                (
+
+                    ds.symptom_id IN ($placeholders)
+                )
+
+            GROUP BY
+                d.id
+
+            ORDER BY
+
+                shared_symptoms DESC,
+
+                d.disease_en ASC
+
+            LIMIT ?
+        ";
+
+        $params = [];
+
+        $params[] = $diseaseId;
+
+        //$params[] = $currentDisease['body_part_id'];
+
+        foreach ($symptomIds as $id) {
+            $params[] = $id;
+        }
+
+        $params[] = $limit;
+
+        $statement = $this->db->prepare($sql);
+
+        foreach ($params as $index => $value) {
+
+            $type = is_int($value)
+                ? \PDO::PARAM_INT
+                : \PDO::PARAM_STR;
+
+            $statement->bindValue(
+                $index + 1,
+                $value,
+                $type
+            );
+        }
+
+        $statement->execute();
+
+        $related = $statement->fetchAll();
+
+        if (empty($related)) {
+            return [];
+        }
+
+        /*
+        |--------------------------------------------------------------------------
+        | Attach symptoms
+        |--------------------------------------------------------------------------
+        */
+
+        foreach ($related as &$disease) {
+
+            $disease['symptoms'] =
+                $this->getSymptomsForDisease(
+                    (int) $disease['id']
+                );
+
+        }
+
+        return $related;
     }
 }

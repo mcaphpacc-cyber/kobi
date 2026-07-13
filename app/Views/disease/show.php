@@ -552,4 +552,147 @@ renderKnowledgeSection(
 );
 
 ?>
+<?php if (!empty($relatedDiseases)) : ?>
+
+<section id="related-diseases" class="mt-5">
+
+    <div class="d-flex justify-content-between align-items-center mb-3">
+
+        <div>
+
+            <h3 class="mb-1">
+
+                <i class="bi bi-diagram-3 me-2 text-primary"></i>
+
+                Related Diseases
+
+            </h3>
+
+            <div class="text-muted">
+
+                Diseases with similar symptoms or affecting the same body system.
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <div class="row g-4">
+
+        <?php foreach ($relatedDiseases as $related) : ?>
+
+            <div class="col-md-6 col-xl-4">
+
+                <div class="card related-disease-card h-100 shadow-sm">
+
+                    <div class="card-body d-flex flex-column">
+
+                        <div class="d-flex justify-content-between align-items-start mb-3">
+
+                            <h5 class="card-title mb-0">
+
+                                <?= e($related['disease_en']); ?>
+
+                            </h5>
+
+                            <?php
+
+                                $score = (int) $related['similarity_score'];
+
+                                if ($score >= 75) {
+
+                                    $badgeClass = 'bg-success';
+
+                                    $badgeText = 'High Match';
+
+                                } elseif ($score >= 40) {
+
+                                    $badgeClass = 'bg-warning text-dark';
+
+                                    $badgeText = 'Medium Match';
+
+                                } else {
+
+                                    $badgeClass = 'bg-primary';
+
+                                    $badgeText = 'Low Match';
+
+                                }
+
+                                ?>
+
+                                <div class="text-end">
+
+                                    <span class="badge <?= $badgeClass; ?>">
+
+                                        <?= e($badgeText); ?>
+
+                                    </span>
+
+                                    <div class="small fw-semibold mt-1">
+
+                                        <?= $score; ?>%
+
+                                    </div>
+
+                                </div>
+
+                        </div>
+
+                        <div class="small text-muted mb-3">
+
+                            <i class="bi bi-link-45deg me-1"></i>
+
+                            <?= (int) $related['shared_symptom_count']; ?>
+
+                            Shared Symptom<?= $related['shared_symptom_count'] == 1 ? '' : 's'; ?>
+
+                        </div>
+
+                        <?php if (!empty($related['shared_symptoms'])) : ?>
+
+                            <div class="mb-3">
+
+                                <?php foreach ($related['shared_symptoms'] as $symptom) : ?>
+
+                                    <span class="badge bg-primary-subtle text-primary border me-1 mb-1">
+
+                                        <?= e($symptom); ?>
+
+                                    </span>
+
+                                <?php endforeach; ?>
+
+                            </div>
+
+                        <?php endif; ?>
+
+                        <div class="mt-auto">
+
+                            <a
+                                href="<?= url('/diseases/' . $related['slug']); ?>"
+                                class="btn btn-outline-primary btn-sm w-100">
+
+                                <i class="bi bi-arrow-right-circle me-2"></i>
+
+                                View Disease
+
+                            </a>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        <?php endforeach; ?>
+
+    </div>
+
+</section>
+
+<?php endif; ?>
 
