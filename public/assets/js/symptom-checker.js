@@ -958,9 +958,11 @@ function renderDiseaseCard(item, rank)
 
                         <button
                             class="btn btn-outline-primary btn-sm compare-btn"
-                            data-id="${item.disease.id}">
+                            data-slug="${item.disease.slug}">
 
-                            ⇄ Compare
+                            <i class="bi bi-columns-gap me-1"></i>
+
+                            Compare
 
                         </button>
 
@@ -1241,17 +1243,18 @@ function renderOverview(item)
     `;
 }
 
-document.addEventListener("click", function(event){
+document.addEventListener('click', function (e) {
 
-    const button = event.target.closest(".compare-btn");
+    const button = e.target.closest('.compare-btn');
 
-    if(!button){
+    if (!button) {
         return;
     }
 
-    alert(
-        "Disease comparison will be available in the next release."
-    );
+    window.location =
+        window.KOBI.baseUrl +
+        'compare?left=' +
+        encodeURIComponent(button.dataset.slug);
 
 });
 

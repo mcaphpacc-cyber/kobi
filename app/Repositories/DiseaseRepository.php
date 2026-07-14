@@ -224,6 +224,49 @@ class DiseaseRepository extends BaseRepository
         ]);
     }
 
+    /**
+     * Search diseases for autocomplete.
+     */
+    public function searchByName(
+        string $keyword,
+        int $limit = 10
+    ): array
+    {
+        $sql = "
+            SELECT
+                id,
+                slug,
+                disease_en,
+                disease_hi
+            FROM diseases
+            WHERE
+                disease_en LIKE :keyword_en
+                OR disease_hi LIKE :keyword_hi
+            ORDER BY disease_en
+            LIMIT {$limit}
+        ";
+
+        $statement = $this->db->prepare($sql);
+
+        $search = '%' . $keyword . '%';
+
+        $statement->bindValue(
+            ':keyword_en',
+            $search,
+            \PDO::PARAM_STR
+        );
+
+        $statement->bindValue(
+            ':keyword_hi',
+            $search,
+            \PDO::PARAM_STR
+        );
+
+        $statement->execute();
+
+        return $statement->fetchAll();
+    }
+
     public function count(): int
     {
         return $this->countRecords('diseases');

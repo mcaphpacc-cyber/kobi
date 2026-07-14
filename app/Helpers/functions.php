@@ -97,3 +97,33 @@ function redirect(string $path): never
     header('Location: ' . url($path));
     exit;
 }
+
+/**
+ * Abort the current request with an HTTP status code.
+ */
+function abort(
+    int $statusCode = 404,
+    string $message = ''
+): never {
+
+    http_response_code($statusCode);
+
+    if ($message !== '') {
+        exit($message);
+    }
+
+    switch ($statusCode) {
+
+        case 404:
+            exit('404 - Page Not Found');
+
+        case 403:
+            exit('403 - Forbidden');
+
+        case 500:
+            exit('500 - Internal Server Error');
+
+        default:
+            exit('HTTP Error ' . $statusCode);
+    }
+}

@@ -5,6 +5,7 @@ declare(strict_types=1);
 use App\Controllers\HomeController;
 use App\Controllers\DiseaseController;
 use App\Controllers\SymptomCheckerController;
+use App\Controllers\ComparisonController;
 
 /*
 |--------------------------------------------------------------------------
@@ -46,4 +47,22 @@ $this->router()->get(
 $this->router->get(
     '/disease/{slug}',
     DiseaseController::class, 'show'
+);
+
+$this->router()->get(
+    '/api/diseases/search',
+    DiseaseController::class,
+    'search'
+);
+
+$this->router()->get(
+    '/compare',
+    ComparisonController::class,
+    'index'
+);
+
+$this->router()->get(
+    '/compare/result',
+    ComparisonController::class,
+    'result'
 );

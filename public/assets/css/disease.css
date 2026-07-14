@@ -103,3 +103,88 @@ section{
 .related-disease-card .small.fw-semibold {
     letter-spacing: .02em;
 }
+/* ==========================================================
+   Disease Comparison
+========================================================== */
+
+.comparison-vs {
+
+    width: 72px;
+
+    height: 72px;
+
+    margin: auto;
+
+    border-radius: 50%;
+
+    background: var(--bs-primary);
+
+    color: #fff;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    font-weight: 700;
+
+    font-size: 1.3rem;
+
+    box-shadow: 0 0.5rem 1rem rgba(0,0,0,.15);
+
+}
+
+.comparison-summary-card {
+
+    transition: transform .2s ease;
+
+}
+
+.comparison-summary-card:hover {
+
+    transform: translateY(-3px);
+
+}
+
+.comparison-section {
+
+    scroll-margin-top: 90px;
+
+}
+
+.comparison-content {
+
+    line-height: 1.8;
+
+}
+
+.comparison-stat-value {
+
+    font-size: 1.4rem;
+
+    font-weight: 700;
+
+}
+
+.comparison-stat-label {
+
+    font-size: .85rem;
+
+    color: #6c757d;
+
+}
+
+@media (max-width: 991px) {
+
+    .comparison-vs {
+
+        width: 54px;
+
+        height: 54px;
+
+        font-size: 1rem;
+
+    }
+
+}

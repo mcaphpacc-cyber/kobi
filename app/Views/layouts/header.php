@@ -44,5 +44,16 @@ href="<?= asset('css/symptom-checker.css') ?>">
     href="<?= asset('css/disease.css'); ?>">
 
 </head>
+<script>
+window.KOBI = Object.freeze({
+
+    baseUrl: "<?= url(); ?>",
+
+    apiBase: "<?= url('api'); ?>",
+
+    locale: "<?= config('locale'); ?>"
+
+});
+</script>
 
 <body>

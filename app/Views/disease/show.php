@@ -670,15 +670,34 @@ renderKnowledgeSection(
 
                         <div class="mt-auto">
 
-                            <a
-                                href="<?= url('/diseases/' . $related['slug']); ?>"
-                                class="btn btn-outline-primary btn-sm w-100">
+                            <div class="d-grid gap-2">
 
-                                <i class="bi bi-arrow-right-circle me-2"></i>
+                                <a
+                                    href="<?= url('/diseases/' . $related['slug']); ?>"
+                                    class="btn btn-outline-primary btn-sm">
 
-                                View Disease
+                                    <i class="bi bi-arrow-right-circle me-2"></i>
 
-                            </a>
+                                    View Disease
+
+                                </a>
+
+                                <a
+                                    href="<?= url(
+                                        '/compare/result?d1='
+                                        . urlencode($disease['slug'])
+                                        . '&d2='
+                                        . urlencode($related['slug'])
+                                    ); ?>"
+                                    class="btn btn-primary btn-sm">
+
+                                    <i class="bi bi-columns-gap me-2"></i>
+
+                                    Compare
+
+                                </a>
+
+                            </div>
 
                         </div>
 

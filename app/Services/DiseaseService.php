@@ -6,12 +6,14 @@ namespace App\Services;
 
 use App\Repositories\DiseaseRepository;
 use App\Algorithms\RelatedDiseaseMatcher;
+use App\Algorithms\DiseaseComparisonBuilder;
 
 class DiseaseService
 {
     public function __construct(
     private DiseaseRepository $repository,
-    private RelatedDiseaseMatcher $matcher
+    private RelatedDiseaseMatcher $matcher,
+    private DiseaseComparisonBuilder $comparisonBuilder
 ) {
 }
 
@@ -27,6 +29,40 @@ class DiseaseService
                 $row,
                 $language
             ),
+            $rows
+        );
+    }
+
+    /**
+     * Search diseases for autocomplete.
+     */
+    public function searchDiseases(
+        string $keyword,
+        string $language = 'en'
+    ): array
+    {
+        $rows = $this->repository->searchByName(
+            trim($keyword)
+        );
+
+        return array_map(
+
+            function (array $row) use ($language): array {
+
+                return [
+
+                    'id' => (int) $row['id'],
+
+                    'slug' => $row['slug'],
+
+                    'name' => $language === 'hi'
+                        ? $row['disease_hi']
+                        : $row['disease_en']
+
+                ];
+
+            },
+
             $rows
         );
     }
@@ -139,5 +175,55 @@ class DiseaseService
             'icd10_code' => $row['icd10_code']
 
         ];
+    }
+
+    /**
+     * Build comparison model for two diseases.
+     */
+    public function getComparison(
+        string $leftSlug,
+        string $rightSlug,
+        string $language = 'en'
+    ): ?array
+    {
+        $leftSlug = trim($leftSlug);
+        $rightSlug = trim($rightSlug);
+
+        if (
+            $leftSlug === '' ||
+            $rightSlug === ''
+        ) {
+            return null;
+        }
+
+        if ($leftSlug === $rightSlug) {
+            return null;
+        }
+
+        $left = $this->repository
+            ->findKnowledgeBySlug(
+                $leftSlug,
+                $language
+            );
+
+        if (!$left) {
+            return null;
+        }
+
+        $right = $this->repository
+            ->findKnowledgeBySlug(
+                $rightSlug,
+                $language
+            );
+
+        if (!$right) {
+            return null;
+        }
+
+        return $this->comparisonBuilder
+            ->build(
+                $left,
+                $right
+            );
     }
 }

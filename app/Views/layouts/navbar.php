@@ -51,6 +51,18 @@ Diseases
 
 <li class="nav-item">
 
+    <a
+        class="nav-link"
+        href="<?= url('/compare'); ?>">
+
+        Compare
+
+    </a>
+
+</li>
+
+<li class="nav-item">
+
 <a class="nav-link disabled">
 
 Body Parts

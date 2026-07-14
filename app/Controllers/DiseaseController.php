@@ -28,6 +28,32 @@ class DiseaseController extends Controller
         ]);
     }
 
+    /**
+     * Search diseases for AJAX autocomplete.
+     */
+    public function search(): void
+    {
+        $keyword = trim($_GET['q'] ?? '');
+
+        if ($keyword === '') {
+
+            header('Content-Type: application/json');
+
+            echo json_encode([]);
+
+            return;
+        }
+
+        $results = $this->service->searchDiseases(
+            $keyword,
+            self::DEFAULT_LANGUAGE
+        );
+
+        header('Content-Type: application/json');
+
+        echo json_encode($results);
+    }
+
     public function show(
         string $slug
     ): void
