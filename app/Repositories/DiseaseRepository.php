@@ -116,14 +116,83 @@ class DiseaseRepository extends BaseRepository
         int $diseaseId
     ): array
     {
-        return [];
+        $sql = "
+            SELECT
+
+                tp.id,
+
+                tp.treatment_system_id,
+
+                tp.title_en,
+
+                tp.title_hi,
+
+                tp.overview_en,
+
+                tp.overview_hi
+
+            FROM treatment_protocols tp
+
+            WHERE tp.disease_id = :id
+
+            ORDER BY tp.treatment_system_id
+        ";
+
+        return $this->fetchAll(
+            $sql,
+            [
+                'id' => $diseaseId
+            ]
+        );
     }
 
     private function getFaqsForDisease(
         int $diseaseId
     ): array
     {
-        return [];
+        $sql = "
+            SELECT
+
+                id,
+
+                question_en,
+
+                answer_en,
+
+                question_hi,
+
+                answer_hi,
+
+                sort_order
+
+            FROM disease_faqs
+
+            WHERE disease_id = :id
+
+            ORDER BY sort_order ASC,
+            id DESC
+        ";
+
+        $rows = $this->fetchAll(
+            $sql,
+            [
+                'id' => $diseaseId
+            ]
+        );
+
+        $faqs = [];
+
+        foreach ($rows as $row) {
+
+            if (!isset($faqs[$row['sort_order']])) {
+
+                $faqs[$row['sort_order']] = $row;
+
+            }
+
+        }
+
+        return array_values($faqs);
     }
 
     public function findKnowledgeBySlug(
@@ -134,17 +203,22 @@ class DiseaseRepository extends BaseRepository
         $sql = "
             SELECT
 
-                d.*,
+            d.*,
 
-                dc.*
+            dc.*,
 
-            FROM diseases d
+            bp.name_en AS body_system
 
-            LEFT JOIN disease_content dc
+        FROM diseases d
+
+        LEFT JOIN body_parts bp
+            ON bp.id = d.body_part_id
+        
+        LEFT JOIN disease_content dc
 
                 ON dc.disease_id = d.id
 
-            WHERE d.slug = :slug
+        WHERE d.slug = :slug
 
             LIMIT 1
         ";
@@ -192,7 +266,9 @@ class DiseaseRepository extends BaseRepository
 
             'treatments' => $this->getTreatmentsForDisease($id),
 
-            'faqs' => $this->getFaqsForDisease($id)
+            'faqs' => $this->getFaqsForDisease($id),
+
+            'diet' => $this->getDietRecommendations($id)
 
         ];
     }
@@ -666,5 +742,82 @@ class DiseaseRepository extends BaseRepository
         }
 
         return $related;
+    }
+
+    private function getDietRecommendations(
+        int $diseaseId
+    ): array
+    {
+        $sql = "
+            SELECT
+                diet_type,
+                item_en,
+                item_hi,
+                notes_en,
+                notes_hi,
+                sort_order
+            FROM disease_diets
+            WHERE disease_id = :id
+            ORDER BY
+                diet_type,
+                sort_order ASC,
+                id ASC
+        ";
+
+        $rows = $this->fetchAll(
+            $sql,
+            [
+                'id' => $diseaseId
+            ]
+        );
+
+        $recommended = array_values(
+            array_filter(
+                $rows,
+                fn($item) =>
+                    $item['diet_type'] === 'recommended'
+            )
+        );
+
+        $avoid = array_values(
+            array_filter(
+                $rows,
+                fn($item) =>
+                    $item['diet_type'] === 'avoid'
+            )
+        );
+
+        return [
+
+            'recommended' =>
+                $this->removeDuplicateDietItems(
+                    $recommended
+                ),
+
+            'avoid' =>
+                $this->removeDuplicateDietItems(
+                    $avoid
+                )
+
+        ];
+    }
+
+    private function removeDuplicateDietItems(
+        array $items
+    ): array
+    {
+        $unique = [];
+
+        foreach ($items as $item) {
+
+            if (!isset($unique[$item['sort_order']])) {
+
+                $unique[$item['sort_order']] = $item;
+
+            }
+
+        }
+
+        return array_values($unique);
     }
 }

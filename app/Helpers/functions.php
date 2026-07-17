@@ -126,4 +126,24 @@ function abort(
         default:
             exit('HTTP Error ' . $statusCode);
     }
+
+
 }
+
+function buildPreventionTips(string $text): array
+    {
+        $tips = preg_split(
+            '/[.;]\s*/',
+            strip_tags($text)
+        );
+
+        $tips = array_filter(
+            array_map('trim', $tips)
+        );
+
+        return array_slice(
+            $tips,
+            0,
+            6
+        );
+    }

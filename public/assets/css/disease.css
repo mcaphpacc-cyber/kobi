@@ -188,3 +188,320 @@ section{
     }
 
 }
+
+.disease-nav
+{
+    position: sticky;
+
+    top: 0px;
+
+    z-index: 100;
+
+    background: #fff;
+
+    border-radius: .75rem;
+
+    box-shadow: 0 .125rem .35rem rgba(0,0,0,.06);
+
+    margin-bottom: 1.5rem;
+}
+
+.disease-nav .card-body
+{
+    padding: 1rem;
+}
+
+.disease-nav .btn
+{
+    transition: all .2s ease;
+}
+
+.disease-nav .btn:hover
+{
+    transform: translateY(-1px);
+}
+
+section[id]
+{
+    scroll-margin-top: 120px;
+}
+
+.disease-nav .btn
+{
+    min-width: 110px;
+
+    margin-bottom: .5rem;
+}
+
+.kobi-section
+{
+    background: #fff;
+
+    border: 1px solid #e9ecef;
+
+    border-radius: 14px;
+
+    overflow: hidden;
+
+    margin-bottom: 2rem;
+
+    box-shadow: 0 .15rem .5rem rgba(0,0,0,.05);
+
+    transition: all .2s ease;
+}
+
+.kobi-section:hover
+{
+    box-shadow: 0 .35rem 1rem rgba(0,0,0,.08);
+}
+
+.kobi-section-header
+{
+    display: flex;
+
+    align-items: center;
+
+    gap: .75rem;
+
+    padding: 1rem 1.5rem;
+
+    border-bottom: 1px solid #eef2f7;
+
+    background: linear-gradient(
+        to right,
+        #ffffff,
+        #f8fbff
+    );
+}
+
+.kobi-section-title
+{
+    margin: 0;
+
+    font-size: 1.45rem;
+
+    font-weight: 700;
+
+    color: #1f2937;
+}
+
+.kobi-section-body
+{
+    padding: 1.5rem;
+}
+
+.kobi-section-icon
+{
+    font-size: 1.35rem;
+
+    color: var(--bs-primary);
+}
+
+.kobi-section-subtitle
+{
+    color: #6c757d;
+
+    font-size: .875rem;
+
+    margin-top: .15rem;
+}
+
+.kobi-section-header i
+{
+    margin-right: .75rem;
+}
+
+#treatmentAccordion .accordion-button
+{
+    align-items: flex-start;
+
+    padding: 1rem 1.25rem;
+}
+
+#treatmentAccordion .accordion-button:not(.collapsed)
+{
+    background: #f8fbff;
+}
+
+#treatmentAccordion .accordion-body
+{
+    line-height: 1.8;
+
+    color: #495057;
+}
+
+#treatmentAccordion .accordion-item
+{
+    overflow: hidden;
+}
+
+.treatment-card-allopathy
+{
+    border-left: 5px solid #0d6efd;
+}
+
+.treatment-card-ayurveda
+{
+    border-left: 5px solid #198754;
+}
+
+.treatment-card-homeopathy
+{
+    border-left: 5px solid #6f42c1;
+}
+
+.treatment-card-acupressure
+{
+    border-left: 5px solid #fd7e14;
+}
+
+.treatment-card-yoga
+{
+    border-left: 5px solid #20c997;
+}
+
+.accordion-button:not(.collapsed)
+{
+    background:#f8fbff;
+
+    color:#0d6efd;
+}
+
+.treatment-content
+{
+    line-height:1.9;
+
+    color:#495057;
+
+    font-size:1rem;
+}
+
+.treatment-card-allopathy .accordion-button
+{
+    background:#eef5ff;
+}
+
+.treatment-card-ayurveda .accordion-button
+{
+    background:#edf8f0;
+}
+
+.treatment-card-homeopathy .accordion-button
+{
+    background:#f5efff;
+}
+
+.treatment-card-acupressure .accordion-button
+{
+    background:#fff5e9;
+}
+
+.treatment-card-yoga .accordion-button
+{
+    background:#eefbf7;
+}
+
+#treatmentAccordion .accordion-item
+{
+    transition: all .25s ease;
+
+    border-radius: .75rem;
+
+    overflow: hidden;
+}
+
+#treatmentAccordion .accordion-item:hover
+{
+    transform: translateY(-2px);
+
+    box-shadow: 0 .35rem .75rem rgba(0,0,0,.08);
+}
+
+#treatmentAccordion .accordion-button::after
+{
+    transition: transform .25s ease;
+}
+
+/* ==========================================
+   FAQ CENTER
+========================================== */
+
+.faq-item
+{
+    border-radius: .75rem;
+
+    overflow: hidden;
+
+    transition: all .25s ease;
+}
+
+.faq-item:hover
+{
+    transform: translateY(-2px);
+
+    box-shadow: 0 .4rem .8rem rgba(0,0,0,.08);
+}
+
+.faq-item .accordion-button
+{
+    font-weight: 600;
+
+    background: #fff;
+}
+
+.faq-item .accordion-button:not(.collapsed)
+{
+    background: #eef6ff;
+
+    color: #0d6efd;
+}
+
+.faq-item .accordion-body
+{
+    line-height: 1.9;
+
+    color: #495057;
+}
+
+.faq-item
+{
+    transition:
+        transform .2s ease,
+        box-shadow .2s ease;
+}
+
+.faq-item:hover
+{
+    transform: translateY(-2px);
+
+    box-shadow:
+        0 .35rem .75rem rgba(0,0,0,.08);
+}
+
+.faq-answer
+{
+    line-height: 1.9;
+
+    color: #495057;
+
+    font-size: 1rem;
+}
+
+.diet-item
+{
+    padding-bottom: .75rem;
+
+    border-bottom: 1px solid #f1f3f5;
+}
+
+.diet-item:last-child
+{
+    border-bottom: none;
+
+    padding-bottom: 0;
+}
+
+.diet-item .fw-semibold
+{
+    font-size: 1rem;
+}
