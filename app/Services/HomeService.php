@@ -8,6 +8,8 @@ use App\Repositories\BodyPartRepository;
 use App\Repositories\CauseRepository;
 use App\Repositories\DiseaseRepository;
 use App\Repositories\SymptomRepository;
+use App\Repositories\HomeRepository;
+
 
 class HomeService
 {
@@ -15,6 +17,7 @@ class HomeService
         private DiseaseRepository $diseases,
         private BodyPartRepository $bodyParts,
         private SymptomRepository $symptoms,
+        private HomeRepository $home,
         private CauseRepository $causes
     ) {
     }
@@ -51,6 +54,24 @@ class HomeService
                 )
             ),
 
+            'bodySystems' => array_map(
+
+                fn(array $row): array => [
+
+                    'id' => (int) $row['id'],
+
+                    'name' => $row['name_en'],
+
+                    'slug' => $row['slug'],
+
+                    'disease_count' => (int) $row['disease_count'],
+
+                ],
+
+                $this->home->getBodySystems()
+
+            ),
+
             'featuredDiseases' => array_map(
                 fn(array $row): array => [
                     'id' => (int) $row['id'],
@@ -63,5 +84,13 @@ class HomeService
             ),
 
         ];
+    }
+
+    public function searchSuggestions(
+        string $keyword
+    ): array
+    {
+        return $this->home
+            ->searchDiseases($keyword);
     }
 }

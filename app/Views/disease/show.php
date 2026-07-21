@@ -126,7 +126,6 @@ $stats = [
       </p>
       <?php endif; ?>
     </div>
-    <hr class="my-1">
     <div class="row g-3">
         <?php
 

@@ -66,3 +66,9 @@ $this->router()->get(
     ComparisonController::class,
     'result'
 );
+
+$this->router()->get(
+    '/api/search/suggestions',
+    HomeController::class,
+    'searchSuggestions'
+);

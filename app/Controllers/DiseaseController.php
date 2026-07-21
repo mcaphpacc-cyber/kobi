@@ -20,12 +20,44 @@ class DiseaseController extends Controller
     {
         $language = config('locale');
 
-        $diseases = $this->service->getAll($language);
+        $bodySlug = trim($_GET['body'] ?? '');
 
-        $this->view('disease/index', [
-            'title' => 'Diseases',
-            'diseases' => $diseases
-        ]);
+        $bodySystem = null;
+
+        if ($bodySlug !== '') {
+
+            $result = $this->service
+                ->getByBodySystem(
+                    $bodySlug,
+                    $language
+                );
+
+            $bodySystem = $result['bodySystem'];
+
+            $diseases = $result['diseases'];
+
+        } else {
+
+            $diseases = $this->service
+                ->getAll($language);
+
+        }
+
+        $bodySystems = $this->service->getBodySystems();
+
+        $statistics = $this->service
+            ->getCatalogStatistics();
+
+        $this->view(
+            'disease/index',
+            [
+                'title'      => 'Diseases',
+                'bodySystem' => $bodySystem,
+                'bodySystems' => $bodySystems,
+                'diseases'   => $diseases,
+                'statistics' => $statistics
+            ]
+        );
     }
 
     /**

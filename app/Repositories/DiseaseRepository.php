@@ -14,15 +14,29 @@ class DiseaseRepository extends BaseRepository
     {
         $sql = "
             SELECT
-                id,
+                d.id,
                 body_part_id,
+                bp.name_en AS body_system,
+                COUNT(DISTINCT ds.symptom_id) AS symptom_count,
+                GROUP_CONCAT(
+                    DISTINCT s.symptom_en
+                    ORDER BY s.display_order ASC
+                    SEPARATOR ', '
+                ) AS symptoms,
                 disease_en,
                 disease_hi,
-                slug,
-                gender,
+                d.slug,
+                d.gender,
                 icd_code,
                 icd10_code
-            FROM diseases
+            FROM diseases d
+            LEFT JOIN body_parts bp
+            ON bp.id = d.body_part_id
+            LEFT JOIN disease_symptoms ds
+            ON ds.disease_id = d.id
+            LEFT JOIN symptoms s
+            ON s.id = ds.symptom_id
+            GROUP BY d.id
             ORDER BY disease_en
         ";
 
@@ -203,7 +217,11 @@ class DiseaseRepository extends BaseRepository
         $sql = "
             SELECT
 
+            d.id AS disease_id,
+
             d.*,
+
+            dc.id AS disease_content_id,
 
             dc.*,
 
@@ -233,7 +251,7 @@ class DiseaseRepository extends BaseRepository
             return null;
         }
 
-        $id = (int) $disease['id'];
+        $id = (int) $disease['disease_id'];
 
         $content = [
 
@@ -253,6 +271,7 @@ class DiseaseRepository extends BaseRepository
             'prevention_hi'    => $disease['prevention_hi'] ?? ''
 
         ];
+
 
         return [
 
@@ -819,5 +838,120 @@ class DiseaseRepository extends BaseRepository
         }
 
         return array_values($unique);
+    }
+
+    public function findByBodySlug(
+        string $slug
+    ): array
+    {
+        /*
+        |--------------------------------------------------------------------------
+        | Get body system
+        |--------------------------------------------------------------------------
+        */
+
+        $bodySystem = $this->fetch(
+            "
+            SELECT
+                id,
+                name_en,
+                slug
+            FROM body_parts
+            WHERE slug = :slug
+            LIMIT 1
+            ",
+            [
+                'slug' => $slug
+            ]
+        );
+
+        if (!$bodySystem) {
+
+            return [
+
+                'bodySystem' => null,
+
+                'diseases' => []
+
+            ];
+
+        }
+
+        /*
+        |--------------------------------------------------------------------------
+        | Get diseases
+        |--------------------------------------------------------------------------
+        */
+
+        $diseases = $this->fetchAll(
+            "
+            SELECT
+                d.id,
+                body_part_id,
+                bp.name_en AS body_system,
+
+                GROUP_CONCAT(
+                    DISTINCT s.symptom_en
+                    ORDER BY s.display_order
+                    SEPARATOR ', '
+                ) AS symptoms,
+                disease_en,
+                disease_hi,
+                d.slug,
+                d.gender,
+                icd_code,
+                icd10_code
+            FROM diseases d
+            LEFT JOIN body_parts bp
+                ON bp.id = d.body_part_id
+
+            LEFT JOIN disease_symptoms ds
+                ON ds.disease_id = d.id
+
+            LEFT JOIN symptoms s
+                ON s.id = ds.symptom_id
+            WHERE body_part_id = :bodyPartId
+            GROUP BY d.id
+            ORDER BY disease_en
+            ",
+            [
+                'bodyPartId' => $bodySystem['id']
+            ]
+        );
+
+        return [
+
+            'bodySystem' => [
+
+                'name' => $bodySystem['name_en'],
+
+                'slug' => $bodySystem['slug']
+
+            ],
+
+            'diseases' => $diseases
+
+        ];
+    }
+
+    public function getCatalogStatistics(): array
+    {
+        return [
+
+            'diseases' => $this->count(),
+
+            'bodySystems' => (int) $this->db
+                ->query("SELECT COUNT(*) FROM body_parts")
+                ->fetchColumn(),
+
+            'symptoms' => (int) $this->db
+                ->query("SELECT COUNT(*) FROM symptoms")
+                ->fetchColumn(),
+
+            'causes' => (int) $this->db
+                ->query("SELECT COUNT(*) FROM causes")
+                ->fetchColumn()
+
+        ];
     }
 }

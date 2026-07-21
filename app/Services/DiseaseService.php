@@ -7,13 +7,15 @@ namespace App\Services;
 use App\Repositories\DiseaseRepository;
 use App\Algorithms\RelatedDiseaseMatcher;
 use App\Algorithms\DiseaseComparisonBuilder;
+use App\Repositories\BodyPartRepository;
 
 class DiseaseService
 {
     public function __construct(
     private DiseaseRepository $repository,
     private RelatedDiseaseMatcher $matcher,
-    private DiseaseComparisonBuilder $comparisonBuilder
+    private DiseaseComparisonBuilder $comparisonBuilder,
+    private BodyPartRepository $bodyPartRepository
 ) {
 }
 
@@ -31,6 +33,34 @@ class DiseaseService
             ),
             $rows
         );
+    }
+
+    public function getByBodySystem(
+        string $slug,
+        string $language = 'en'
+    ): array
+    {
+        $result = $this->repository
+            ->findByBodySlug($slug);
+
+        return [
+
+            'bodySystem' => $result['bodySystem'],
+
+            'diseases' => array_map(
+
+                fn (array $row): array =>
+
+                    $this->mapDisease(
+                        $row,
+                        $language
+                    ),
+
+                $result['diseases']
+
+            )
+
+        ];
     }
 
     /**
@@ -167,8 +197,14 @@ class DiseaseService
             'slug' => $row['slug'],
 
             'gender' => $row['gender'],
+            
+            'symptoms'    => $row['symptoms'] ?? '',
+
+            'symptom_count' => (int) ($row['symptom_count'] ?? 0),
 
             'body_part_id' => (int) $row['body_part_id'],
+
+            'body_system' => $row['body_system'],
 
             'icd_code' => $row['icd_code'],
 
@@ -225,5 +261,37 @@ class DiseaseService
                 $left,
                 $right
             );
+    }
+
+    public function getCatalogStatistics(): array
+    {
+        return $this->repository
+            ->getCatalogStatistics();
+    }
+
+
+    public function getBodySystems(): array
+    {
+        $rows = $this->bodyPartRepository->getAll();
+
+        return array_map(
+
+            fn (array $row): array => [
+
+                'id' => (int) $row['id'],
+
+                'name' => $row['name_en'],
+
+                'slug' => $row['slug'],
+
+                'gender' => $row['gender'],
+
+                'disease_count' => (int) $row['disease_count']
+
+            ],
+
+            $rows
+
+        );
     }
 }

@@ -147,3 +147,19 @@ function buildPreventionTips(string $text): array
             6
         );
     }
+
+function bodySystemIcon(string $name): string
+{
+    return match ($name)
+    {
+        'Head & Brain' => 'bi-brain',
+        'Heart & Blood Vessels' => 'bi-heart-pulse',
+        'Eyes' => 'bi-eye',
+        'Digestive System' => 'bi-capsule',
+        'Bones & Joints' => 'bi-person-standing',
+        'Blood & Immune System' => 'bi-droplet',
+        'Respiratory System' => 'bi-lungs',
+        'Skin Hair & Nails' => 'bi-bandaid',
+        default => 'bi-diagram-3',
+    };
+}

@@ -15,13 +15,32 @@ class BodyPartRepository extends BaseRepository
     {
         return $this->fetchAll("
             SELECT
-                id,
-                name_en,
-                name_hi,
-                gender,
-                slug
-            FROM body_parts
-            ORDER BY name_en
+
+                bp.id,
+
+                bp.name_en,
+
+                bp.gender,
+
+                bp.slug,
+
+                COUNT(d.id) AS disease_count
+
+            FROM body_parts bp
+
+            LEFT JOIN diseases d
+
+            ON d.body_part_id = bp.id
+
+            GROUP BY
+
+                bp.id,
+
+                bp.name_en
+
+            ORDER BY
+
+                bp.name_en
         ");
     }
 }

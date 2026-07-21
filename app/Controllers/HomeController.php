@@ -22,4 +22,23 @@ class HomeController extends Controller
             'dashboard' => $dashboard,
         ]);
     }
+
+    public function searchSuggestions(): void
+    {
+        $query = trim($_GET['q'] ?? '');
+
+        if (strlen($query) < 2) {
+
+            $this->json([]);
+
+            return;
+
+        }
+
+        $results =
+            $this->service
+                ->searchSuggestions($query);
+
+        $this->json($results);
+    }
 }
