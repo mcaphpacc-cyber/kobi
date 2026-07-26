@@ -674,3 +674,50 @@ section[id]
     color: #fff;
 
 }
+
+.catalog-toolbar
+{
+    position: sticky;
+
+    top: 0;
+
+    z-index: 1000;
+
+    background: #fff;
+
+    padding: 12px 0;
+
+    border-bottom: 1px solid #dee2e6;
+}
+
+.card
+{
+    margin-bottom: 1rem;
+}
+
+.card-body
+{
+    padding: 1rem;
+}
+
+#diseaseTable thead th{
+
+    padding:16px 18px;
+
+    vertical-align:middle;
+
+}
+
+#diseaseTable tbody td{
+
+    padding:14px 18px;
+
+    vertical-align:middle;
+
+}
+
+.compare-btn{
+
+    border-radius:12px;
+
+}

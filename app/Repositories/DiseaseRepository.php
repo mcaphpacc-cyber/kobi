@@ -954,4 +954,64 @@ class DiseaseRepository extends BaseRepository
 
         ];
     }
+
+    /**
+     * Find diseases by IDs while preserving the given order.
+     */
+    public function findByIds(array $ids): array
+    {
+        if (empty($ids)) {
+            return [];
+        }
+
+        $placeholders = implode(
+            ',',
+            array_fill(0, count($ids), '?')
+        );
+
+        $order = implode(
+            ',',
+            array_map('intval', $ids)
+        );
+
+        $sql = "
+            SELECT
+                d.id,
+                body_part_id,
+                bp.name_en AS body_system,
+                COUNT(DISTINCT ds.symptom_id) AS symptom_count,
+                GROUP_CONCAT(
+                    DISTINCT s.symptom_en
+                    ORDER BY s.display_order
+                    SEPARATOR ', '
+                ) AS symptoms,
+                disease_en,
+                disease_hi,
+                d.slug,
+                d.gender,
+                icd_code,
+                icd10_code
+            FROM diseases d
+
+            LEFT JOIN body_parts bp
+                ON bp.id = d.body_part_id
+
+            LEFT JOIN disease_symptoms ds
+                ON ds.disease_id = d.id
+
+            LEFT JOIN symptoms s
+                ON s.id = ds.symptom_id
+
+            WHERE d.id IN ($placeholders)
+
+            GROUP BY d.id
+
+            ORDER BY FIELD(d.id, $order)
+        ";
+
+        return $this->fetchAll(
+            $sql,
+            $ids
+        );
+    }
 }

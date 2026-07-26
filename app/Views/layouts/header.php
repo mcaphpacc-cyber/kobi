@@ -43,6 +43,10 @@ href="<?= asset('css/symptom-checker.css') ?>">
     rel="stylesheet"
     href="<?= asset('css/disease.css'); ?>">
 
+<link
+    rel="stylesheet"
+    href="<?= asset('css/discovery.css') ?>">
+
 </head>
 <script>
 window.KOBI = Object.freeze({

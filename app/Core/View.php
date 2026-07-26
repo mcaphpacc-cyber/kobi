@@ -38,4 +38,22 @@ class View
 
         require $layoutFile;
     }
+
+    public static function component(
+        string $view,
+        array $data = []
+    ): void
+    {
+        $viewsPath = dirname(__DIR__) . '/Views/';
+
+        $viewFile = $viewsPath . $view . '.php';
+
+        if (!file_exists($viewFile)) {
+            throw new RuntimeException("View not found: {$view}");
+        }
+
+        extract($data, EXTR_SKIP);
+
+        require $viewFile;
+    }
 }

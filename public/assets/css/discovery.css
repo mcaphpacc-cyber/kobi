@@ -1,0 +1,158 @@
+/* ==========================================================
+   KOBI Discovery Dashboard
+   ========================================================== */
+
+.discovery-hero
+{
+    background: linear-gradient(
+        135deg,
+        #f8fbff,
+        #eef7ff
+    );
+
+    border-radius: 16px;
+}
+
+.discovery-hero h1
+{
+    font-weight: 700;
+}
+
+.discovery-hero p
+{
+    max-width: 700px;
+    margin: auto;
+}
+
+.discovery-stat
+{
+    border: none;
+    border-radius: 14px;
+
+    transition: all .25s ease;
+}
+
+.discovery-stat:hover
+{
+    transform: translateY(-4px);
+
+    box-shadow:
+        0 12px 30px
+        rgba(0,0,0,.08);
+}
+
+.discovery-stat h2
+{
+    font-size: 2rem;
+
+    margin-bottom: .4rem;
+
+    color: var(--bs-primary);
+}
+
+.discovery-widget
+{
+    border: none;
+
+    border-radius: 14px;
+
+    overflow: hidden;
+
+    transition: all .25s ease;
+}
+
+.discovery-widget:hover
+{
+    transform: translateY(-4px);
+
+    box-shadow:
+        0 15px 30px
+        rgba(0,0,0,.08);
+}
+
+.discovery-widget .card-header
+{
+    background: white;
+
+    font-weight: 600;
+
+    border-bottom: 1px solid #eee;
+}
+
+.discovery-widget .list-group-item
+{
+    border: none;
+
+    padding: .8rem 0;
+
+    transition: all .2s;
+}
+
+.discovery-widget .list-group-item:hover
+{
+    padding-left: .5rem;
+
+    color: var(--bs-primary);
+
+    cursor: pointer;
+}
+
+.discovery-widget .card-footer
+{
+    background: white;
+
+    border-top: 1px solid #eee;
+}
+
+.discovery-widget .card-footer a
+{
+    text-decoration: none;
+
+    font-weight: 500;
+}
+
+.discovery-widget .card-footer a:hover
+{
+    text-decoration: underline;
+}
+
+.discovery-actions .btn
+{
+    min-width: 180px;
+}
+
+@media (max-width: 991px)
+{
+    .discovery-hero
+    {
+        text-align: center;
+    }
+
+    .discovery-stat h2
+    {
+        font-size: 1.75rem;
+    }
+}
+
+@media (max-width: 576px)
+{
+    .discovery-hero
+    {
+        padding: 10px;
+    }
+
+    .discovery-widget
+    {
+        margin-bottom: 1rem;
+    }
+
+    .discovery-stat
+    {
+        margin-bottom: 1rem;
+    }
+
+    .discovery-actions .btn
+    {
+        width: 100%;
+    }
+}

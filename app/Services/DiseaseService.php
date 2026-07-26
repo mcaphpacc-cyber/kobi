@@ -294,4 +294,109 @@ class DiseaseService
 
         );
     }
+
+    /**
+     * Return featured diseases.
+     */
+    public function getFeatured(
+        string $language = 'en'
+    ): array
+    {
+        $rows = $this->repository->getFeatured();
+
+        return array_map(
+            fn(array $row) => [
+                'id'   => (int) $row['id'],
+                'name' => $language === 'hi'
+                    ? $row['disease_hi']
+                    : $row['disease_en'],
+                'slug' => $row['slug']
+            ],
+            $rows
+        );
+    }
+
+    /**
+     * Return all diseases marked as featured
+     * using the standard catalog structure.
+     */
+    public function getFeaturedCatalog(
+        string $language = 'en'
+    ): array
+    {
+        $featured = $this->repository->getFeatured();
+
+        if (empty($featured)) {
+            return [];
+        }
+
+        $all = $this->getAll($language);
+
+        $featuredIds = array_column(
+            $featured,
+            'id'
+        );
+
+        return array_values(
+            array_filter(
+                $all,
+                fn(array $disease) =>
+                    in_array(
+                        $disease['id'],
+                        $featuredIds,
+                        true
+                    )
+            )
+        );
+    }
+
+    private const RECENT_LIMIT = 10;
+
+    public function rememberDisease(int $diseaseId): void
+    {
+        if (session_status() !== PHP_SESSION_ACTIVE) {
+            session_start();
+        }
+
+        $recent = $_SESSION['recent_diseases'] ?? [];
+
+        $recent = array_values(
+            array_diff(
+                $recent,
+                [$diseaseId]
+            )
+        );
+
+        array_unshift(
+            $recent,
+            $diseaseId
+        );
+
+        $_SESSION['recent_diseases'] = array_slice(
+            $recent,
+            0,
+            self::RECENT_LIMIT
+        );
+    }
+
+    public function getRecentlyViewed(
+        string $language = 'en'
+    ): array
+    {
+        $ids = $_SESSION['recent_diseases'] ?? [];
+
+        if (empty($ids)) {
+            return [];
+        }
+
+        $rows = $this->repository->findByIds($ids);
+        
+        return array_map(
+            fn(array $row) => $this->mapDisease(
+                $row,
+                $language
+            ),
+            $rows
+        );
+    }
 }

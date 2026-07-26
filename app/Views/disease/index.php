@@ -2,18 +2,49 @@
 
     <div class="text-center">
 
-        <h1 class="display-5 fw-bold">
+        <?php
 
-            Disease Knowledge Base
+            $heroTitle = 'Disease Knowledge Base';
+            $heroDescription = 'Explore diseases organized by body system, symptoms and medical knowledge.';
 
-        </h1>
+            if (!empty($_GET['featured'])) {
 
-        <p class="lead mb-0">
+                $heroTitle = 'Featured Diseases';
 
-            Explore diseases organized by body system,
-            symptoms and medical knowledge.
+                $heroDescription =
+                    'Curated diseases selected for quick exploration.';
 
-        </p>
+            } elseif (!empty($_GET['recent'])) {
+
+                $heroTitle = 'Recently Viewed Diseases';
+
+                $heroDescription =
+                    'Continue exploring diseases you recently viewed.';
+
+            } elseif (!empty($bodySystem)) {
+
+                $heroTitle =
+                    e($bodySystem['name']) . ' Diseases';
+
+                $heroDescription =
+                    'Browse diseases affecting the '
+                    . strtolower($bodySystem['name'])
+                    . ' body system.';
+            }
+
+            ?>
+
+            <h1 class="display-5 fw-bold">
+
+                <?= $heroTitle ?>
+
+            </h1>
+
+            <p class="lead mb-0">
+
+                <?= $heroDescription ?>
+
+            </p>
 
     </div>
 
@@ -44,6 +75,44 @@
         🧬 Causes
         <?= number_format($statistics['causes']) ?>
     </div>
+
+</div>
+
+<?php
+
+$currentFilter = 'All Diseases';
+
+$badge = 'primary';
+
+if (!empty($_GET['featured'])) {
+
+    $currentFilter = 'Featured';
+
+    $badge = 'warning';
+
+} elseif (!empty($_GET['recent'])) {
+
+    $currentFilter = 'Recently Viewed';
+
+    $badge = 'secondary';
+
+} elseif (!empty($bodySystem)) {
+
+    $currentFilter = $bodySystem['name'];
+
+    $badge = 'info';
+
+}
+
+?>
+
+<div class="mb-4">
+
+    <span class="badge bg-<?= $badge ?> fs-6">
+
+        <?= $currentFilter ?>
+
+    </span>
 
 </div>
 <div class="row g-3 align-items-center mb-4">
@@ -119,6 +188,32 @@
                     <?= number_format($statistics['diseases']) ?>
 
                 </span>
+
+            </a>
+
+            <a
+                href="<?= url('/diseases?featured=1') ?>"
+                class="btn btn-sm <?= isset($_GET['featured'])
+                    ? 'btn-primary'
+                    : 'btn-outline-warning' ?>"
+            >
+
+                <i class="bi bi-star-fill"></i>
+
+                Featured
+
+            </a>
+
+            <a
+                href="<?= url('/diseases?recent=1') ?>"
+                class="btn btn-sm <?= isset($_GET['recent'])
+                    ? 'btn-primary'
+                    : 'btn-outline-secondary' ?>"
+            >
+
+                <i class="bi bi-clock-history"></i>
+
+                Recent
 
             </a>
 
@@ -232,171 +327,266 @@
     </button>
 
 </div>
+<div class="card border-0 shadow-sm rounded-4 overflow-hidden mb-4">
 
-<table id="diseaseTable" class="table table-striped table-hover">
+    <div class="table-responsive">
 
-<thead class="table-dark">
+        <table id="diseaseTable" class="table table-hover align-middle mb-0">
 
-<tr>
+            <thead class="table-dark">
 
-<th>Disease</th>
+            <tr>
 
-<th>Body System</th>
+            <th>Disease</th>
 
-<th>Common Symptoms</th>
+            <th>Body System</th>
 
-<th>Gender</th>
+            <th>Common Symptoms</th>
 
-<th class="text-center" style="width:130px;">
-    Compare
-</th>
+            <th>Gender</th>
 
-</tr>
+            <th class="text-center" style="width:130px;">
+                Compare
+            </th>
 
-</thead>
+            </tr>
 
-<tbody>
-    <?php if (empty($diseases)): ?>
+            </thead>
 
-<div class="card border-0 shadow-sm">
+            <tbody>
+                <?php if (empty($diseases)): ?>
 
-    <div class="card-body text-center py-5">
+            <div class="card border-0 shadow-sm">
 
-        <i class="bi bi-search fs-1 text-muted"></i>
+                <div class="card-body text-center py-5">
 
-        <h4 class="mt-3">
+                    <i class="bi bi-search fs-1 text-muted"></i>
 
-            No diseases found
+                    <h4 class="mt-3">
 
-        </h4>
+                        No diseases found
 
-        <p class="text-muted">
+                    </h4>
 
-            There are currently no diseases
-            available for this body system.
+                    <p class="text-muted">
 
-        </p>
+                        There are currently no diseases
+                        available for this body system.
 
-        <a
-            href="<?= url('/diseases') ?>"
-            class="btn btn-primary"
-        >
+                    </p>
 
-            View All Diseases
+                    <a
+                        href="<?= url('/diseases') ?>"
+                        class="btn btn-primary"
+                    >
 
-        </a>
+                        View All Diseases
+
+                    </a>
+
+                </div>
+
+            </div>
+
+            <?php return; ?>
+
+            <?php endif; ?>
+
+            <?php if (empty($diseases)): ?>
+
+            <div class="card border-0 shadow-sm">
+
+                <div class="card-body text-center py-5">
+
+                    <i class="bi bi-search fs-1 text-muted"></i>
+
+                    <?php if (!empty($_GET['recent'])): ?>
+
+                        <h4>No recently viewed diseases</h4>
+
+                        <p class="text-muted">
+
+                            Start exploring diseases to build
+                            your recent history.
+
+                        </p>
+
+                    <?php elseif (!empty($_GET['featured'])): ?>
+
+                        <h4>No featured diseases</h4>
+
+                        <p class="text-muted">
+
+                            Featured diseases have not been
+                            configured yet.
+
+                        </p>
+
+                    <?php else: ?>
+
+                        <h4>No diseases found</h4>
+
+                        <p class="text-muted">
+
+                            No diseases match the current filter.
+
+                        </p>
+
+                    <?php endif; ?>
+
+                    <a
+                        href="<?= url('/diseases') ?>"
+                        class="btn btn-primary mt-3"
+                    >
+
+                        Browse All Diseases
+
+                    </a>
+
+                </div>
+
+            </div>
+
+            <?php return; ?>
+
+            <?php endif; ?>
+
+            <?php foreach ($diseases as $disease): ?>
+
+            <tr
+                class="disease-row"
+                data-name="<?= e(strtolower($disease['name'])) ?>"
+                data-body-system="<?= e(strtolower($disease['body_system'])) ?>"
+                data-symptoms="<?= e(strtolower($disease['symptoms'])) ?>"
+                data-gender="<?= e(strtolower($disease['gender'])) ?>"
+                data-symptom-count="<?= (int) $disease['symptom_count'] ?>"
+                data-url="<?= url('/disease/' . $disease['slug']) ?>"
+            >
+
+                <td>
+                    <a
+                        href="<?= url('/disease/' . $disease['slug']) ?>"
+                        class="fw-semibold text-decoration-none"
+                    >
+                        <?= e($disease['name']) ?>
+                    </a>
+                </td>
+
+                <td>
+                    <?= e($disease['body_system']) ?>
+                </td>
+
+                <td>
+                    <?php
+                    $symptoms = array_slice(
+                        array_filter(array_map('trim', explode(',', $disease['symptoms']))),
+                        0,
+                        3
+                    );
+                    ?>
+                    <div class="d-flex flex-wrap gap-2">
+                            <?php foreach ($symptoms as $symptom): ?>
+                            
+                                <span
+                                    class="badge rounded-pill bg-light text-dark border symptom-tag"
+                                    data-symptom="<?= strtolower(trim($symptom)) ?>"
+                                >
+                                    <?= htmlspecialchars($symptom) ?>
+                                </span>
+
+                            <?php endforeach; ?>
+                    </div>
+                </td>
+
+                <td>
+
+                    <?php
+                    $genderClass = match ($disease['gender']) {
+                        'male' => 'bg-primary',
+                        'female' => 'bg-danger',
+                        default => 'bg-success'
+                    };
+                    ?>
+
+                    <span class="badge <?= $genderClass ?>">
+                        <?= ucfirst($disease['gender']) ?>
+                    </span>
+
+                </td>
+
+                <td class="text-center">
+
+                    <button
+                        type="button"
+                        class="btn btn-outline-primary btn-sm compare-btn"
+                        data-slug="<?= e($disease['slug']) ?>"
+                        data-name="<?= e($disease['name']) ?>"
+                    >
+
+                        <i class="bi bi-plus-lg"></i>
+
+                        Compare
+
+                    </button>
+
+                </td>
+
+            </tr>
+
+            <?php endforeach; ?>
+
+            </tbody>
+
+            </table>
 
     </div>
 
 </div>
-
-<?php return; ?>
-
-<?php endif; ?>
-    <?php if (empty($diseases)): ?>
-
-<div class="alert alert-warning">
-
-    <i class="bi bi-info-circle"></i>
-
-    No diseases found for this body system.
-
-</div>
-
-<?php return; ?>
-
-<?php endif; ?>
-
-<?php foreach ($diseases as $disease): ?>
-
-<tr
-    class="disease-row"
-    data-name="<?= e(strtolower($disease['name'])) ?>"
-    data-body-system="<?= e(strtolower($disease['body_system'])) ?>"
-    data-symptoms="<?= e(strtolower($disease['symptoms'])) ?>"
-    data-gender="<?= e(strtolower($disease['gender'])) ?>"
-    data-symptom-count="<?= (int) $disease['symptom_count'] ?>"
-    data-url="<?= url('/disease/' . $disease['slug']) ?>"
->
-
-    <td>
-        <a
-            href="<?= url('/disease/' . $disease['slug']) ?>"
-            class="fw-semibold text-decoration-none"
-        >
-            <?= e($disease['name']) ?>
-        </a>
-    </td>
-
-    <td>
-        <?= e($disease['body_system']) ?>
-    </td>
-
-    <td>
-        <?php
-        $symptoms = array_slice(
-            array_filter(array_map('trim', explode(',', $disease['symptoms']))),
-            0,
-            3
-        );
-        ?>
-        <div class="d-flex flex-wrap gap-2">
-                <?php foreach ($symptoms as $symptom): ?>
-                
-                    <span
-                        class="badge rounded-pill bg-light text-dark border symptom-tag"
-                        data-symptom="<?= strtolower(trim($symptom)) ?>"
-                    >
-                        <?= htmlspecialchars($symptom) ?>
-                    </span>
-
-                <?php endforeach; ?>
-        </div>
-    </td>
-
-    <td>
-
-        <?php
-        $genderClass = match ($disease['gender']) {
-            'male' => 'bg-primary',
-            'female' => 'bg-danger',
-            default => 'bg-success'
-        };
-        ?>
-
-        <span class="badge <?= $genderClass ?>">
-            <?= ucfirst($disease['gender']) ?>
-        </span>
-
-    </td>
-
-    <td class="text-center">
-
-        <button
-            type="button"
-            class="btn btn-outline-primary btn-sm compare-btn"
-            data-slug="<?= e($disease['slug']) ?>"
-            data-name="<?= e($disease['name']) ?>"
-        >
-
-            <i class="bi bi-plus-lg"></i>
-
-            Compare
-
-        </button>
-
-    </td>
-
-</tr>
-
-<?php endforeach; ?>
-
-</tbody>
-
-</table>
 <nav class="mt-4">
     <ul
         id="catalogPagination"
         class="pagination justify-content-center">
     </ul>
 </nav>
+<hr class="my-5">
+
+<div class="text-center">
+
+    <h5 class="mb-3">
+
+        Continue Exploring
+
+    </h5>
+
+    <div class="d-flex justify-content-center flex-wrap gap-2">
+
+        <a
+            href="<?= url('/discovery') ?>"
+            class="btn btn-outline-primary"
+        >
+            <i class="bi bi-compass"></i>
+
+            Discovery
+        </a>
+
+        <a
+            href="<?= url('/symptom-checker') ?>"
+            class="btn btn-outline-success"
+        >
+            <i class="bi bi-clipboard2-pulse"></i>
+
+            Symptom Checker
+        </a>
+
+        <a
+            href="<?= url('/diseases') ?>"
+            class="btn btn-outline-secondary"
+        >
+            <i class="bi bi-grid"></i>
+
+            Disease Catalog
+        </a>
+
+    </div>
+
+</div>

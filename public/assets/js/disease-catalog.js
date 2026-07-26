@@ -158,6 +158,12 @@ document.addEventListener("DOMContentLoaded", () => {
 
         bindEvents();
 
+        loadPreferences();
+
+        loadUrlState();
+
+        syncControls();
+
         updateCatalog();
 
         bindSymptomTags();
@@ -167,6 +173,11 @@ document.addEventListener("DOMContentLoaded", () => {
         bindCompareNow();
 
         updateCompareUI();
+
+        window.addEventListener(
+            "popstate",
+            onHistoryChanged
+        );
 
         console.log(
             "KOBI Disease Catalog initialized."
@@ -191,6 +202,11 @@ document.addEventListener("DOMContentLoaded", () => {
 
         if (dom.search) {
 
+            localStorage.setItem(
+                "kobi.catalog.scroll",
+                0
+            );
+
             dom.search.addEventListener(
 
                 "input",
@@ -204,7 +220,7 @@ document.addEventListener("DOMContentLoaded", () => {
                             .trim()
                             .toLowerCase();
                     
-                    state.currentPage = 1;
+                    resetToFirstPage();
 
                     updateCatalog();
 
@@ -224,7 +240,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
                         state.keyword = "";
 
-                        state.currentPage = 1;
+                        resetToFirstPage();
+
                         updateCatalog();
 
                     }
@@ -253,7 +270,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
                         dom.gender.value;
 
-                    state.currentPage = 1;
+                    resetToFirstPage();
 
                     updateCatalog();
 
@@ -281,7 +298,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
                         dom.sort.value;
 
-                    state.currentPage = 1;
+                    resetToFirstPage();
 
                     updateCatalog();
 
@@ -308,17 +325,15 @@ document.addEventListener("DOMContentLoaded", () => {
 
         renderRows(filtered);
 
-        updateCounter(
+        updateCounter(filtered.length);
 
-            filtered.length
+        updateEmptyState(filtered.length);
 
-        );
+        savePreferences();
 
-        updateEmptyState(
+        updateUrl();
 
-            filtered.length
-
-        );
+        restoreScrollPosition();
 
     }
 
@@ -492,7 +507,9 @@ document.addEventListener("DOMContentLoaded", () => {
     | Render Rows
     |--------------------------------------------------------------------------
     */
-
+    // -----------------------------------------------------
+    // Rendering
+    // -----------------------------------------------------
     function renderRows(filtered)
     {
         rows.forEach(
@@ -570,96 +587,96 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     function renderPagination(totalPages)
-{
-    dom.pagination.innerHTML = "";
-
-    if (totalPages <= 1)
     {
-        return;
-    }
+        dom.pagination.innerHTML = "";
 
-    const createItem = (
-        label,
-        page,
-        active = false,
-        disabled = false
-    ) =>
-    {
-        const li =
-            document.createElement("li");
-
-        li.className =
-            "page-item";
-
-        if (active)
-            li.classList.add(
-                "active"
-            );
-
-        if (disabled)
-            li.classList.add(
-                "disabled"
-            );
-
-        const link =
-            document.createElement("a");
-
-        link.href = "#";
-
-        link.className =
-            "page-link";
-
-        link.textContent =
-            label;
-
-        if (!disabled)
+        if (totalPages <= 1)
         {
-            link.addEventListener(
-                "click",
-                function (e)
-                {
-                    e.preventDefault();
+            return;
+        }
 
-                    state.currentPage =
-                        page;
+        const createItem = (
+            label,
+            page,
+            active = false,
+            disabled = false
+        ) =>
+        {
+            const li =
+                document.createElement("li");
 
-                    updateCatalog();
-                }
+            li.className =
+                "page-item";
+
+            if (active)
+                li.classList.add(
+                    "active"
+                );
+
+            if (disabled)
+                li.classList.add(
+                    "disabled"
+                );
+
+            const link =
+                document.createElement("a");
+
+            link.href = "#";
+
+            link.className =
+                "page-link";
+
+            link.textContent =
+                label;
+
+            if (!disabled)
+            {
+                link.addEventListener(
+                    "click",
+                    function (e)
+                    {
+                        e.preventDefault();
+
+                        state.currentPage =
+                            page;
+
+                        updateCatalog();
+                    }
+                );
+            }
+
+            li.appendChild(link);
+
+            dom.pagination.appendChild(li);
+        };
+
+        createItem(
+            "«",
+            state.currentPage - 1,
+            false,
+            state.currentPage === 1
+        );
+
+        for (
+            let page = 1;
+            page <= totalPages;
+            page++
+        )
+        {
+            createItem(
+                page,
+                page,
+                page === state.currentPage
             );
         }
 
-        li.appendChild(link);
-
-        dom.pagination.appendChild(li);
-    };
-
-    createItem(
-        "«",
-        state.currentPage - 1,
-        false,
-        state.currentPage === 1
-    );
-
-    for (
-        let page = 1;
-        page <= totalPages;
-        page++
-    )
-    {
         createItem(
-            page,
-            page,
-            page === state.currentPage
+            "»",
+            state.currentPage + 1,
+            false,
+            state.currentPage === totalPages
         );
     }
-
-    createItem(
-        "»",
-        state.currentPage + 1,
-        false,
-        state.currentPage === totalPages
-    );
-}
 
     /*
     |--------------------------------------------------------------------------
@@ -878,7 +895,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
                     dom.search.value = symptom;
 
-                    state.currentPage = 1;
+                    resetToFirstPage();
 
                     updateCatalog();
 
@@ -932,13 +949,17 @@ document.addEventListener("DOMContentLoaded", () => {
 
                 const slug = button.dataset.slug;
 
-                if (state.compare.includes(slug))
+                const selected = state.compare.some(
+                    item => item.slug === slug
+                );
+
+                if (selected)
                 {
                     button.classList.remove("btn-outline-primary");
                     button.classList.add("btn-success");
 
                     button.innerHTML =
-                        '<i class="bi bi-check-lg"></i> Added';
+                        '<i class="bi bi-check-lg"></i> Selected';
                 }
                 else
                 {
@@ -1026,6 +1047,237 @@ document.addEventListener("DOMContentLoaded", () => {
         );
 
         return button ? button.dataset.name : slug;
+    }
+
+    
+
+    // -----------------------------------------------------
+    // State Persistence
+    // -----------------------------------------------------
+
+    function savePreferences()
+    {
+        localStorage.setItem(
+
+            "kobi.catalog.preferences",
+
+            JSON.stringify({
+
+                keyword:
+                    state.keyword,
+
+                gender:
+                    state.gender,
+
+                sort:
+                    state.sort,
+
+                page:
+                    state.currentPage,
+
+                body:
+                    state.bodySystem ?? ""
+
+            })
+
+        );
+    }
+
+    function loadPreferences()
+    {
+        const saved =
+            localStorage.getItem(
+
+                "kobi.catalog.preferences"
+
+            );
+
+        if (!saved)
+        {
+            return;
+        }
+
+        const preferences =
+            JSON.parse(saved);
+
+        state.keyword =
+            preferences.keyword ?? "";
+
+        state.gender =
+            preferences.gender ?? "all";
+
+        state.sort =
+            preferences.sort ?? "az";
+
+        state.currentPage =
+            preferences.page ?? 1;
+    }
+
+    function updateUrl(addHistory = true)
+    {
+        const params =
+            new URLSearchParams();
+
+        if (state.keyword)
+        {
+            params.set(
+                "search",
+                state.keyword
+            );
+        }
+
+        if (state.gender !== "all")
+        {
+            params.set(
+                "gender",
+                state.gender
+            );
+        }
+
+        if (state.sort !== "az")
+        {
+            params.set(
+                "sort",
+                state.sort
+            );
+        }
+
+        if (state.currentPage > 1)
+        {
+            params.set(
+                "page",
+                state.currentPage
+            );
+        }
+
+        const url =
+            window.location.pathname +
+            (
+                params.toString()
+                    ? "?" + params.toString()
+                    : ""
+            );
+
+        history.pushState(
+            {
+                keyword: state.keyword,
+                gender: state.gender,
+                sort: state.sort,
+                page: state.currentPage
+            },
+            "",
+            url
+        );
+
+         if (addHistory)
+        {
+            history.pushState({}, "", url);
+        }
+        else
+        {
+            history.replaceState({}, "", url);
+        }
+    }
+
+    function loadUrlState()
+    {
+        const params =
+            new URLSearchParams(
+                window.location.search
+            );
+
+        if (
+            params.has("search")
+        )
+        {
+            state.keyword =
+                params.get("search");
+        }
+
+        if (
+            params.has("gender")
+        )
+        {
+            state.gender =
+                params.get("gender");
+        }
+
+        if (
+            params.has("sort")
+        )
+        {
+            state.sort =
+                params.get("sort");
+        }
+
+        if (
+            params.has("page")
+        )
+        {
+            state.currentPage =
+                parseInt(
+                    params.get("page"),
+                    10
+                ) || 1;
+        }
+    }
+
+    function onHistoryChanged()
+    {
+        loadUrlState();
+
+        syncControls();
+
+        updateCatalog();
+    }
+
+    function syncControls()
+    {
+        dom.search.value = state.keyword;
+        dom.gender.value = state.gender;
+        dom.sort.value = state.sort;
+    }
+
+    function saveScrollPosition()
+    {
+        localStorage.setItem(
+            "kobi.catalog.scroll",
+            window.scrollY
+        );
+    }
+
+    function restoreScrollPosition()
+    {
+        const position =
+            parseInt(
+                localStorage.getItem(
+                    "kobi.catalog.scroll"
+                ),
+                10
+            );
+
+        if (!isNaN(position))
+        {
+            window.scrollTo({
+                top: position,
+                behavior: "instant"
+            });
+        }
+    }
+
+    function resetScrollPosition()
+    {
+        localStorage.setItem(
+            "kobi.catalog.scroll",
+            0
+        );
+    }
+
+    function resetToFirstPage()
+    {
+        state.currentPage = 1;
+
+        resetScrollPosition();
     }
 
 });

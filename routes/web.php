@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 use App\Controllers\HomeController;
 use App\Controllers\DiseaseController;
+use App\Controllers\DiscoveryController;
 use App\Controllers\SymptomCheckerController;
 use App\Controllers\ComparisonController;
 
@@ -71,4 +72,22 @@ $this->router()->get(
     '/api/search/suggestions',
     HomeController::class,
     'searchSuggestions'
+);
+
+$this->router()->get(
+    '/discovery',
+    DiscoveryController::class,
+    'index'
+);
+
+$this->router()->get(
+    '/body-parts',
+    BodyPartController::class,
+    'index'
+);
+
+$this->router()->get(
+    '/body-parts/{slug}',
+    BodyPartController::class,
+    'show'
 );

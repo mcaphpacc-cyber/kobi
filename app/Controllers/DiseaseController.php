@@ -22,9 +22,22 @@ class DiseaseController extends Controller
 
         $bodySlug = trim($_GET['body'] ?? '');
 
+        $featured =
+            (int) ($_GET['featured'] ?? 0) === 1;
+
+        $recent =
+            (int) ($_GET['recent'] ?? 0) === 1;
+
         $bodySystem = null;
 
-        if ($bodySlug !== '') {
+        if ($featured) {
+
+            $diseases = $this->service
+                ->getFeaturedCatalog($language);
+
+            $title = 'Featured Diseases';
+
+        } elseif ($bodySlug !== '') {
 
             $result = $this->service
                 ->getByBodySystem(
@@ -36,11 +49,22 @@ class DiseaseController extends Controller
 
             $diseases = $result['diseases'];
 
+            $title = $bodySystem
+                ? $bodySystem['name'] . ' Diseases'
+                : 'Diseases';
+
+        } elseif ($recent) {
+
+            $diseases = $this->service
+                ->getRecentlyViewed($language);
+
+            $title = 'Recently Viewed Diseases';
         } else {
 
             $diseases = $this->service
                 ->getAll($language);
 
+            $title = 'Diseases';
         }
 
         $bodySystems = $this->service->getBodySystems();
@@ -104,6 +128,10 @@ class DiseaseController extends Controller
         $relatedDiseases = $this->service
         ->getRelatedDiseases(
             $knowledge
+        );
+
+        $this->service->rememberDisease(
+            (int) $knowledge['disease']['disease_id']
         );
 
         $this->view(
