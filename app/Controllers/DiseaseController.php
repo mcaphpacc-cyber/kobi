@@ -152,4 +152,23 @@ class DiseaseController extends Controller
 
         );
     }
+
+    private function buildCatalogFilters(): array
+    {
+        return [
+
+            'q' => trim($_GET['q'] ?? ''),
+
+            'body' => trim($_GET['body'] ?? ''),
+
+            'featured' => !empty($_GET['featured']),
+
+            'recent' => !empty($_GET['recent']),
+
+            'gender' => trim($_GET['gender'] ?? ''),
+
+            'sort' => trim($_GET['sort'] ?? 'name'),
+
+        ];
+    }
 }

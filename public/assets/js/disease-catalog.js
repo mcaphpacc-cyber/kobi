@@ -160,7 +160,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
         loadPreferences();
 
-        loadUrlState();
+        syncStateFromUrl();
 
         syncControls();
 
@@ -1158,61 +1158,63 @@ document.addEventListener("DOMContentLoaded", () => {
                     : ""
             );
 
-        history.pushState(
-            {
-                keyword: state.keyword,
-                gender: state.gender,
-                sort: state.sort,
-                page: state.currentPage
-            },
-            "",
-            url
-        );
-
-         if (addHistory)
+        const historyState =
         {
-            history.pushState({}, "", url);
+            keyword: state.keyword,
+            gender: state.gender,
+            sort: state.sort,
+            page: state.currentPage
+        };
+
+        if (addHistory)
+        {
+            history.pushState(
+                historyState,
+                "",
+                url
+            );
         }
         else
         {
-            history.replaceState({}, "", url);
+            history.replaceState(
+                historyState,
+                "",
+                url
+            );
         }
     }
 
-    function loadUrlState()
+    function syncStateFromUrl()
     {
+        state.keyword = "";
+        state.gender = "all";
+        state.sort = "az";
+        state.currentPage = 1;
+
         const params =
             new URLSearchParams(
                 window.location.search
             );
 
-        if (
-            params.has("search")
-        )
+        if (params.has("search"))
         {
             state.keyword =
                 params.get("search");
         }
 
-        if (
-            params.has("gender")
-        )
+        if (params.has("gender"))
         {
             state.gender =
                 params.get("gender");
         }
 
-        if (
-            params.has("sort")
-        )
+        if (params.has("sort"))
         {
             state.sort =
                 params.get("sort");
         }
 
-        if (
-            params.has("page")
-        )
+        if (params.has("page"))
         {
             state.currentPage =
                 parseInt(
@@ -1224,7 +1226,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     function onHistoryChanged()
     {
-        loadUrlState();
+        syncStateFromUrl();
 
         syncControls();
 

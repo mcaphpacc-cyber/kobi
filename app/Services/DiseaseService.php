@@ -22,16 +22,13 @@ class DiseaseService
     /**
      * Return diseases for the selected language.
      */
-    public function getAll(string $language = 'en'): array
+    public function getAll(
+        string $language = 'en'
+    ): array
     {
-        $rows = $this->repository->findAll();
-
-        return array_map(
-            fn (array $row): array => $this->mapDisease(
-                $row,
-                $language
-            ),
-            $rows
+        return $this->getCatalog(
+            [],
+            $language
         );
     }
 
@@ -47,17 +44,9 @@ class DiseaseService
 
             'bodySystem' => $result['bodySystem'],
 
-            'diseases' => array_map(
-
-                fn (array $row): array =>
-
-                    $this->mapDisease(
-                        $row,
-                        $language
-                    ),
-
-                $result['diseases']
-
+            'diseases' => $this->mapDiseaseCollection(
+                $result['diseases'],
+                $language
             )
 
         ];
@@ -181,6 +170,17 @@ class DiseaseService
         );
     }
 
+    /*
+    |--------------------------------------------------------------------------
+    | Repository Compatibility
+    |--------------------------------------------------------------------------
+    |
+    | During the B.1 repository migration, this method supports both the
+    | legacy repository queries and the new unified catalog query.
+    | Once the migration is complete, legacy fallbacks can be removed.
+    |
+    */
+
     private function mapDisease(
         array $row,
         string $language
@@ -188,7 +188,7 @@ class DiseaseService
     {
         return [
 
-            'id' => (int) $row['id'],
+            'id' => (int) (  $row['disease_id'] ?? $row['id'] ?? 0),
 
             'name' => $language === 'hi'
                 ? $row['disease_hi']
@@ -204,13 +204,53 @@ class DiseaseService
 
             'body_part_id' => (int) $row['body_part_id'],
 
-            'body_system' => $row['body_system'],
+            'body_system' => $language === 'hi'
+                ? (
+                    $row['body_name_hi']
+                    ?? $row['body_system']
+                    ?? ''
+                )
+                : (
+                    $row['body_name_en']
+                    ?? $row['body_system']
+                    ?? ''
+                ),
 
-            'icd_code' => $row['icd_code'],
+            'icd' => $row['icd_code']
+                ?? $row['icd']
+                ?? '',
 
-            'icd10_code' => $row['icd10_code']
+            'icd10' => $row['icd10_code']
+                ?? $row['icd10']
+                ?? '',
 
         ];
+    }
+
+    /**
+     * Map a collection of diseases.
+     *
+     * @param array $rows
+     * @param string $language
+     * @return array
+     */
+    private function mapDiseaseCollection(
+        array $rows,
+        string $language = 'en'
+    ): array
+    {
+        return array_map(
+
+            fn (array $row): array =>
+
+                $this->mapDisease(
+                    $row,
+                    $language
+                ),
+
+            $rows
+
+        );
     }
 
     /**
@@ -397,6 +437,38 @@ class DiseaseService
                 $language
             ),
             $rows
+        );
+    }
+
+    /**
+     * Get Disease Catalog.
+     *
+     * @param array $filters
+     * @param string $language
+     * @return array
+     */
+    public function getCatalog(
+        array $filters = [],
+        string $language = 'en'
+    ): array
+    {
+        /*
+        |--------------------------------------------------------------------------
+        | Recently Viewed
+        |--------------------------------------------------------------------------
+        */
+
+        if (!empty($filters['recent']))
+        {
+            return $this->getRecentlyViewed($language);
+        }
+
+        $rows = $this->repository
+            ->findCatalog($filters);
+
+        return $this->mapDiseaseCollection(
+            $rows,
+            $language
         );
     }
 }

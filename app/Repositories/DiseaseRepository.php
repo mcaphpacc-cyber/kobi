@@ -1014,4 +1014,241 @@ class DiseaseRepository extends BaseRepository
             $ids
         );
     }
+
+    /**
+     * Unified Disease Catalog Query.
+     *
+     * Supported filters:
+     * - body
+     * - featured
+     * - gender
+     * - q
+     * - sort
+     */
+    public function findCatalog(
+        array $filters = []
+    ): array
+    {
+        /*
+        |--------------------------------------------------------------------------
+        | Dynamic Query Parts
+        |--------------------------------------------------------------------------
+        */
+
+        $joins = [];
+
+        $conditions = [];
+
+        $params = [];
+
+        $orderBy = [];
+
+        /*
+        |--------------------------------------------------------------------------
+        | Base Query
+        |--------------------------------------------------------------------------
+        */
+
+        $sql = "
+            SELECT
+
+                d.id              AS disease_id,
+                d.slug,
+                d.disease_en,
+                d.disease_hi,
+                d.gender,
+                d.icd_code,
+                d.icd10_code,
+                d.body_part_id,
+
+                bp.slug           AS body_slug,
+                bp.name_en        AS body_name_en,
+                bp.name_hi        AS body_name_hi,
+
+                dc.overview_en,
+                dc.overview_hi,
+
+                COUNT(
+                    DISTINCT ds.symptom_id
+                ) AS symptom_count,
+
+                GROUP_CONCAT(
+
+                    DISTINCT s.symptom_en
+
+                    ORDER BY s.display_order ASC
+
+                    SEPARATOR ', '
+
+                ) AS symptoms
+
+            FROM diseases d
+
+            LEFT JOIN body_parts bp
+                ON bp.id = d.body_part_id
+
+            LEFT JOIN disease_content dc
+                ON dc.disease_id = d.id
+
+            LEFT JOIN disease_symptoms ds
+                ON ds.disease_id = d.id
+
+            LEFT JOIN symptoms s
+                ON s.id = ds.symptom_id
+        ";
+
+        /*
+        |--------------------------------------------------------------------------
+        | Featured Diseases
+        |--------------------------------------------------------------------------
+        */
+
+        if (!empty($filters['featured']))
+        {
+            $joins[] = "
+                INNER JOIN featured_diseases fd
+                    ON fd.disease_id = d.id
+            ";
+
+            $orderBy[] = "fd.priority_order ASC";
+        }
+
+        /*
+        |--------------------------------------------------------------------------
+        | Body Part
+        |--------------------------------------------------------------------------
+        */
+
+        if (!empty($filters['body']))
+        {
+            $conditions[] =
+                "bp.slug = :body";
+
+            $params['body'] =
+                trim($filters['body']);
+        }
+
+        /*
+        |--------------------------------------------------------------------------
+        | Gender
+        |--------------------------------------------------------------------------
+        */
+
+        if (!empty($filters['gender']))
+        {
+            $conditions[] =
+                "d.gender = :gender";
+
+            $params['gender'] =
+                $filters['gender'];
+        }
+
+        /*
+        |--------------------------------------------------------------------------
+        | Search
+        |--------------------------------------------------------------------------
+        */
+
+        if (!empty($filters['q']))
+        {
+            $conditions[] = "
+            (
+                d.disease_en LIKE :search
+
+                OR d.disease_hi LIKE :search
+
+                OR d.icd_code LIKE :search
+
+                OR d.icd10_code LIKE :search
+
+                OR bp.name_en LIKE :search
+
+                OR bp.name_hi LIKE :search
+
+                OR s.symptom_en LIKE :search
+
+                OR dc.overview_en LIKE :search
+
+                OR dc.overview_hi LIKE :search
+            )
+            ";
+
+            $search = trim($filters['q']);
+
+            $params['search'] = '%' . $search . '%';
+        }
+
+        /*
+        |--------------------------------------------------------------------------
+        | Dynamic JOINS
+        |--------------------------------------------------------------------------
+        */
+
+        if (!empty($joins))
+        {
+            $sql .= "\n" .
+                implode("\n", $joins);
+        }
+
+        /*
+        |--------------------------------------------------------------------------
+        | WHERE
+        |--------------------------------------------------------------------------
+        */
+
+        if (!empty($conditions))
+        {
+            $sql .= "\nWHERE\n    " .
+                implode("\nAND ", $conditions);
+        }
+
+        /*
+        |--------------------------------------------------------------------------
+        | GROUP BY
+        |--------------------------------------------------------------------------
+        */
+
+        $sql .= "
+            GROUP BY
+                d.id
+        ";
+
+        /*
+        |--------------------------------------------------------------------------
+        | Sorting
+        |--------------------------------------------------------------------------
+        */
+
+        switch ($filters['sort'] ?? '')
+        {
+            case 'updated':
+
+                $orderBy[] =
+                    "d.updated_at DESC";
+
+                break;
+
+            case 'name':
+
+                $orderBy[] =
+                    "d.disease_en ASC";
+
+                break;
+        }
+
+        if (empty($orderBy))
+        {
+            $orderBy[] =
+                "d.disease_en ASC";
+        }
+
+        $sql .= "
+            ORDER BY
+                " . implode(', ', $orderBy);
+
+        return $this->fetchAll(
+            $sql,
+            $params
+        );
+    }
 }
