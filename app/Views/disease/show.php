@@ -496,28 +496,33 @@ ob_start();
 ?>
   <div class="accordion" id="treatmentAccordion">
     <?php foreach ($knowledge['treatments'] as $index => $treatment) : ?>
-    <?php
+
+<?php
 
 $icon =
     $treatmentIcons[
         $treatment['treatment_system_id']
     ] ?? 'bi-plus-circle';
 
-$preview =
-    mb_substr(
-        strip_tags($treatment['overview_en']),
-        0,
-        140
+$overview =
+    trim(
+        (string) ($treatment['overview_en'] ?? '')
     );
 
+$preview =
+    $overview !== ''
+        ? mb_substr(
+            strip_tags($overview),
+            0,
+            140
+        )
+        : '';
+
 if (
-    mb_strlen(
-        strip_tags($treatment['overview_en'])
-    ) > 140
+    $overview !== '' &&
+    mb_strlen(strip_tags($overview)) > 140
 ) {
-
     $preview .= '...';
-
 }
 
 $treatmentClasses = [
@@ -568,47 +573,86 @@ $treatmentBadges = [
 
 ];
 
-?>
-    <div class="accordion-item mb-3 rounded-3 border <?= $cardClass ?>">
-      <h2
-class="accordion-header"
-id="heading<?= $index; ?>">
-        <button
-class="accordion-button collapsed"
-type="button"
-data-bs-toggle="collapse"
-data-bs-target="#collapse<?= $index; ?>">
-        <div class="w-100">
-          <div class="fw-bold mb-2"> <i class="bi <?= $icon; ?> me-2 text-primary"></i>
-            <?= e($treatment['title_en']); ?>
-            <?php
 $badge =
     $treatmentBadges[
         $treatment['treatment_system_id']
     ] ?? null;
+
 ?>
-            <?php if ($badge) : ?>
-            <span class="badge <?= $badge['class']; ?> ms-2">
-            <?= $badge['text']; ?>
-            </span>
-            <?php endif; ?>
-          </div>
-          <div class="small text-muted">
-            <?= e($preview); ?>
-          </div>
-        </div>
+
+<div class="accordion-item mb-3 rounded-3 border <?= $cardClass ?>">
+
+    <h2
+        class="accordion-header"
+        id="heading<?= $index; ?>"
+    >
+
+        <button
+            class="accordion-button collapsed"
+            type="button"
+            data-bs-toggle="collapse"
+            data-bs-target="#collapse<?= $index; ?>"
+        >
+
+            <div class="w-100">
+
+                <div class="fw-bold mb-2">
+
+                    <i class="bi <?= $icon; ?> me-2 text-primary"></i>
+
+                    <?= e($treatment['title_en']); ?>
+
+                    <?php if ($badge) : ?>
+
+                        <span class="badge <?= $badge['class']; ?> ms-2">
+                            <?= $badge['text']; ?>
+                        </span>
+
+                    <?php endif; ?>
+
+                </div>
+
+                <?php if ($preview !== '') : ?>
+
+                    <div class="small text-muted">
+                        <?= e($preview); ?>
+                    </div>
+
+                <?php endif; ?>
+
+            </div>
+
         </button>
-      </h2>
-      <div
-id="collapse<?= $index; ?>"
-class="accordion-collapse collapse"
-data-bs-parent="#treatmentAccordion">
+
+    </h2>
+
+    <div
+        id="collapse<?= $index; ?>"
+        class="accordion-collapse collapse"
+        data-bs-parent="#treatmentAccordion"
+    >
+
         <div class="treatment-content accordion-body">
-          <?= nl2br(e($treatment['overview_en'])) ?>
+
+            <?php if ($overview !== '') : ?>
+
+                <?= nl2br(e($overview)); ?>
+
+            <?php else : ?>
+
+                <div class="text-muted">
+                    Detailed treatment guidance is currently being prepared.
+                </div>
+
+            <?php endif; ?>
+
         </div>
-      </div>
+
     </div>
-    <?php endforeach; ?>
+
+</div>
+
+<?php endforeach; ?>
     <div class="alert alert-info mt-4 mb-0"> <i class="bi bi-info-circle me-2"></i> <strong>Medical Note:</strong> The treatment information provided is intended for educational purposes only.
       Always consult a qualified healthcare professional before starting,
       stopping, or changing any treatment. </div>
