@@ -20,15 +20,13 @@ class DiseaseRepository extends BaseRepository
                 COUNT(DISTINCT ds.symptom_id) AS symptom_count,
                 GROUP_CONCAT(
                     DISTINCT s.symptom_en
-                    ORDER BY s.display_order ASC
+                    ORDER BY s.symptom_en ASC
                     SEPARATOR ', '
                 ) AS symptoms,
                 disease_en,
                 disease_hi,
                 d.slug,
-                d.gender,
-                icd_code,
-                icd10_code
+                d.gender
             FROM diseases d
             LEFT JOIN body_parts bp
             ON bp.id = d.body_part_id
@@ -55,9 +53,7 @@ class DiseaseRepository extends BaseRepository
                 disease_en,
                 disease_hi,
                 slug,
-                gender,
-                icd_code,
-                icd10_code
+                gender
             FROM diseases
             WHERE id = :id
             LIMIT 1
@@ -80,9 +76,7 @@ class DiseaseRepository extends BaseRepository
                 disease_en,
                 disease_hi,
                 slug,
-                gender,
-                icd_code,
-                icd10_code
+                gender
             FROM diseases
             WHERE slug = :slug
             LIMIT 1
@@ -304,9 +298,7 @@ class DiseaseRepository extends BaseRepository
                 disease_en,
                 disease_hi,
                 slug,
-                gender,
-                icd_code,
-                icd10_code
+                gender
             FROM diseases
             WHERE
                 disease_en LIKE :keyword
@@ -480,8 +472,6 @@ class DiseaseRepository extends BaseRepository
                 d.id,
                 d.disease_en,
                 d.slug,
-                d.severity_level,
-                d.urgency_note,
                 dc.risk_factors_en,
                 dc.causes_en,
                 dc.diagnosis_en,
@@ -520,11 +510,10 @@ class DiseaseRepository extends BaseRepository
             $disease['symptoms'] =
                 $symptomMap[$disease['id']] ?? [];
 
+                $disease['quickFacts'] = QuickFactsBuilder::build($disease);
         }
 
-        $disease['quickFacts'] =
-        QuickFactsBuilder::build($disease);
-
+        unset($disease);
         return $diseases;
     }
 
@@ -892,15 +881,13 @@ class DiseaseRepository extends BaseRepository
 
                 GROUP_CONCAT(
                     DISTINCT s.symptom_en
-                    ORDER BY s.display_order
+                    ORDER BY s.symptom_en
                     SEPARATOR ', '
                 ) AS symptoms,
                 disease_en,
                 disease_hi,
                 d.slug,
-                d.gender,
-                icd_code,
-                icd10_code
+                d.gender
             FROM diseases d
             LEFT JOIN body_parts bp
                 ON bp.id = d.body_part_id
@@ -982,15 +969,13 @@ class DiseaseRepository extends BaseRepository
                 COUNT(DISTINCT ds.symptom_id) AS symptom_count,
                 GROUP_CONCAT(
                     DISTINCT s.symptom_en
-                    ORDER BY s.display_order
+                    ORDER BY s.symptom_en
                     SEPARATOR ', '
                 ) AS symptoms,
                 disease_en,
                 disease_hi,
                 d.slug,
-                d.gender,
-                icd_code,
-                icd10_code
+                d.gender
             FROM diseases d
 
             LEFT JOIN body_parts bp
@@ -1057,8 +1042,6 @@ class DiseaseRepository extends BaseRepository
                 d.disease_en,
                 d.disease_hi,
                 d.gender,
-                d.icd_code,
-                d.icd10_code,
                 d.body_part_id,
 
                 bp.slug           AS body_slug,
@@ -1076,7 +1059,7 @@ class DiseaseRepository extends BaseRepository
 
                     DISTINCT s.symptom_en
 
-                    ORDER BY s.display_order ASC
+                    ORDER BY s.symptom_en ASC
 
                     SEPARATOR ', '
 
@@ -1156,10 +1139,6 @@ class DiseaseRepository extends BaseRepository
                 d.disease_en LIKE :search
 
                 OR d.disease_hi LIKE :search
-
-                OR d.icd_code LIKE :search
-
-                OR d.icd10_code LIKE :search
 
                 OR bp.name_en LIKE :search
 

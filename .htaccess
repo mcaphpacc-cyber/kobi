@@ -1,0 +1,19 @@
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+
+    # Disable directory listings
+    Options -Indexes
+
+    # Protect environment files
+    RewriteRule ^\.env(?:\..*)?$ - [F,L]
+
+    # Protect application directories
+    RewriteRule ^(?:app|bootstrap|config|database|storage|vendor)(?:/|$) - [F,L]
+
+    # Protect Composer/project files
+    RewriteRule ^(?:composer\.json|composer\.lock|phpunit\.xml|phpunit\.xml\.dist)(?:/|$) - [F,L]
+
+    # Protect Git files/directories
+    RewriteRule ^\.git(?:/|$) - [F,L]
+    RewriteRule ^\.gitignore$ - [F,L]
+</IfModule>

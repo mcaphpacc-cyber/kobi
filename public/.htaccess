@@ -1,8 +1,14 @@
 <IfModule mod_rewrite.c>
     RewriteEngine On
 
+    # Prevent directory listing
+    Options -Indexes
+
+    # Protect hidden files such as .env, .git, etc.
+    RewriteRule (^|/)\. - [F,L]
+
+    # Front controller
     RewriteCond %{REQUEST_FILENAME} !-f
     RewriteCond %{REQUEST_FILENAME} !-d
-
     RewriteRule ^ index.php [QSA,L]
 </IfModule>

@@ -13,7 +13,7 @@ class QuickFactsBuilder
             'cause',
             'Cause',
             'bi-bug',
-            $disease['cause'] ?? null
+            $disease['causes_en'] ?? null
         );
 
         self::addFact(
@@ -21,7 +21,7 @@ class QuickFactsBuilder
             'risk',
             'Risk Factors',
             'bi-exclamation-triangle',
-            $disease['risk_factors'] ?? null
+            $disease['risk_factors_en'] ?? null
         );
 
         self::addFact(
@@ -29,7 +29,7 @@ class QuickFactsBuilder
             'diagnosis',
             'Diagnosis',
             'bi-heart-pulse',
-            $disease['diagnosis'] ?? null
+            $disease['diagnosis_en'] ?? null
         );
 
         self::addFact(
@@ -37,7 +37,7 @@ class QuickFactsBuilder
             'prevention',
             'Prevention',
             'bi-shield-check',
-            $disease['prevention'] ?? null
+            $disease['prevention_en'] ?? null
         );
 
         return $facts;
