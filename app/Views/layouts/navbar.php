@@ -1,118 +1,187 @@
 <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
 
-<div class="container">
+    <div class="container">
 
-<a class="navbar-brand fw-bold" href="<?= url('/') ?>">
+        <a
+            class="navbar-brand fw-bold"
+            href="<?= url('/') ?>">
 
-KOBI
+            KOBI
 
-</a>
+        </a>
 
-<button
-class="navbar-toggler"
-type="button"
-data-bs-toggle="collapse"
-data-bs-target="#navbar">
+        <button
+            class="navbar-toggler"
+            type="button"
+            data-bs-toggle="collapse"
+            data-bs-target="#navbar">
 
-<span class="navbar-toggler-icon"></span>
+            <span class="navbar-toggler-icon"></span>
 
-</button>
+        </button>
 
-<div
-class="collapse navbar-collapse"
-id="navbar">
+        <div
+            class="collapse navbar-collapse"
+            id="navbar">
 
-<ul class="navbar-nav me-auto">
+            <ul class="navbar-nav me-auto">
 
-<li class="nav-item">
+                <li class="nav-item">
 
-<a class="nav-link" href="<?= url('/') ?>">
+                    <a
+                        class="nav-link"
+                        href="<?= url('/') ?>">
 
-Home
+                        Home
 
-</a>
+                    </a>
 
-</li>
+                </li>
 
-<li class="nav-item">
+                <li class="nav-item">
 
-<a class="nav-link" href="<?= url('/diseases') ?>">
+                    <a
+                        class="nav-link"
+                        href="<?= url('/diseases') ?>">
 
-Diseases
+                        Diseases
 
-</a>
+                    </a>
 
-</li>
-<li class="nav-item">
-    <a class="nav-link" href="<?= url('/symptom-checker'); ?>">
-        Symptom Checker
-    </a>
-</li>
+                </li>
 
-<li class="nav-item">
+                <li class="nav-item">
 
-    <a
-        class="nav-link"
-        href="<?= url('/compare'); ?>">
+                    <a
+                        class="nav-link"
+                        href="<?= url('/symptom-checker'); ?>">
 
-        Compare
+                        Symptom Checker
 
-    </a>
+                    </a>
 
-</li>
+                </li>
 
-<li class="nav-item">
+                <li class="nav-item">
 
-    <a
-        class="nav-link"
-        href="<?= url('/discovery'); ?>">
+                    <a
+                        class="nav-link"
+                        href="<?= url('/compare'); ?>">
 
-        Knowledge Discovery
+                        Compare
 
-    </a>
+                    </a>
 
-</li>
+                </li>
 
-<li class="nav-item">
+                <li class="nav-item">
 
-<a class="nav-link disabled">
+                    <a
+                        class="nav-link"
+                        href="<?= url('/discovery'); ?>">
 
-Body Parts
+                        Knowledge Discovery
 
-</a>
+                    </a>
 
-</li>
+                </li>
 
-<li class="nav-item">
+                <li class="nav-item">
 
-<a class="nav-link disabled">
+                    <a class="nav-link disabled">
 
-Symptoms
+                        Body Parts
 
-</a>
+                    </a>
 
-</li>
+                </li>
 
-<li class="nav-item">
+                <li class="nav-item">
 
-<a class="nav-link disabled">
+                    <a class="nav-link disabled">
 
-Search
+                        Symptoms
 
-</a>
+                    </a>
 
-</li>
+                </li>
 
-</ul>
+                <li class="nav-item">
 
-<span class="navbar-text">
+                    <a class="nav-link disabled">
 
-v<?= e(config('version')) ?>
+                        Search
 
-</span>
+                    </a>
 
-</div>
+                </li>
 
-</div>
+            </ul>
+
+            <!-- Authentication -->
+
+            <?php if ($auth !== null && $auth->check()): ?>
+
+                <div class="d-flex align-items-center gap-3">
+
+                    <span class="navbar-text">
+
+                        Hello,
+                        <?= e($auth->user()['name'] ?? 'User') ?>
+
+                    </span>
+
+                    <form
+                        method="POST"
+                        action="<?= url('/logout') ?>"
+                        class="d-inline">
+
+                        <?= csrfField() ?>
+
+                        <button
+                            type="submit"
+                            class="btn btn-outline-light btn-sm">
+
+                            Logout
+
+                        </button>
+
+                    </form>
+
+                </div>
+
+            <?php else: ?>
+
+                <div class="d-flex align-items-center gap-2">
+
+                    <a
+                        class="btn btn-outline-light btn-sm"
+                        href="<?= url('/login') ?>">
+
+                        Login
+
+                    </a>
+
+                    <a
+                        class="btn btn-light btn-sm text-primary"
+                        href="<?= url('/register') ?>">
+
+                        Register
+
+                    </a>
+
+                </div>
+
+            <?php endif; ?>
+
+            <span class="navbar-text ms-3">
+
+                v<?= e(config('version')) ?>
+
+            </span>
+
+        </div>
+
+    </div>
 
 </nav>

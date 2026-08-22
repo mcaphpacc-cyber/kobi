@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Services;
 
+use App\Core\Session;
 use App\Repositories\BodyPartRepository;
 use App\Repositories\CauseRepository;
 use App\Repositories\DiseaseRepository;
@@ -18,7 +19,7 @@ class HomeService
         private BodyPartRepository $bodyParts,
         private SymptomRepository $symptoms,
         private HomeRepository $home,
-        private CauseRepository $causes
+        private CauseRepository $causes,
     ) {
     }
 

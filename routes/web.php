@@ -7,6 +7,7 @@ use App\Controllers\DiseaseController;
 use App\Controllers\DiscoveryController;
 use App\Controllers\SymptomCheckerController;
 use App\Controllers\ComparisonController;
+use App\Controllers\AuthController;
 
 /*
 |--------------------------------------------------------------------------
@@ -90,4 +91,35 @@ $this->router()->get(
     '/body-parts/{slug}',
     BodyPartController::class,
     'show'
+);
+
+// Authentication
+$this->router()->get(
+    '/register',
+    AuthController::class,
+    'register'
+);
+
+$this->router()->post(
+    '/register',
+    AuthController::class,
+    'store'
+);
+
+$this->router()->get(
+    '/login',
+    AuthController::class,
+    'login'
+);
+
+$this->router()->post(
+    '/login',
+    AuthController::class,
+    'authenticate'
+);
+
+$this->router()->post(
+    '/logout',
+    AuthController::class,
+    'logout'
 );

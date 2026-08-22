@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 namespace App\Services;
+use App\Core\Session;
 
 use App\Repositories\DiseaseRepository;
 use App\Algorithms\RelatedDiseaseMatcher;
@@ -15,7 +16,8 @@ class DiseaseService
     private DiseaseRepository $repository,
     private RelatedDiseaseMatcher $matcher,
     private DiseaseComparisonBuilder $comparisonBuilder,
-    private BodyPartRepository $bodyPartRepository
+    private BodyPartRepository $bodyPartRepository,
+    private Session $session
 ) {
 }
 
@@ -394,11 +396,10 @@ class DiseaseService
 
     public function rememberDisease(int $diseaseId): void
     {
-        if (session_status() !== PHP_SESSION_ACTIVE) {
-            session_start();
-        }
-
-        $recent = $_SESSION['recent_diseases'] ?? [];
+        $recent = $this->session->get(
+            'recent_diseases',
+            []
+        );
 
         $recent = array_values(
             array_diff(
@@ -412,10 +413,13 @@ class DiseaseService
             $diseaseId
         );
 
-        $_SESSION['recent_diseases'] = array_slice(
-            $recent,
-            0,
-            self::RECENT_LIMIT
+        $this->session->put(
+            'recent_diseases',
+            array_slice(
+                $recent,
+                0,
+                self::RECENT_LIMIT
+            )
         );
     }
 
@@ -423,14 +427,17 @@ class DiseaseService
         string $language = 'en'
     ): array
     {
-        $ids = $_SESSION['recent_diseases'] ?? [];
+        $ids = $this->session->get(
+            'recent_diseases',
+            []
+        );
 
         if (empty($ids)) {
             return [];
         }
 
         $rows = $this->repository->findByIds($ids);
-        
+
         return array_map(
             fn(array $row) => $this->mapDisease(
                 $row,
@@ -438,6 +445,8 @@ class DiseaseService
             ),
             $rows
         );
+
+        
     }
 
     /**

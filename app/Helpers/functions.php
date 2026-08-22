@@ -163,3 +163,27 @@ function bodySystemIcon(string $name): string
         default => 'bi-diagram-3',
     };
 }
+
+/**
+ * Generate or retrieve the current CSRF token.
+ */
+function csrfToken(): string
+{
+    static $session = null;
+
+    if ($session === null) {
+        $session = new \App\Core\Session();
+    }
+
+    return $session->csrfToken();
+}
+
+/**
+ * Escape a CSRF token for use in HTML.
+ */
+function csrfField(): string
+{
+    return '<input type="hidden" name="_csrf_token" value="' .
+        e(csrfToken()) .
+        '">';
+}

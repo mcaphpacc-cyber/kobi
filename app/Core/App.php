@@ -20,6 +20,10 @@ class App
 
         $this->container = new Container();
 
+        View::setContainer(
+            $this->container
+        );
+
         require dirname(__DIR__, 2) . '/routes/web.php';
     }
 
