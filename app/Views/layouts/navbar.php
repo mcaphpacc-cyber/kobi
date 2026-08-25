@@ -131,6 +131,14 @@
 
                     </span>
 
+                    <a
+                        class="btn btn-outline-light btn-sm"
+                        href="<?= url('/account') ?>">
+
+                        My Account
+
+                    </a>
+
                     <form
                         method="POST"
                         action="<?= url('/logout') ?>"

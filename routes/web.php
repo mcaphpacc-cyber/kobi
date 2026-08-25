@@ -8,6 +8,8 @@ use App\Controllers\DiscoveryController;
 use App\Controllers\SymptomCheckerController;
 use App\Controllers\ComparisonController;
 use App\Controllers\AuthController;
+use App\Controllers\AccountController;
+use App\Controllers\SavedDiseaseController;
 
 /*
 |--------------------------------------------------------------------------
@@ -122,4 +124,60 @@ $this->router()->post(
     '/logout',
     AuthController::class,
     'logout'
+);
+
+// Account
+$this->router()->get(
+    '/account',
+    AccountController::class,
+    'index'
+);
+
+$this->router()->post(
+    '/account/profile',
+    AccountController::class,
+    'updateProfile'
+);
+
+$this->router()->post(
+    '/account/password',
+    AccountController::class,
+    'changePassword'
+);
+
+// Saved Diseases
+$this->router()->post(
+    '/account/saved-diseases/save',
+    SavedDiseaseController::class,
+    'save'
+);
+
+$this->router()->post(
+    '/account/saved-diseases/remove',
+    SavedDiseaseController::class,
+    'remove'
+);
+
+$this->router()->get(
+    '/account/saved-diseases',
+    AccountController::class,
+    'savedDiseases'
+);
+
+$this->router()->get(
+    '/account/treatment-preferences',
+    AccountController::class,
+    'treatmentPreferences'
+);
+
+$this->router()->post(
+    '/account/treatment-preferences',
+    AccountController::class,
+    'saveTreatmentPreferences'
+);
+
+$this->router()->post(
+    '/account/treatment-preferences/reset',
+    AccountController::class,
+    'resetTreatmentPreferences'
 );

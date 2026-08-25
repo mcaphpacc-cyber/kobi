@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Controllers;
 
 use App\Services\DiseaseService;
+use App\Services\SavedDiseaseService;
 
 
 
@@ -12,7 +13,8 @@ class DiseaseController extends Controller
 {
     private const DEFAULT_LANGUAGE = 'en';
     public function __construct(
-        private DiseaseService $service
+        private DiseaseService $service,
+        private SavedDiseaseService $savedDiseaseService
     ) {
     }
 
@@ -134,22 +136,18 @@ class DiseaseController extends Controller
             (int) $knowledge['disease']['disease_id']
         );
 
+        $isSaved = $this->savedDiseaseService->isSaved(
+            (int) $knowledge['disease']['disease_id']
+        );
+
         $this->view(
-
             'disease/show',
-
             [
-
-                'title' =>
-
-                    $knowledge['disease']['disease_en'],
-
+                'title' => $knowledge['disease']['disease_en'],
                 'knowledge' => $knowledge,
-
-                'relatedDiseases' => $relatedDiseases
-
+                'relatedDiseases' => $relatedDiseases,
+                'isSaved' => $isSaved
             ]
-
         );
     }
 

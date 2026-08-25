@@ -2,6 +2,7 @@
 
 $disease = $knowledge['disease'];
 $content = $knowledge['content'] ?? [];
+$isSaved = $isSaved ?? false;
 
 $quickFacts = [];
 
@@ -116,6 +117,63 @@ $stats = [
         </span>
         <?php endif; ?>
       </div>
+      <div class="mt-3">
+
+        <?php if ($isSaved) : ?>
+
+            <form
+                method="POST"
+                action="<?= url('/account/saved-diseases/remove'); ?>"
+                class="d-inline"
+            >
+
+                <?= csrfField(); ?>
+
+                <input
+                    type="hidden"
+                    name="disease_id"
+                    value="<?= (int) $disease['disease_id']; ?>"
+                >
+
+                <button
+                    type="submit"
+                    class="btn btn-outline-primary btn-sm"
+                >
+                    <i class="bi bi-bookmark-check-fill me-1"></i>
+                    Saved
+                </button>
+
+            </form>
+
+        <?php else : ?>
+
+            <form
+                method="POST"
+                action="<?= url('/account/saved-diseases/save'); ?>"
+                class="d-inline"
+            >
+
+                <?= csrfField(); ?>
+
+                <input
+                    type="hidden"
+                    name="disease_id"
+                    value="<?= (int) $disease['disease_id']; ?>"
+                >
+
+                <button
+                    type="submit"
+                    class="btn btn-primary btn-sm"
+                >
+                    <i class="bi bi-bookmark me-1"></i>
+                    Save Disease
+                </button>
+
+            </form>
+
+        <?php endif; ?>
+
+    </div>
       <?php if (!empty($content['overview_en'])) : ?>
       <p class="mt-3 mb-0 text-muted">
         <?= e(

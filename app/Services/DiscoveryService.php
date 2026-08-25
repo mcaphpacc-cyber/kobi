@@ -9,11 +9,10 @@ use App\Repositories\DiscoveryRepository;
 class DiscoveryService
 {
     public function __construct(
-    DiscoveryRepository $repository,
-    DiscoveryDashboardBuilder $builder
+        private DiscoveryRepository $repository,
+        private DiscoveryDashboardBuilder $builder,
+        private DiseaseService $diseaseService
     ) {
-        $this->repository = $repository;
-        $this->builder = $builder;
     }
 
     public function getDashboard(): array
@@ -32,7 +31,10 @@ class DiscoveryService
                 $this->repository->getFeaturedDiseases(),
 
             popularSymptoms:
-                $this->repository->getPopularSymptoms(8)
+                $this->repository->getPopularSymptoms(8),
+            
+            recentDiseases:
+            $this->diseaseService->getRecentlyViewed()
 
         );
     }

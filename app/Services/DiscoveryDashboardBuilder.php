@@ -9,7 +9,8 @@ class DiscoveryDashboardBuilder
         array $statistics,
         array $bodyParts,
         array $featuredDiseases,
-        array $popularSymptoms
+        array $popularSymptoms,
+        array $recentDiseases
     )
     {
         return [
@@ -20,7 +21,7 @@ class DiscoveryDashboardBuilder
 
                 $this->buildBodyPartsWidget($bodyParts),
 
-                $this->buildRecentWidget(),
+                $this->buildRecentWidget($recentDiseases),
 
                 $this->buildFeaturedDiseasesWidget($featuredDiseases),
 
@@ -87,19 +88,37 @@ class DiscoveryDashboardBuilder
         );
     }
 
-    private function buildRecentWidget(): array
+    private function buildRecentWidget(
+        array $recentDiseases
+    ): array
     {
+        $items = [];
+
+        foreach ($recentDiseases as $disease) {
+
+            $items[] = [
+
+                'title' => $disease['name'],
+
+                'url' => url(
+                    '/disease/' . $disease['slug']
+                )
+
+            ];
+
+        }
+
         return $this->createWidget(
 
             title: 'Recently Viewed',
 
             icon: 'bi bi-clock-history',
 
-            type: 'text',
+            type: 'links',
 
             data: [
 
-                'text' => 'Nothing viewed yet.'
+                'items' => $items
 
             ]
 

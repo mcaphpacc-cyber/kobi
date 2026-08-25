@@ -17,7 +17,8 @@ class DiseaseService
     private RelatedDiseaseMatcher $matcher,
     private DiseaseComparisonBuilder $comparisonBuilder,
     private BodyPartRepository $bodyPartRepository,
-    private Session $session
+    private Session $session,
+    private TreatmentPreferenceService $treatmentPreferenceService
 ) {
 }
 
@@ -128,11 +129,24 @@ class DiseaseService
         string $language = 'en'
     ): ?array
     {
-        return $this->repository
-            ->findKnowledgeBySlug(
-                $slug,
-                $language
+        $knowledge =
+            $this->repository
+                ->findKnowledgeBySlug(
+                    $slug,
+                    $language
+                );
+
+        if (!$knowledge)
+        {
+            return null;
+        }
+
+        $knowledge['treatments'] =
+            $this->applyTreatmentPreference(
+                $knowledge['treatments'] ?? []
             );
+
+        return $knowledge;
     }
 
     public function getRelatedDiseases(
@@ -479,5 +493,67 @@ class DiseaseService
             $rows,
             $language
         );
+    }
+
+    private function applyTreatmentPreference(
+        array $treatments
+    ): array {
+        if (count($treatments) <= 1)
+        {
+            return $treatments;
+        }
+
+        $preferredOrder =
+            $this->treatmentPreferenceService
+                ->getDisplayOrder();
+
+        if (empty($preferredOrder))
+        {
+            return $treatments;
+        }
+
+        $preferencePositions = [];
+
+        foreach (
+            $preferredOrder
+            as $position => $treatmentSystemId
+        ) {
+            $preferencePositions[
+                (int) $treatmentSystemId
+            ] = $position;
+        }
+
+        usort(
+            $treatments,
+            function (
+                array $a,
+                array $b
+            ) use ($preferencePositions): int {
+
+                $aSystemId =
+                    (int) (
+                        $a['treatment_system_id'] ?? 0
+                    );
+
+                $bSystemId =
+                    (int) (
+                        $b['treatment_system_id'] ?? 0
+                    );
+
+                $aPosition =
+                    $preferencePositions[
+                        $aSystemId
+                    ] ?? PHP_INT_MAX;
+
+                $bPosition =
+                    $preferencePositions[
+                        $bSystemId
+                    ] ?? PHP_INT_MAX;
+
+                return $aPosition <=> $bPosition;
+            }
+        );
+
+        return $treatments;
     }
 }
