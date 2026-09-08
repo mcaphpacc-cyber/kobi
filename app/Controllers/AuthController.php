@@ -8,11 +8,13 @@ use App\Core\Request;
 use App\Core\Session;
 use App\Services\AuthService;
 use RuntimeException;
+use App\Services\HealthProfileService;
 
 class AuthController extends Controller
 {
     public function __construct(
         private AuthService $authService,
+        private HealthProfileService $healthProfileService,
         private Request $request,
         private Session $session
     ) {
@@ -61,6 +63,13 @@ class AuthController extends Controller
                 $user['email'],
                 (string) $this->request->post('password', '')
             );
+
+            /*
+            * Ensure the newly registered user has
+            * a self health profile.
+            */
+            $this->healthProfileService
+                ->ensureSelfProfile();
 
             redirect('/');
 

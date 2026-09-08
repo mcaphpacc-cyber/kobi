@@ -14,5 +14,9 @@ return [
         env('APP_DEBUG', false),
         FILTER_VALIDATE_BOOLEAN
     ),
+    'storage_path' => env(
+        'APP_STORAGE_PATH',
+        dirname(__DIR__) . '/storage'
+    ),
 
 ];

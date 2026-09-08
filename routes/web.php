@@ -181,3 +181,234 @@ $this->router()->post(
     AccountController::class,
     'resetTreatmentPreferences'
 );
+
+$this->router()->get(
+    '/account/health-records',
+    AccountController::class,
+    'healthRecords'
+);
+
+$this->router()->get(
+    '/account/health-records/create',
+    AccountController::class,
+    'createHealthRecord'
+);
+
+$this->router()->post(
+    '/account/health-records',
+    AccountController::class,
+    'storeHealthRecord'
+);
+
+$this->router()->get(
+    '/account/health-records/{id}/edit',
+    AccountController::class,
+    'editHealthRecord'
+);
+
+$this->router()->post(
+    '/account/health-records/{id}',
+    AccountController::class,
+    'updateHealthRecord'
+);
+
+$this->router()->get(
+    '/account/health-records/{id}',
+    AccountController::class,
+    'healthRecord'
+);
+
+$this->router()->get(
+    '/account/health-records/{profileId}/conditions',
+    AccountController::class,
+    'healthConditions'
+);
+
+$this->router()->get(
+    '/account/health-records/{profileId}/conditions/create',
+    AccountController::class,
+    'createHealthCondition'
+);
+
+$this->router()->post(
+    '/account/health-records/{profileId}/conditions',
+    AccountController::class,
+    'storeHealthCondition'
+);
+
+$this->router()->get(
+    '/account/health-records/{profileId}/conditions/{conditionId}/edit',
+    AccountController::class,
+    'editHealthCondition'
+);
+
+$this->router()->post(
+    '/account/health-records/{profileId}/conditions/{conditionId}/update',
+    AccountController::class,
+    'updateHealthCondition'
+);
+
+$this->router()->post(
+    '/account/health-records/{profileId}/conditions/{conditionId}/delete',
+    AccountController::class,
+    'deleteHealthCondition'
+);
+
+// Health Record - Medicines
+$this->router()->get(
+    '/account/health-records/{profileId}/medicines',
+    AccountController::class,
+    'healthMedicines'
+);
+
+$this->router()->get(
+    '/account/health-records/{profileId}/medicines/create',
+    AccountController::class,
+    'createHealthMedicine'
+);
+
+$this->router()->post(
+    '/account/health-records/{profileId}/medicines',
+    AccountController::class,
+    'storeHealthMedicine'
+);
+
+$this->router()->get(
+    '/account/health-records/{profileId}/medicines/{medicineId}/edit',
+    AccountController::class,
+    'editHealthMedicine'
+);
+
+$this->router()->post(
+    '/account/health-records/{profileId}/medicines/{medicineId}/update',
+    AccountController::class,
+    'updateHealthMedicine'
+);
+
+$this->router()->post(
+    '/account/health-records/{profileId}/medicines/{medicineId}/delete',
+    AccountController::class,
+    'deleteHealthMedicine'
+);
+
+// Health Record - Allergies
+$this->router()->get(
+    '/account/health-records/{profileId}/allergies',
+    AccountController::class,
+    'healthAllergies'
+);
+
+$this->router()->get(
+    '/account/health-records/{profileId}/allergies/create',
+    AccountController::class,
+    'createHealthAllergy'
+);
+
+$this->router()->post(
+    '/account/health-records/{profileId}/allergies',
+    AccountController::class,
+    'storeHealthAllergy'
+);
+
+$this->router()->get(
+    '/account/health-records/{profileId}/allergies/{allergyId}/edit',
+    AccountController::class,
+    'editHealthAllergy'
+);
+
+$this->router()->post(
+    '/account/health-records/{profileId}/allergies/{allergyId}/update',
+    AccountController::class,
+    'updateHealthAllergy'
+);
+
+$this->router()->post(
+    '/account/health-records/{profileId}/allergies/{allergyId}/delete',
+    AccountController::class,
+    'deleteHealthAllergy'
+);
+
+// Health Record - Procedures
+$this->router()->get(
+    '/account/health-records/{profileId}/procedures',
+    AccountController::class,
+    'healthProcedures'
+);
+
+$this->router()->get(
+    '/account/health-records/{profileId}/procedures/create',
+    AccountController::class,
+    'createHealthProcedure'
+);
+
+$this->router()->post(
+    '/account/health-records/{profileId}/procedures',
+    AccountController::class,
+    'storeHealthProcedure'
+);
+
+$this->router()->get(
+    '/account/health-records/{profileId}/procedures/{procedureId}/edit',
+    AccountController::class,
+    'editHealthProcedure'
+);
+
+$this->router()->post(
+    '/account/health-records/{profileId}/procedures/{procedureId}/update',
+    AccountController::class,
+    'updateHealthProcedure'
+);
+
+$this->router()->post(
+    '/account/health-records/{profileId}/procedures/{procedureId}/delete',
+    AccountController::class,
+    'deleteHealthProcedure'
+);
+
+// Health Record - Medical Timeline
+$this->router()->get(
+    '/account/health-records/{profileId}/timeline',
+    AccountController::class,
+    'healthTimeline'
+);
+
+// Health Record - Medical Summary
+$this->router()->get(
+    '/account/health-records/{profileId}/medical-summary',
+    AccountController::class,
+    'medicalSummary'
+);
+
+// Health Record - Medical Summary Sharing
+
+$this->router()->get(
+    '/account/health-records/{profileId}/medical-summary/share',
+    AccountController::class,
+    'createMedicalSummaryShare'
+);
+
+$this->router()->post(
+    '/account/health-records/{profileId}/medical-summary/share',
+    AccountController::class,
+    'storeMedicalSummaryShare'
+);
+
+$this->router()->get(
+    '/account/health-records/{profileId}/medical-summary/shares',
+    AccountController::class,
+    'medicalSummaryShares'
+);
+
+$this->router()->post(
+    '/account/health-records/{profileId}/medical-summary/shares/{shareId}/revoke',
+    AccountController::class,
+    'revokeMedicalSummaryShare'
+);
+
+// Public Medical Summary Share
+
+$this->router()->get(
+    '/shared/medical-summary/{token}',
+    AccountController::class,
+    'sharedMedicalSummary'
+);
