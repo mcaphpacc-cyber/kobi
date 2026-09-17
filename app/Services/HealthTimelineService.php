@@ -6,6 +6,7 @@ use App\Repositories\HealthAllergyRepository;
 use App\Repositories\HealthConditionRepository;
 use App\Repositories\HealthMedicineRepository;
 use App\Repositories\HealthProcedureRepository;
+use App\Repositories\HealthDocumentRepository;
 
 class HealthTimelineService
 {
@@ -14,6 +15,7 @@ class HealthTimelineService
     private HealthAllergyRepository $allergyRepository;
     private HealthProcedureRepository $procedureRepository;
     private HealthProfileService $healthProfileService;
+    private HealthDocumentRepository $documentRepository;
 
 
     public function __construct(
@@ -21,13 +23,15 @@ class HealthTimelineService
         HealthMedicineRepository $medicineRepository,
         HealthAllergyRepository $allergyRepository,
         HealthProcedureRepository $procedureRepository,
-        HealthProfileService $healthProfileService
+        HealthProfileService $healthProfileService,
+        HealthDocumentRepository $documentRepository
     ) {
         $this->conditionRepository = $conditionRepository;
         $this->medicineRepository = $medicineRepository;
         $this->allergyRepository = $allergyRepository;
         $this->procedureRepository = $procedureRepository;
         $this->healthProfileService = $healthProfileService;
+        $this->documentRepository = $documentRepository;
     }
 
 
@@ -58,6 +62,11 @@ class HealthTimelineService
         $this->addProcedureEvents(
             $events,
             $this->procedureRepository->findByProfileId($profileId)
+        );
+
+        $this->addDocumentEvents(
+            $events,
+            $this->documentRepository->findByProfileId($profileId)
         );
 
         usort(
@@ -295,6 +304,58 @@ class HealthTimelineService
                         $procedure['reason']
                 ],
                 'sort_order' => (int) $procedure['id']
+            ];
+        }
+    }
+
+    /**
+     * Add document events to the timeline.
+     */
+    private function addDocumentEvents(
+        array &$events,
+        array $documents
+    ): void {
+        $typeLabels = [
+            'lab_report' => 'Lab Report',
+            'imaging' => 'Imaging',
+            'prescription' => 'Prescription',
+            'discharge_summary' => 'Discharge Summary',
+            'medical_record' => 'Medical Record',
+            'surgery_procedure' => 'Surgery / Procedure',
+            'consultation' => 'Consultation',
+            'other' => 'Other'
+        ];
+
+        foreach ($documents as $document) {
+
+            if (empty($document['document_date'])) {
+                continue;
+            }
+
+            $documentType =
+                (string) (
+                    $document['document_type'] ?? 'other'
+                );
+
+            $typeLabel =
+                $typeLabels[$documentType]
+                ?? 'Other';
+
+            $events[] = [
+                'event_type' => 'document',
+                'event_date' => $document['document_date'],
+                'title' => $document['title'],
+                'subtitle' => $typeLabel,
+                'source_type' => 'document',
+                'source_id' => (int) $document['id'],
+                'metadata' => [
+                    'document_type' => $documentType,
+                    'hospital' =>
+                        $document['hospital'] ?? '',
+                    'doctor' =>
+                        $document['doctor'] ?? ''
+                ],
+                'sort_order' => (int) $document['id']
             ];
         }
     }

@@ -926,17 +926,26 @@ $formatLabel =
 
                     <div class="medical-summary-future-item">
 
-                        <div
-                            class="medical-summary-label"
-                        >
+                        <div class="medical-summary-label">
                             Reports &amp; Documents
                         </div>
 
-                        <div class="text-muted small">
-                            Medical documents will be
-                            available here when the
-                            document system is implemented.
+                        <div class="text-muted small mb-2">
+                            View medical reports and documents
+                            associated with this health record.
                         </div>
+
+                        <a
+                            href="<?= url(
+                                '/account/health-records/' .
+                                $profileId .
+                                '/documents'
+                            ) ?>"
+                            class="text-decoration-none"
+                        >
+                            View Reports &amp; Documents
+                            <i class="bi bi-arrow-right"></i>
+                        </a>
 
                     </div>
 

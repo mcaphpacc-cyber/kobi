@@ -201,6 +201,48 @@ $this->router()->post(
 );
 
 $this->router()->get(
+    '/account/health-records/{profileId}/access',
+    AccountController::class,
+    'healthRecordAccess'
+);
+
+$this->router()->post(
+    '/account/health-records/{profileId}/access/invite',
+    AccountController::class,
+    'storeHealthRecordInvitation'
+);
+
+$this->router()->get(
+    '/shared/health-profile-invitation/{token}',
+    AccountController::class,
+    'healthProfileInvitation'
+);
+
+$this->router()->post(
+    '/shared/health-profile-invitation/{token}/accept',
+    AccountController::class,
+    'acceptHealthProfileInvitation'
+);
+
+$this->router()->post(
+    '/account/health-records/{profileId}/access/members/{memberUserId}/role',
+    AccountController::class,
+    'updateHealthRecordMemberRole'
+);
+
+$this->router()->post(
+    '/account/health-records/{profileId}/access/members/{memberUserId}/revoke',
+    AccountController::class,
+    'revokeHealthRecordMember'
+);
+
+$this->router()->post(
+    '/account/health-records/{profileId}/access/members/{memberUserId}/reactivate',
+    AccountController::class,
+    'reactivateHealthRecordMember'
+);
+
+$this->router()->get(
     '/account/health-records/{id}/edit',
     AccountController::class,
     'editHealthRecord'
@@ -411,4 +453,46 @@ $this->router()->get(
     '/shared/medical-summary/{token}',
     AccountController::class,
     'sharedMedicalSummary'
+);
+
+$this->router()->get(
+    '/account/health-records/{profileId}/documents',
+    AccountController::class,
+    'healthDocuments'
+);
+
+$this->router()->get(
+    '/account/health-records/{profileId}/documents/create',
+    AccountController::class,
+    'createHealthDocument'
+);
+
+$this->router()->post(
+    '/account/health-records/{profileId}/documents',
+    AccountController::class,
+    'storeHealthDocument'
+);
+
+$this->router()->get(
+    '/account/health-records/{profileId}/documents/{documentId}/edit',
+    AccountController::class,
+    'editHealthDocument'
+);
+
+$this->router()->post(
+    '/account/health-records/{profileId}/documents/{documentId}/update',
+    AccountController::class,
+    'updateHealthDocument'
+);
+
+$this->router()->get(
+    '/account/health-records/{profileId}/documents/{documentId}/file',
+    AccountController::class,
+    'healthDocumentFile'
+);
+
+$this->router()->post(
+    '/account/health-records/{profileId}/documents/{documentId}/delete',
+    AccountController::class,
+    'deleteHealthDocument'
 );

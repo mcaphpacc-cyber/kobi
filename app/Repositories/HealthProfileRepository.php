@@ -199,6 +199,219 @@ class HealthProfileRepository extends BaseRepository
     }
 
     /**
+     * Find a membership for a user on a health profile.
+     */
+    public function findMember(
+        int $profileId,
+        int $userId
+    ): ?array {
+        $sql = "
+            SELECT
+                id,
+                health_profile_id,
+                user_id,
+                role,
+                status,
+                created_at,
+                updated_at
+
+            FROM health_profile_members
+
+            WHERE health_profile_id = :profile_id
+            AND user_id = :user_id
+
+            LIMIT 1
+        ";
+
+        return $this->fetch(
+            $sql,
+            [
+                'profile_id' => $profileId,
+                'user_id' => $userId
+            ]
+        );
+    }
+
+    /**
+     * Find all members of a health profile.
+     */
+    public function findMembersByProfileId(
+        int $profileId
+    ): array {
+        $sql = "
+            SELECT
+                hpm.id,
+                hpm.health_profile_id,
+                hpm.user_id,
+                hpm.role,
+                hpm.status,
+                hpm.created_at,
+                hpm.updated_at,
+                u.name,
+                u.email
+
+            FROM health_profile_members hpm
+
+            INNER JOIN users u
+                ON u.id = hpm.user_id
+
+            WHERE hpm.health_profile_id = :profile_id
+
+            ORDER BY
+                CASE
+                    WHEN hpm.role = 'owner' THEN 0
+                    WHEN hpm.role = 'editor' THEN 1
+                    ELSE 2
+                END,
+                u.name ASC,
+                hpm.id ASC
+        ";
+
+        return $this->fetchAll(
+            $sql,
+            [
+                'profile_id' => $profileId
+            ]
+        );
+    }
+
+    /**
+     * Update the role of an existing member.
+     */
+    public function updateMemberRole(
+        int $profileId,
+        int $userId,
+        string $role
+    ): bool {
+        $sql = "
+            UPDATE health_profile_members
+
+            SET
+                role = :role
+
+            WHERE health_profile_id = :profile_id
+            AND user_id = :user_id
+            AND status = 'active'
+            AND role IN ('editor', 'viewer')
+        ";
+
+        return $this->execute(
+            $sql,
+            [
+                'role' => $role,
+                'profile_id' => $profileId,
+                'user_id' => $userId
+            ]
+        );
+    }
+
+    /**
+     * Revoke an active member's access.
+     */
+    public function revokeMember(
+        int $profileId,
+        int $userId
+    ): bool {
+        $sql = "
+            UPDATE health_profile_members
+
+            SET
+                status = 'revoked'
+
+            WHERE health_profile_id = :profile_id
+            AND user_id = :user_id
+            AND status = 'active'
+            AND role IN ('editor', 'viewer')
+        ";
+
+        return $this->execute(
+            $sql,
+            [
+                'profile_id' => $profileId,
+                'user_id' => $userId
+            ]
+        );
+    }
+
+    /**
+     * Reactivate a revoked member.
+     */
+    public function reactivateMember(
+        int $profileId,
+        int $userId,
+        string $role
+    ): bool {
+        $sql = "
+            UPDATE health_profile_members
+
+            SET
+                role = :role,
+                status = 'active'
+
+            WHERE health_profile_id = :profile_id
+            AND user_id = :user_id
+            AND status = 'revoked'
+            AND role IN ('editor', 'viewer')
+        ";
+
+        return $this->execute(
+            $sql,
+            [
+                'role' => $role,
+                'profile_id' => $profileId,
+                'user_id' => $userId
+            ]
+        );
+    }
+
+    /**
+     * Add a new member or reactivate an existing membership.
+     */
+    public function addOrReactivateMember(
+        int $profileId,
+        int $userId,
+        string $role = 'viewer'
+    ): bool {
+        $existing = $this->findMember(
+            $profileId,
+            $userId
+        );
+
+        if ($existing !== null)
+        {
+            if ($existing['status'] === 'active')
+            {
+                return false;
+            }
+
+            $sql = "
+                UPDATE health_profile_members
+
+                SET
+                    role = :role,
+                    status = 'active'
+
+                WHERE id = :id
+                AND status = 'revoked'
+            ";
+
+            return $this->execute(
+                $sql,
+                [
+                    'role' => $role,
+                    'id' => $existing['id']
+                ]
+            );
+        }
+
+        return $this->addMember(
+            $profileId,
+            $userId,
+            $role
+        );
+    }
+
+    /**
      * Find the active self profile owned by a user.
      */
     public function findSelfProfile(
@@ -321,6 +534,40 @@ class HealthProfileRepository extends BaseRepository
                 'gender' => $gender,
                 'profile_id' => $profileId,
                 'user_id' => $userId
+            ]
+        );
+    }
+
+    /**
+     * Find an active health profile by ID.
+     */
+    public function findActiveById(
+        int $profileId
+    ): ?array {
+        $sql = "
+            SELECT
+                id,
+                profile_type,
+                full_name,
+                date_of_birth,
+                gender,
+                created_by,
+                status,
+                created_at,
+                updated_at
+
+            FROM health_profiles
+
+            WHERE id = :profile_id
+            AND status = 'active'
+
+            LIMIT 1
+        ";
+
+        return $this->fetch(
+            $sql,
+            [
+                'profile_id' => $profileId
             ]
         );
     }

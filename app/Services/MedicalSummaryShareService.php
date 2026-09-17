@@ -163,9 +163,14 @@ class MedicalSummaryShareService
         }
 
 
+        $publicSnapshot =
+            $this->buildPublicSnapshot(
+                $summary
+            );
+
         $snapshot =
             json_encode(
-                $summary,
+                $publicSnapshot,
                 JSON_THROW_ON_ERROR |
                 JSON_UNESCAPED_UNICODE |
                 JSON_UNESCAPED_SLASHES
@@ -471,6 +476,267 @@ class MedicalSummaryShareService
 
             'snapshot' =>
                 $snapshot
+        ];
+    }
+
+    /**
+     * Build the public Medical Summary snapshot.
+     *
+     * Only explicitly approved fields are included.
+     * Internal identifiers, membership data, timestamps,
+     * and other application fields must never be exposed
+     * through a public Medical Summary share.
+     */
+    private function buildPublicSnapshot(
+        array $summary
+    ): array {
+        $profile =
+            $summary['profile']
+            ?? [];
+
+        $activeConditions =
+            $summary['conditions']['active']
+            ?? [];
+
+        $historicalConditions =
+            $summary['conditions']['historical']
+            ?? [];
+
+        $currentMedicines =
+            $summary['medicines']['current']
+            ?? [];
+
+        $allergies =
+            $summary['allergies']
+            ?? [];
+
+        $procedures =
+            $summary['procedures']
+            ?? [];
+
+
+        $publicConditions = [];
+
+        foreach (
+            array_merge(
+                $activeConditions,
+                $historicalConditions
+            )
+            as $condition
+        ) {
+            $publicConditions[] = [
+                'condition_name' =>
+                    $condition['condition_name']
+                    ?? null,
+
+                'status' =>
+                    $condition['status']
+                    ?? null,
+
+                'diagnosed_on' =>
+                    $condition['diagnosed_on']
+                    ?? null,
+
+                'resolved_on' =>
+                    $condition['resolved_on']
+                    ?? null,
+
+                'doctor_hospital' =>
+                    $condition['doctor_hospital']
+                    ?? null,
+
+                'notes' =>
+                    $condition['notes']
+                    ?? null
+            ];
+        }
+
+
+        $publicMedicines = [];
+
+        foreach (
+            $currentMedicines
+            as $medicine
+        ) {
+            $publicMedicines[] = [
+                'brand_name' =>
+                    $medicine['brand_name']
+                    ?? null,
+
+                'generic_name' =>
+                    $medicine['generic_name']
+                    ?? null,
+
+                'strength' =>
+                    $medicine['strength']
+                    ?? null,
+
+                'dose' =>
+                    $medicine['dose']
+                    ?? null,
+
+                'frequency' =>
+                    $medicine['frequency']
+                    ?? null,
+
+                'route' =>
+                    $medicine['route']
+                    ?? null,
+
+                'status' =>
+                    $medicine['status']
+                    ?? null,
+
+                'started_on' =>
+                    $medicine['started_on']
+                    ?? null,
+
+                'stopped_on' =>
+                    $medicine['stopped_on']
+                    ?? null,
+
+                'prescribed_by' =>
+                    $medicine['prescribed_by']
+                    ?? null,
+
+                'notes' =>
+                    $medicine['notes']
+                    ?? null
+            ];
+        }
+
+
+        $publicAllergies = [];
+
+        foreach (
+            $allergies
+            as $allergy
+        ) {
+            $publicAllergies[] = [
+                'allergen' =>
+                    $allergy['allergen']
+                    ?? null,
+
+                'category' =>
+                    $allergy['category']
+                    ?? null,
+
+                'reaction' =>
+                    $allergy['reaction']
+                    ?? null,
+
+                'severity' =>
+                    $allergy['severity']
+                    ?? null,
+
+                'identified_on' =>
+                    $allergy['identified_on']
+                    ?? null,
+
+                'notes' =>
+                    $allergy['notes']
+                    ?? null
+            ];
+        }
+
+
+        $publicProcedures = [];
+
+        foreach (
+            $procedures
+            as $procedure
+        ) {
+            $publicProcedures[] = [
+                'procedure_name' =>
+                    $procedure['procedure_name']
+                    ?? null,
+
+                'procedure_type' =>
+                    $procedure['procedure_type']
+                    ?? null,
+
+                'performed_on' =>
+                    $procedure['performed_on']
+                    ?? null,
+
+                'hospital' =>
+                    $procedure['hospital']
+                    ?? null,
+
+                'doctor' =>
+                    $procedure['doctor']
+                    ?? null,
+
+                'reason' =>
+                    $procedure['reason']
+                    ?? null,
+
+                'notes' =>
+                    $procedure['notes']
+                    ?? null
+            ];
+        }
+
+
+        return [
+            'profile' => [
+                'full_name' =>
+                    $profile['full_name']
+                    ?? null,
+
+                'date_of_birth' =>
+                    $profile['date_of_birth']
+                    ?? null,
+
+                'age' =>
+                    $profile['age']
+                    ?? null,
+
+                'gender' =>
+                    $profile['gender']
+                    ?? null
+            ],
+
+            'conditions' => [
+                'active' =>
+                    array_values(
+                        array_filter(
+                            $publicConditions,
+                            static function (
+                                array $condition
+                            ): bool {
+                                return
+                                    ($condition['status'] ?? null)
+                                    !== 'historical';
+                            }
+                        )
+                    ),
+
+                'historical' =>
+                    array_values(
+                        array_filter(
+                            $publicConditions,
+                            static function (
+                                array $condition
+                            ): bool {
+                                return
+                                    ($condition['status'] ?? null)
+                                    === 'historical';
+                            }
+                        )
+                    )
+            ],
+
+            'medicines' => [
+                'current' =>
+                    $publicMedicines
+            ],
+
+            'allergies' =>
+                $publicAllergies,
+
+            'procedures' =>
+                $publicProcedures
         ];
     }
 }

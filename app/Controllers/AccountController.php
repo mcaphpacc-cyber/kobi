@@ -17,6 +17,8 @@ use App\Services\HealthProcedureService;
 use App\Services\HealthTimelineService;
 use App\Services\MedicalSummaryService;
 use App\Services\MedicalSummaryShareService;
+use App\Services\HealthDocumentService;
+use App\Services\HealthProfileInvitationService;
 
 class AccountController extends Controller
 {
@@ -32,7 +34,9 @@ class AccountController extends Controller
         private HealthProcedureService $healthProcedureService,
         private HealthTimelineService $healthTimelineService,
         private MedicalSummaryService $medicalSummaryService,
-        private MedicalSummaryShareService $medicalSummaryShareService
+        private MedicalSummaryShareService $medicalSummaryShareService,
+        private HealthDocumentService $healthDocumentService,
+        private HealthProfileInvitationService $healthProfileInvitationService
     ) {
     }
 
@@ -103,8 +107,7 @@ class AccountController extends Controller
         }
 
         $profile =
-            $this->healthProfileService
-                ->getProfile($profileId);
+            $this->getAccessibleHealthProfile($profileId);
 
         $conditions =
             $this->healthConditionService
@@ -142,8 +145,10 @@ class AccountController extends Controller
                 true
             )
         ) {
-            throw new RuntimeException(
-                'You do not have permission to add a medical condition.'
+            redirect(
+                '/account/health-records/' .
+                $profileId .
+                '/conditions'
             );
         }
 
@@ -203,6 +208,17 @@ class AccountController extends Controller
         }
         catch (\Throwable $exception)
         {
+            if (
+                $exception->getMessage()
+                === 'You do not have permission to modify this health profile.'
+            ) {
+                redirect(
+                    '/account/health-records/' .
+                    $profileId .
+                    '/conditions'
+                );
+            }
+
             $profile =
                 $this->healthProfileService
                     ->getProfile($profileId);
@@ -243,8 +259,10 @@ class AccountController extends Controller
                 true
             )
         ) {
-            throw new RuntimeException(
-                'You do not have permission to edit medical conditions.'
+            redirect(
+                '/account/health-records/' .
+                $profileId .
+                '/conditions'
             );
         }
 
@@ -321,6 +339,17 @@ class AccountController extends Controller
         }
         catch (\Throwable $exception)
         {
+            if (
+                $exception->getMessage()
+                === 'You do not have permission to modify this health profile.'
+            ) {
+                redirect(
+                    '/account/health-records/' .
+                    $profileId .
+                    '/conditions'
+                );
+            }
+
             $profile =
                 $this->healthProfileService
                     ->getProfile($profileId);
@@ -376,6 +405,17 @@ class AccountController extends Controller
         }
         catch (\Throwable $exception)
         {
+            if (
+                $exception->getMessage()
+                === 'You do not have permission to modify this health profile.'
+            ) {
+                redirect(
+                    '/account/health-records/' .
+                    $profileId .
+                    '/conditions'
+                );
+            }
+
             throw $exception;
         }
     }
@@ -389,8 +429,7 @@ class AccountController extends Controller
         }
 
         $profile =
-            $this->healthProfileService
-                ->getProfile($profileId);
+            $this->getAccessibleHealthProfile($profileId);
 
         $medicines =
             $this->healthMedicineService
@@ -428,8 +467,10 @@ class AccountController extends Controller
                 true
             )
         ) {
-            throw new RuntimeException(
-                'You do not have permission to add a medicine.'
+            redirect(
+                '/account/health-records/' .
+                $profileId .
+                '/medicines'
             );
         }
 
@@ -504,6 +545,17 @@ class AccountController extends Controller
         }
         catch (\Throwable $exception)
         {
+            if (
+                $exception->getMessage()
+                === 'You do not have permission to modify this health record.'
+            ) {
+                redirect(
+                    '/account/health-records/' .
+                    $profileId .
+                    '/medicines'
+                );
+            }
+
             $profile =
                 $this->healthProfileService
                     ->getProfile($profileId);
@@ -518,7 +570,10 @@ class AccountController extends Controller
                     'profile' => $profile,
 
                     'error' =>
-                        $exception->getMessage()
+                        $exception->getMessage(),
+
+                    'old' =>
+                        $_POST
                 ]
             );
         }
@@ -544,8 +599,10 @@ class AccountController extends Controller
                 true
             )
         ) {
-            throw new RuntimeException(
-                'You do not have permission to edit medicines.'
+            redirect(
+                '/account/health-records/' .
+                $profileId .
+                '/medicines'
             );
         }
 
@@ -637,6 +694,17 @@ class AccountController extends Controller
         }
         catch (\Throwable $exception)
         {
+            if (
+                $exception->getMessage()
+                === 'You do not have permission to modify this health record.'
+            ) {
+                redirect(
+                    '/account/health-records/' .
+                    $profileId .
+                    '/medicines'
+                );
+            }
+
             $profile =
                 $this->healthProfileService
                     ->getProfile($profileId);
@@ -692,6 +760,17 @@ class AccountController extends Controller
         }
         catch (\Throwable $exception)
         {
+            if (
+                $exception->getMessage()
+                === 'You do not have permission to modify this health record.'
+            ) {
+                redirect(
+                    '/account/health-records/' .
+                    $profileId .
+                    '/medicines'
+                );
+            }
+
             throw $exception;
         }
     }
@@ -704,66 +783,55 @@ class AccountController extends Controller
             redirect('/login');
         }
 
-        try
-        {
-            $profile =
-                $this->healthProfileService
-                    ->getProfile($profileId);
+        $profile =
+            $this->getAccessibleHealthProfile($profileId);
 
-            $allergies =
-                $this->healthAllergyService
-                    ->getAllergies($profileId);
+        $allergies =
+            $this->healthAllergyService
+                ->getAllergies($profileId);
 
-            return $this->view(
-                'account/health-allergies',
-                [
-                    'profile' => $profile,
-                    'allergies' => $allergies
-                ]
-            );
-        }
-        catch (RuntimeException $e)
-        {
-            return $this->view(
-                'account/health-record',
-                [
-                    'error' => $e->getMessage()
-                ]
-            );
-        }
+        return $this->view(
+            'account/health-allergies',
+            [
+                'profile' => $profile,
+                'allergies' => $allergies
+            ]
+        );
     }
 
 
     public function createHealthAllergy(
         int $profileId
-    ) {
+    ): void {
         if (!$this->authService->check())
         {
             redirect('/login');
         }
 
-        try
-        {
-            $profile =
-                $this->healthProfileService
-                    ->getProfile($profileId);
+        $profile =
+            $this->healthProfileService
+                ->getProfile($profileId);
 
-            return $this->view(
-                'account/health-allergy-create',
-                [
-                    'profile' => $profile
-                ]
+        if (
+            !in_array(
+                $profile['role'] ?? null,
+                ['owner', 'editor'],
+                true
+            )
+        ) {
+            redirect(
+                '/account/health-records/' .
+                $profileId .
+                '/allergies'
             );
         }
-        catch (RuntimeException $e)
-        {
-            return $this->view(
-                'account/health-record',
-                [
-                    'error' => $e->getMessage()
-                ]
-            );
-        }
+
+        $this->view(
+            'account/health-allergy-create',
+            [
+                'profile' => $profile
+            ]
+        );
     }
 
 
@@ -793,6 +861,17 @@ class AccountController extends Controller
         }
         catch (RuntimeException $e)
         {
+            if (
+                $e->getMessage()
+                === 'You do not have permission to modify this health record.'
+            ) {
+                redirect(
+                    '/account/health-records/' .
+                    $profileId .
+                    '/allergies'
+                );
+            }
+
             $profile =
                 $this->healthProfileService
                     ->getProfile($profileId);
@@ -811,42 +890,51 @@ class AccountController extends Controller
     public function editHealthAllergy(
         int $profileId,
         int $allergyId
-    ) {
+    ): void {
         if (!$this->authService->check())
         {
             redirect('/login');
         }
 
-        try
-        {
-            $profile =
-                $this->healthProfileService
-                    ->getProfile($profileId);
+        $profile =
+            $this->healthProfileService
+                ->getProfile($profileId);
 
-            $allergy =
-                $this->healthAllergyService
-                    ->getAllergy(
-                        $profileId,
-                        $allergyId
-                    );
-
-            return $this->view(
-                'account/health-allergy-edit',
-                [
-                    'profile' => $profile,
-                    'allergy' => $allergy
-                ]
+        if (
+            !in_array(
+                $profile['role'] ?? null,
+                ['owner', 'editor'],
+                true
+            )
+        ) {
+            redirect(
+                '/account/health-records/' .
+                $profileId .
+                '/allergies'
             );
         }
-        catch (RuntimeException $e)
+
+        $allergy =
+            $this->healthAllergyService
+                ->getAllergy(
+                    $profileId,
+                    $allergyId
+                );
+
+        if (!$allergy)
         {
-            return $this->view(
-                'account/health-record',
-                [
-                    'error' => $e->getMessage()
-                ]
+            throw new RuntimeException(
+                'Allergy not found.'
             );
         }
+
+        $this->view(
+            'account/health-allergy-edit',
+            [
+                'profile' => $profile,
+                'allergy' => $allergy
+            ]
+        );
     }
 
 
@@ -878,6 +966,17 @@ class AccountController extends Controller
         }
         catch (RuntimeException $e)
         {
+            if (
+                $e->getMessage()
+                === 'You do not have permission to modify this health record.'
+            ) {
+                redirect(
+                    '/account/health-records/' .
+                    $profileId .
+                    '/allergies'
+                );
+            }
+
             $profile =
                 $this->healthProfileService
                     ->getProfile($profileId);
@@ -944,33 +1043,20 @@ class AccountController extends Controller
             redirect('/login');
         }
 
-        try
-        {
-            $profile =
-                $this->healthProfileService
-                    ->getProfile($profileId);
+        $profile =
+            $this->getAccessibleHealthProfile($profileId);
 
-            $procedures =
-                $this->healthProcedureService
-                    ->getProcedures($profileId);
+        $procedures =
+            $this->healthProcedureService
+                ->getProcedures($profileId);
 
-            $this->view(
-                'account/health-procedures',
-                [
-                    'profile' => $profile,
-                    'procedures' => $procedures
-                ]
-            );
-        }
-        catch (RuntimeException $e)
-        {
-            $this->view(
-                'account/health-record',
-                [
-                    'error' => $e->getMessage()
-                ]
-            );
-        }
+        $this->view(
+            'account/health-procedures',
+            [
+                'profile' => $profile,
+                'procedures' => $procedures
+            ]
+        );
     }
 
 
@@ -983,28 +1069,30 @@ class AccountController extends Controller
             redirect('/login');
         }
 
-        try
-        {
-            $profile =
-                $this->healthProfileService
-                    ->getProfile($profileId);
+        $profile =
+            $this->healthProfileService
+                ->getProfile($profileId);
 
-            $this->view(
-                'account/health-procedure-create',
-                [
-                    'profile' => $profile
-                ]
+        if (
+            !in_array(
+                $profile['role'] ?? null,
+                ['owner', 'editor'],
+                true
+            )
+        ) {
+            redirect(
+                '/account/health-records/' .
+                $profileId .
+                '/procedures'
             );
         }
-        catch (RuntimeException $e)
-        {
-            $this->view(
-                'account/health-record',
-                [
-                    'error' => $e->getMessage()
-                ]
-            );
-        }
+
+        $this->view(
+            'account/health-procedure-create',
+            [
+                'profile' => $profile
+            ]
+        );
     }
 
 
@@ -1021,6 +1109,24 @@ class AccountController extends Controller
         {
             $this->verifyCsrf();
 
+            $profile =
+                $this->healthProfileService
+                    ->getProfile($profileId);
+
+            if (
+                !in_array(
+                    $profile['role'] ?? null,
+                    ['owner', 'editor'],
+                    true
+                )
+            ){
+                redirect(
+                    '/account/health-records/' .
+                    $profileId .
+                    '/procedures'
+                );
+            }
+
             $this->healthProcedureService
                 ->createProcedure(
                     $profileId,
@@ -1035,6 +1141,17 @@ class AccountController extends Controller
         }
         catch (RuntimeException $e)
         {
+            if (
+                $e->getMessage()
+                === 'You do not have permission to modify this health record.'
+            ) {
+                redirect(
+                    '/account/health-records/' .
+                    $profileId .
+                    '/procedures'
+                );
+            }
+
             $profile =
                 $this->healthProfileService
                     ->getProfile($profileId);
@@ -1066,6 +1183,20 @@ class AccountController extends Controller
                 $this->healthProfileService
                     ->getProfile($profileId);
 
+            if (
+                !in_array(
+                    $profile['role'] ?? null,
+                    ['owner', 'editor'],
+                    true
+                )
+            ) {
+                redirect(
+                    '/account/health-records/' .
+                    $profileId .
+                    '/procedures'
+                );
+            }
+
             $procedure =
                 $this->healthProcedureService
                     ->getProcedure(
@@ -1083,11 +1214,10 @@ class AccountController extends Controller
         }
         catch (RuntimeException $e)
         {
-            $this->view(
-                'account/health-record',
-                [
-                    'error' => $e->getMessage()
-                ]
+            redirect(
+                '/account/health-records/' .
+                $profileId .
+                '/procedures'
             );
         }
     }
@@ -1122,6 +1252,17 @@ class AccountController extends Controller
         }
         catch (RuntimeException $e)
         {
+            if (
+                $e->getMessage()
+                === 'You do not have permission to modify this health record.'
+            ) {
+                redirect(
+                    '/account/health-records/' .
+                    $profileId .
+                    '/procedures'
+                );
+            }
+
             $profile =
                 $this->healthProfileService
                     ->getProfile($profileId);
@@ -1181,8 +1322,140 @@ class AccountController extends Controller
         }
     }
 
-    public function healthTimeline(int $profileId): void
-    {
+    public function healthDocuments(
+        int $profileId
+    ): void {
+        if (!$this->authService->check())
+        {
+            redirect('/login');
+        }
+
+        $profile =
+            $this->getAccessibleHealthProfile($profileId);
+
+        $documents =
+            $this->healthDocumentService
+                ->getDocuments($profileId);
+
+        $this->view(
+            'account/health-documents',
+            [
+                'profile' => $profile,
+                'documents' => $documents
+            ]
+        );
+    }
+
+
+    public function createHealthDocument(
+        int $profileId
+    ): void {
+        if (!$this->authService->check())
+        {
+            redirect('/login');
+        }
+
+        $profile =
+    $this->healthProfileService
+        ->getProfile($profileId);
+
+        if (
+            !in_array(
+                $profile['role'] ?? null,
+                ['owner', 'editor'],
+                true
+            )
+        ) {
+            redirect(
+                '/account/health-records/' .
+                $profileId .
+                '/documents'
+            );
+        }
+
+        $this->view(
+            'account/health-document-create',
+            [
+                'profile' => $profile
+            ]
+        );
+    }
+
+    public function storeHealthDocument(
+        int $profileId
+    ): void {
+        if (!$this->authService->check())
+        {
+            redirect('/login');
+        }
+
+        try
+        {
+            $this->verifyCsrf();
+
+            $this->healthDocumentService
+                ->createDocument(
+                    $profileId,
+                    $_FILES['document'] ?? [],
+                    [
+                        'title' =>
+                            $_POST['title'] ?? '',
+
+                        'document_type' =>
+                            $_POST['document_type'] ?? 'other',
+
+                        'document_date' =>
+                            $_POST['document_date'] ?? '',
+
+                        'hospital' =>
+                            $_POST['hospital'] ?? '',
+
+                        'doctor' =>
+                            $_POST['doctor'] ?? '',
+
+                        'notes' =>
+                            $_POST['notes'] ?? ''
+                    ]
+                );
+
+            redirect(
+                '/account/health-records/' .
+                $profileId .
+                '/documents'
+            );
+        }
+        catch (RuntimeException $e)
+        {
+            if (
+                $e->getMessage()
+                === 'You do not have permission to modify this health record.'
+            ) {
+                redirect(
+                    '/account/health-records/' .
+                    $profileId .
+                    '/documents'
+                );
+            }
+
+            $profile =
+                $this->healthProfileService
+                    ->getProfile($profileId);
+
+            $this->view(
+                'account/health-document-create',
+                [
+                    'profile' => $profile,
+                    'error' => $e->getMessage()
+                ]
+            );
+        }
+    }
+
+
+    public function editHealthDocument(
+        int $profileId,
+        int $documentId
+    ): void {
         if (!$this->authService->check())
         {
             redirect('/login');
@@ -1194,32 +1467,53 @@ class AccountController extends Controller
                 $this->healthProfileService
                     ->getProfile($profileId);
 
-            $timeline =
-                $this->healthTimelineService
-                    ->getTimeline($profileId);
+            if (
+                !in_array(
+                    $profile['role'] ?? null,
+                    ['owner', 'editor'],
+                    true
+                )
+            ) {
+                throw new RuntimeException(
+                    'You do not have permission to edit medical documents.'
+                );
+            }
+
+            $document =
+                $this->healthDocumentService
+                    ->getDocument($documentId);
+
+            if (
+                (int) $document['health_profile_id']
+                !== $profileId
+            ) {
+                throw new RuntimeException(
+                    'Medical document not found.'
+                );
+            }
 
             $this->view(
-                'account/health-timeline',
+                'account/health-document-edit',
                 [
                     'profile' => $profile,
-                    'timeline' => $timeline
+                    'document' => $document
                 ]
             );
         }
-        catch (\Throwable $e)
+        catch (RuntimeException $e)
         {
-            $this->view(
-                'account/health-record',
-                [
-                    'profile' => null,
-                    'error' => $e->getMessage()
-                ]
+            redirect(
+                '/account/health-records/' .
+                $profileId .
+                '/documents'
             );
         }
     }
 
-    public function medicalSummary(int $profileId): void
-    {
+    public function updateHealthDocument(
+        int $profileId,
+        int $documentId
+    ): void {
         if (!$this->authService->check())
         {
             redirect('/login');
@@ -1227,27 +1521,282 @@ class AccountController extends Controller
 
         try
         {
-            $summary =
-                $this->medicalSummaryService
-                    ->getSummary($profileId);
+            $this->verifyCsrf();
 
-            $this->view(
-                'account/medical-summary',
-                [
-                    'summary' => $summary
-                ]
+            $document =
+                $this->healthDocumentService
+                    ->getDocument($documentId);
+
+            if (
+                (int) $document['health_profile_id']
+                !== $profileId
+            ) {
+                throw new RuntimeException(
+                    'Medical document not found.'
+                );
+            }
+
+            $this->healthDocumentService
+                ->updateDocument(
+                    $documentId,
+                    [
+                        'title' =>
+                            $_POST['title'] ?? '',
+
+                        'document_type' =>
+                            $_POST['document_type'] ?? 'other',
+
+                        'document_date' =>
+                            $_POST['document_date'] ?? '',
+
+                        'hospital' =>
+                            $_POST['hospital'] ?? '',
+
+                        'doctor' =>
+                            $_POST['doctor'] ?? '',
+
+                        'notes' =>
+                            $_POST['notes'] ?? ''
+                    ]
+                );
+
+            redirect(
+                '/account/health-records/' .
+                $profileId .
+                '/documents'
             );
         }
-        catch (\Throwable $e)
+        catch (RuntimeException $e)
         {
+            if (
+                $e->getMessage()
+                === 'You do not have permission to modify this health record.'
+            ) {
+                redirect(
+                    '/account/health-records/' .
+                    $profileId .
+                    '/documents'
+                );
+            }
+
+            $profile =
+                $this->healthProfileService
+                    ->getProfile($profileId);
+
+            $document =
+                $this->healthDocumentService
+                    ->getDocument($documentId);
+
             $this->view(
-                'account/health-record',
+                'account/health-document-edit',
                 [
-                    'profile' => null,
+                    'profile' => $profile,
+                    'document' => $document,
                     'error' => $e->getMessage()
                 ]
             );
         }
+    }
+
+    public function healthDocumentFile(
+        int $profileId,
+        int $documentId
+    ): void {
+        if (!$this->authService->check())
+        {
+            redirect('/login');
+        }
+
+        try
+        {
+            $document =
+                $this->healthDocumentService
+                    ->getDocument($documentId);
+
+            if (
+                (int) $document['health_profile_id']
+                !== $profileId
+            ) {
+                throw new RuntimeException(
+                    'Medical document not found.'
+                );
+            }
+
+            $filePath =
+                $this->healthDocumentService
+                    ->getFilePath($documentId);
+
+            $mimeType =
+                trim(
+                    (string) (
+                        $document['mime_type'] ?? ''
+                    )
+                );
+
+            if ($mimeType === '')
+            {
+                throw new RuntimeException(
+                    'Medical document MIME type is unavailable.'
+                );
+            }
+
+            $originalFilename =
+                trim(
+                    (string) (
+                        $document['original_filename']
+                        ?? 'medical-document'
+                    )
+                );
+
+            $safeFilename =
+                str_replace(
+                    [
+                        "\r",
+                        "\n",
+                        '"'
+                    ],
+                    '',
+                    $originalFilename
+                );
+
+            if ($safeFilename === '')
+            {
+                $safeFilename = 'medical-document';
+            }
+
+            header(
+                'Content-Type: ' .
+                $mimeType
+            );
+
+            header(
+                'Content-Length: ' .
+                (string) filesize($filePath)
+            );
+
+            header(
+                'Content-Disposition: inline; filename="' .
+                $safeFilename .
+                '"'
+            );
+
+            header(
+                'X-Content-Type-Options: nosniff'
+            );
+
+            header(
+                'Cache-Control: private, no-store, no-cache, must-revalidate, max-age=0'
+            );
+
+            header(
+                'Pragma: no-cache'
+            );
+
+            readfile($filePath);
+        }
+        catch (RuntimeException $e)
+        {
+            http_response_code(404);
+
+            $this->view(
+                'account/health-document-error',
+                [
+                    'error' =>
+                        'Medical document could not be opened.'
+                ]
+            );
+        }
+    }
+
+    public function deleteHealthDocument(
+        int $profileId,
+        int $documentId
+    ): void {
+        if (!$this->authService->check())
+        {
+            redirect('/login');
+        }
+
+        try
+        {
+            $this->verifyCsrf();
+
+            $document =
+                $this->healthDocumentService
+                    ->getDocument($documentId);
+
+            if (
+                (int) $document['health_profile_id']
+                !== $profileId
+            ) {
+                throw new RuntimeException(
+                    'Medical document not found.'
+                );
+            }
+
+            $this->healthDocumentService
+                ->deleteDocument($documentId);
+
+            redirect(
+                '/account/health-records/' .
+                $profileId .
+                '/documents'
+            );
+        }
+        catch (RuntimeException $e)
+        {
+            redirect(
+                '/account/health-records/' .
+                $profileId .
+                '/documents'
+            );
+        }
+    }
+
+    public function healthTimeline(
+        int $profileId
+    ): void
+    {
+        if (!$this->authService->check())
+        {
+            redirect('/login');
+        }
+
+        $profile =
+            $this->getAccessibleHealthProfile($profileId);
+
+        $timeline =
+            $this->healthTimelineService
+                ->getTimeline($profileId);
+
+        $this->view(
+            'account/health-timeline',
+            [
+                'profile' => $profile,
+                'timeline' => $timeline
+            ]
+        );
+    }
+
+    public function medicalSummary(
+        int $profileId
+    ): void
+    {
+        if (!$this->authService->check())
+        {
+            redirect('/login');
+        }
+
+        $summary =
+            $this->medicalSummaryService
+                ->getSummary($profileId);
+
+        $this->view(
+            'account/medical-summary',
+            [
+                'summary' => $summary
+            ]
+        );
     }
 
 
@@ -1298,6 +1847,27 @@ class AccountController extends Controller
             throw new RuntimeException(
                 'Invalid security token. Please try again.'
             );
+        }
+    }
+
+    private function getAccessibleHealthProfile(
+        int $profileId
+    ): array {
+        try
+        {
+            return $this->healthProfileService
+                ->getProfile($profileId);
+        }
+        catch (RuntimeException $exception)
+        {
+            if (
+                $exception->getMessage()
+                === 'Health profile not found.'
+            ) {
+                redirect('/account/health-records');
+            }
+
+            throw $exception;
         }
     }
 
@@ -1399,6 +1969,7 @@ class AccountController extends Controller
         redirect('/account/treatment-preferences');
     }
 
+    
     public function healthRecord(
         int $profileId
     ): void
@@ -1409,8 +1980,11 @@ class AccountController extends Controller
         }
 
         $profile =
-            $this->healthProfileService
-                ->getProfile($profileId);
+            $this->getAccessibleHealthProfile($profileId);
+
+        $documentCount =
+            $this->healthDocumentService
+                ->getDocumentCount($profileId);
 
         $this->view(
             'account/health-record',
@@ -1418,7 +1992,10 @@ class AccountController extends Controller
                 'title' => $profile['full_name']
                     . ' - Health Record',
 
-                'profile' => $profile
+                'profile' => $profile,
+
+                'documentCount' =>
+                    $documentCount
             ]
         );
     }
@@ -1500,8 +2077,9 @@ class AccountController extends Controller
                 true
             )
         ) {
-            throw new RuntimeException(
-                'You do not have permission to edit this health profile.'
+            redirect(
+                '/account/health-records/' .
+                $profileId
             );
         }
 
@@ -1560,6 +2138,16 @@ class AccountController extends Controller
         }
         catch (\Throwable $exception)
         {
+            if (
+                $exception->getMessage()
+                === 'You do not have permission to edit this health profile.'
+            ) {
+                redirect(
+                    '/account/health-records/' .
+                    $profileId
+                );
+            }
+
             $profile =
                 $this->healthProfileService
                     ->getProfile($profileId);
@@ -1617,7 +2205,11 @@ class AccountController extends Controller
         }
         catch (\Throwable $exception)
         {
-            throw $exception;
+            redirect(
+                '/account/health-records/' .
+                $profileId .
+                '/medical-summary'
+            );
         }
     }
 
@@ -1679,6 +2271,17 @@ class AccountController extends Controller
         }
         catch (\Throwable $exception)
         {
+            if (
+                $exception->getMessage()
+                === 'Only the health profile owner can share a medical summary.'
+            ) {
+                redirect(
+                    '/account/health-records/' .
+                    $profileId .
+                    '/medical-summary'
+                );
+            }
+
             $profile =
                 $this->healthProfileService
                     ->getProfile($profileId);
@@ -1735,7 +2338,11 @@ class AccountController extends Controller
         }
         catch (\Throwable $exception)
         {
-            throw $exception;
+            redirect(
+                '/account/health-records/' .
+                $profileId .
+                '/medical-summary'
+            );
         }
     }
 
@@ -1765,6 +2372,17 @@ class AccountController extends Controller
         }
         catch (\Throwable $exception)
         {
+            if (
+                $exception->getMessage()
+                === 'Only the health profile owner can revoke a medical summary share.'
+            ) {
+                redirect(
+                    '/account/health-records/' .
+                    $profileId .
+                    '/medical-summary'
+                );
+            }
+
             throw $exception;
         }
     }
@@ -1817,6 +2435,482 @@ class AccountController extends Controller
             $this->view(
                 'shared/medical-summary-error',
                 [
+                    'error' =>
+                        $exception->getMessage()
+                ]
+            );
+        }
+    }
+
+    /**
+     * Manage access to a health profile.
+     */
+    public function healthRecordAccess(
+        int $profileId
+    ): void {
+        if (!$this->authService->check())
+        {
+            redirect('/login');
+        }
+
+        try
+        {
+            $access =
+                $this->healthProfileInvitationService
+                    ->getAccessManagement($profileId);
+
+            $this->view(
+                'account/health-record-access',
+                [
+                    'title' =>
+                        $access['profile']['full_name']
+                        . ' - Manage Access',
+
+                    'profile' =>
+                        $access['profile'],
+
+                    'activeMembers' =>
+                        $access['activeMembers'],
+
+                    'revokedMembers' =>
+                        $access['revokedMembers'],
+
+                    'pendingInvitations' =>
+                        $access['pendingInvitations']
+                ]
+            );
+        }
+        catch (\RuntimeException $e)
+        {
+            redirect(
+                '/account/health-records/' .
+                $profileId
+            );
+        }
+    }
+
+    /**
+     * Create a health profile access invitation.
+     */
+    public function storeHealthRecordInvitation(
+        int $profileId
+    ): void {
+        if (!$this->authService->check())
+        {
+            redirect('/login');
+        }
+
+        try
+        {
+            $this->verifyCsrf();
+
+            $email =
+                $_POST['email'] ?? '';
+
+            $role =
+                $_POST['role'] ?? 'viewer';
+
+            $expiresInDays =
+                (int) (
+                    $_POST['expires_in_days']
+                    ?? 7
+                );
+
+            $token =
+                $this->healthProfileInvitationService
+                    ->createInvitation(
+                        $profileId,
+                        $email,
+                        $role,
+                        $expiresInDays
+                    );
+
+            $profile =
+                $this->healthProfileService
+                    ->getProfile($profileId);
+
+            $this->view(
+                'account/health-record-invitation-created',
+                [
+                    'title' =>
+                        'Invitation Created',
+
+                    'profile' =>
+                        $profile,
+
+                    'token' =>
+                        $token
+                ]
+            );
+        }
+        catch (\Throwable $exception)
+        {
+            $profile =
+                $this->healthProfileService
+                    ->getProfile($profileId);
+
+            if (
+                ($profile['role'] ?? null) !== 'owner'
+            ) {
+                redirect(
+                    '/account/health-records/' .
+                    $profileId
+                );
+            }
+
+            $access =
+                $this->healthProfileInvitationService
+                    ->getAccessManagement($profileId);
+
+            $this->view(
+                'account/health-record-access',
+                [
+                    'title' =>
+                        'Manage Access - ' .
+                        $profile['full_name'],
+
+                    'profile' =>
+                        $profile,
+
+                    'activeMembers' =>
+                        $access['activeMembers'],
+
+                    'revokedMembers' =>
+                        $access['revokedMembers'],
+
+                    'pendingInvitations' =>
+                        $access['pendingInvitations'],
+
+                    'error' =>
+                        $exception->getMessage(),
+
+                    'formEmail' =>
+                        $_POST['email'] ?? '',
+
+                    'formRole' =>
+                        $_POST['role'] ?? 'viewer',
+
+                    'formExpiry' =>
+                        $_POST['expires_in_days'] ?? '7'
+                ]
+            );
+        }
+    }
+
+    /**
+     * Display a health profile invitation.
+     */
+    public function healthProfileInvitation(
+        string $token
+    ): void {
+        $token = trim($token);
+
+        if ($token === '')
+        {
+            abort(
+                404,
+                'Invitation not found.'
+            );
+        }
+
+        if (!$this->authService->check())
+        {
+            $this->session->put(
+                'pending_health_profile_invitation',
+                $token
+            );
+
+            redirect('/login');
+        }
+
+        try
+        {
+            /*
+            * Validate the invitation without accepting it.
+            */
+            $invitation =
+                $this->healthProfileInvitationService
+                    ->getInvitationForAcceptance($token);
+
+            $this->view(
+                'account/health-profile-invitation',
+                [
+                    'title' => 'Health Profile Invitation',
+                    'invitation' => $invitation,
+                    'token' => $token
+                ]
+            );
+        }
+        catch (\RuntimeException $exception)
+        {
+            $this->view(
+                'account/health-profile-invitation-error',
+                [
+                    'title' => 'Health Profile Invitation',
+                    'message' => $exception->getMessage()
+                ]
+            );
+        }
+    }
+
+    /**
+     * Accept a health profile invitation.
+     */
+    public function acceptHealthProfileInvitation(
+        string $token
+    ): void {
+        if (!$this->authService->check())
+        {
+            $this->session->put(
+                'pending_health_profile_invitation',
+                trim($token)
+            );
+
+            redirect('/login');
+        }
+
+        try
+        {
+            $this->verifyCsrf();
+
+            $profile =
+                $this->healthProfileInvitationService
+                    ->acceptInvitation($token);
+
+            redirect(
+                '/account/health-records/' .
+                (int) $profile['id']
+            );
+        }
+        catch (\RuntimeException $exception)
+        {
+            $this->view(
+                'account/health-profile-invitation-error',
+                [
+                    'title' =>
+                        'Health Profile Invitation',
+
+                    'message' =>
+                        $exception->getMessage()
+                ]
+            );
+        }
+    }
+
+    /**
+     * Update a health profile member's role.
+     */
+    public function updateHealthRecordMemberRole(
+        int $profileId,
+        int $memberUserId
+    ): void {
+        if (!$this->authService->check())
+        {
+            redirect('/login');
+        }
+
+        try
+        {
+            $this->verifyCsrf();
+
+            $role =
+                $_POST['role'] ?? '';
+
+            $this->healthProfileInvitationService
+                ->updateMemberRole(
+                    $profileId,
+                    $memberUserId,
+                    (string) $role
+                );
+
+            redirect(
+                '/account/health-records/' .
+                $profileId .
+                '/access'
+            );
+        }
+        catch (\RuntimeException $exception)
+        {
+            $profile =
+                $this->healthProfileService
+                    ->getProfile($profileId);
+
+            if (
+                ($profile['role'] ?? null) !== 'owner'
+            ) {
+                redirect(
+                    '/account/health-records/' .
+                    $profileId
+                );
+            }
+
+            $access =
+                $this->healthProfileInvitationService
+                    ->getAccessManagement($profileId);
+
+            $this->view(
+                'account/health-record-access',
+                [
+                    'title' =>
+                        'Manage Access - ' .
+                        $access['profile']['full_name'],
+
+                    'profile' =>
+                        $access['profile'],
+
+                    'activeMembers' =>
+                        $access['activeMembers'],
+
+                    'revokedMembers' =>
+                        $access['revokedMembers'],
+
+                    'pendingInvitations' =>
+                        $access['pendingInvitations'],
+
+                    'error' =>
+                        $exception->getMessage()
+                ]
+            );
+        }
+    }
+
+    /**
+     * Revoke a health profile member's access.
+     */
+    public function revokeHealthRecordMember(
+        int $profileId,
+        int $memberUserId
+    ): void {
+        if (!$this->authService->check())
+        {
+            redirect('/login');
+        }
+
+        try
+        {
+            $this->verifyCsrf();
+
+            $this->healthProfileInvitationService
+                ->revokeMember(
+                    $profileId,
+                    $memberUserId
+                );
+
+            redirect(
+                '/account/health-records/' .
+                $profileId .
+                '/access'
+            );
+        }
+        catch (\RuntimeException $exception)
+        {
+            if (
+                $exception->getMessage()
+                === 'Only the health profile owner can revoke member access.'
+            ) {
+                redirect(
+                    '/account/health-records/' .
+                    $profileId
+                );
+            }
+
+            $access =
+                $this->healthProfileInvitationService
+                    ->getAccessManagement($profileId);
+
+            $this->view(
+                'account/health-record-access',
+                [
+                    'title' =>
+                        'Manage Access - ' .
+                        $access['profile']['full_name'],
+
+                    'profile' =>
+                        $access['profile'],
+
+                    'activeMembers' =>
+                        $access['activeMembers'],
+
+                    'revokedMembers' =>
+                        $access['revokedMembers'],
+
+                    'pendingInvitations' =>
+                        $access['pendingInvitations'],
+
+                    'error' =>
+                        $exception->getMessage()
+                ]
+            );
+        }
+    }
+
+    /**
+     * Restore a revoked health profile member.
+     */
+    public function reactivateHealthRecordMember(
+        int $profileId,
+        int $memberUserId
+    ): void {
+        if (!$this->authService->check())
+        {
+            redirect('/login');
+        }
+
+        try
+        {
+            $this->verifyCsrf();
+
+            $role =
+                $_POST['role'] ?? 'viewer';
+
+            $this->healthProfileInvitationService
+                ->reactivateMember(
+                    $profileId,
+                    $memberUserId,
+                    (string) $role
+                );
+
+            redirect(
+                '/account/health-records/' .
+                $profileId .
+                '/access'
+            );
+        }
+        catch (\RuntimeException $exception)
+        {
+            if (
+                $exception->getMessage()
+                === 'Only the health profile owner can restore member access.'
+            ) {
+                redirect(
+                    '/account/health-records/' .
+                    $profileId
+                );
+            }
+
+            $access =
+                $this->healthProfileInvitationService
+                    ->getAccessManagement($profileId);
+
+            $this->view(
+                'account/health-record-access',
+                [
+                    'title' =>
+                        'Manage Access - ' .
+                        $access['profile']['full_name'],
+
+                    'profile' =>
+                        $access['profile'],
+
+                    'activeMembers' =>
+                        $access['activeMembers'],
+
+                    'revokedMembers' =>
+                        $access['revokedMembers'],
+
+                    'pendingInvitations' =>
+                        $access['pendingInvitations'],
+
                     'error' =>
                         $exception->getMessage()
                 ]

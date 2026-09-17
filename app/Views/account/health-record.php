@@ -53,6 +53,21 @@
             </a>
 
         <?php endif; ?>
+
+        <?php if (
+    ($profile['role'] ?? null) === 'owner'
+): ?>
+    <a
+        href="<?= url(
+            '/account/health-records/' .
+            (int) $profile['id'] .
+            '/access'
+        ) ?>"
+        class="btn btn-outline-primary"
+    >
+        Manage Access
+    </a>
+<?php endif; ?>
         </div>
 
 
@@ -415,7 +430,6 @@
 
                 </div>
 
-
                 <!-- Documents -->
 
                 <div class="col-12 col-md-6 col-lg-4">
@@ -437,9 +451,28 @@
                                 scans and other documents.
                             </p>
 
-                            <span class="btn btn-outline-secondary disabled">
-                                Coming Soon
-                            </span>
+                            <?php if (($documentCount ?? 0) > 0): ?>
+
+                                <p class="text-muted small mb-3">
+                                    <?= (int) $documentCount ?>
+                                    <?= (int) $documentCount === 1
+                                        ? 'document'
+                                        : 'documents'
+                                    ?>
+                                </p>
+
+                            <?php endif; ?>
+
+                            <a
+                                href="<?= url(
+                                    '/account/health-records/' .
+                                    (int) $profile['id'] .
+                                    '/documents'
+                                ) ?>"
+                                class="btn btn-outline-primary"
+                            >
+                                View Documents
+                            </a>
 
                         </div>
 

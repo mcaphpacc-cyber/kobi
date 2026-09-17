@@ -65,13 +65,19 @@ class AuthController extends Controller
             );
 
             /*
-            * Ensure the newly registered user has
-            * a self health profile.
+            * Normal registrations receive a self health
+            * profile automatically.
+            *
+            * Invitation-based registrations will receive
+            * access to the invited family profile instead.
             */
-            $this->healthProfileService
-                ->ensureSelfProfile();
+            if (!$this->hasPendingHealthProfileInvitation())
+            {
+                $this->healthProfileService
+                    ->ensureSelfProfile();
+            }
 
-            redirect('/');
+            $this->redirectAfterAuthentication();
 
         } catch (RuntimeException $exception) {
 
@@ -128,7 +134,7 @@ class AuthController extends Controller
                 (string) $this->request->post('password', '')
             );
 
-            redirect('/');
+            $this->redirectAfterAuthentication();
 
         } catch (RuntimeException $exception) {
 
@@ -167,6 +173,20 @@ class AuthController extends Controller
         }
     }
 
+    /**
+     * Determine whether the current registration
+     * was initiated through a health profile invitation.
+     */
+    private function hasPendingHealthProfileInvitation(): bool
+    {
+        $token =
+            $this->session->get(
+                'pending_health_profile_invitation'
+            );
+
+        return is_string($token) && $token !== '';
+    }
+
     private function verifyCsrf(): void
     {
         $token = $this->request->post(
@@ -183,5 +203,34 @@ class AuthController extends Controller
                 'Invalid security token. Please try again.'
             );
         }
+    }
+
+    /**
+     * Redirect the authenticated user to a pending
+     * health profile invitation when one exists.
+     */
+    private function redirectAfterAuthentication(): void
+    {
+        $token =
+            $this->session->get(
+                'pending_health_profile_invitation'
+            );
+
+        if (
+            is_string($token) &&
+            $token !== ''
+        )
+        {
+            $this->session->remove(
+                'pending_health_profile_invitation'
+            );
+
+            redirect(
+                '/shared/health-profile-invitation/' .
+                urlencode($token)
+            );
+        }
+
+        redirect('/');
     }
 }

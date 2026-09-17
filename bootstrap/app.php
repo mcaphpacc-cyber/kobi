@@ -65,6 +65,32 @@ session_start();
 
 header('Content-Type: text/html; charset=UTF-8');
 
+header(
+    "Content-Security-Policy: "
+    . "default-src 'self'; "
+    . "script-src 'self' 'sha256-HXnvbjhHtEQlezvoFANKV23eYJYHqnX9EjrIQe1jYDw='; "
+    . "style-src 'self'; "
+    . "img-src 'self' data:; "
+    . "font-src 'self'; "
+    . "connect-src 'self'; "
+    . "object-src 'none'; "
+    . "base-uri 'self'; "
+    . "frame-ancestors 'none'; "
+    . "form-action 'self';"
+);
+
+header('X-Frame-Options: DENY');
+header('X-Content-Type-Options: nosniff');
+header('Referrer-Policy: no-referrer');
+
+header(
+    'Permissions-Policy: '
+    . 'camera=(), '
+    . 'microphone=(), '
+    . 'geolocation=(), '
+    . 'payment=()'
+);
+
 /*
 |--------------------------------------------------------------------------
 | Uncaught Exception Handler

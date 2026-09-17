@@ -25,17 +25,27 @@
                 Health Record
             </a>
 
-            <a
-                href="<?= url(
-                    '/account/health-records/' .
-                    $profile['id'] .
-                    '/procedures/create'
-                ) ?>"
-                class="btn btn-primary"
-            >
-                <i class="bi bi-plus-lg me-1"></i>
-                Add Procedure
-            </a>
+            <?php if (
+                in_array(
+                    $profile['role'] ?? null,
+                    ['owner', 'editor'],
+                    true
+                )
+            ): ?>
+
+                <a
+                    href="<?= url(
+                        '/account/health-records/' .
+                        $profile['id'] .
+                        '/procedures/create'
+                    ) ?>"
+                    class="btn btn-primary"
+                >
+                    <i class="bi bi-plus-lg me-1"></i>
+                    Add Procedure
+                </a>
+
+            <?php endif; ?>
 
         </div>
 
@@ -61,17 +71,27 @@
                     and hospitalizations for this health profile.
                 </p>
 
-                <a
-                    href="<?= url(
-                        '/account/health-records/' .
-                        $profile['id'] .
-                        '/procedures/create'
-                    ) ?>"
-                    class="btn btn-primary"
-                >
-                    <i class="bi bi-plus-lg me-1"></i>
-                    Add Procedure
-                </a>
+                <?php if (
+                    in_array(
+                        $profile['role'] ?? null,
+                        ['owner', 'editor'],
+                        true
+                    )
+                ): ?>
+
+                    <a
+                        href="<?= url(
+                            '/account/health-records/' .
+                            $profile['id'] .
+                            '/procedures/create'
+                        ) ?>"
+                        class="btn btn-primary"
+                    >
+                        <i class="bi bi-plus-lg me-1"></i>
+                        Add Procedure
+                    </a>
+
+                <?php endif; ?>
 
             </div>
 
@@ -235,21 +255,31 @@
                                             class="d-inline-flex gap-1"
                                         >
 
-                                            <a
-                                                href="<?= url(
-                                                    '/account/health-records/' .
-                                                    $profile['id'] .
-                                                    '/procedures/' .
-                                                    $procedure['id'] .
-                                                    '/edit'
-                                                ) ?>"
-                                                class="btn btn-sm btn-outline-primary"
-                                                title="Edit"
-                                            >
-                                                <i
-                                                    class="bi bi-pencil"
-                                                ></i>
-                                            </a>
+                                            <?php if (
+                                                in_array(
+                                                    $profile['role'] ?? null,
+                                                    ['owner', 'editor'],
+                                                    true
+                                                )
+                                            ): ?>
+
+                                                <a
+                                                    href="<?= url(
+                                                        '/account/health-records/' .
+                                                        $profile['id'] .
+                                                        '/procedures/' .
+                                                        $procedure['id'] .
+                                                        '/edit'
+                                                    ) ?>"
+                                                    class="btn btn-sm btn-outline-primary"
+                                                    title="Edit"
+                                                >
+                                                    <i
+                                                        class="bi bi-pencil"
+                                                    ></i>
+                                                </a>
+
+                                            <?php endif; ?>
 
 
                                             <?php if (

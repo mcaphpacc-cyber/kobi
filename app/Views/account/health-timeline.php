@@ -15,14 +15,16 @@ $eventIcons = [
     'condition' => 'bi-heart-pulse',
     'medicine' => 'bi-capsule',
     'allergy' => 'bi-exclamation-triangle',
-    'procedure' => 'bi-hospital'
+    'procedure' => 'bi-hospital',
+    'document' => 'bi-file-earmark-medical'
 ];
 
 $eventLabels = [
     'condition' => 'Condition',
     'medicine' => 'Medicine',
     'allergy' => 'Allergy',
-    'procedure' => 'Procedure'
+    'procedure' => 'Procedure',
+    'document' => 'Document'
 ];
 ?>
 
@@ -214,6 +216,16 @@ $eventLabels = [
                                             '/procedures/' .
                                             $sourceId .
                                             '/edit'
+                                        );
+                                    break;
+                                case 'document':
+                                    $sourceUrl =
+                                        url(
+                                            '/account/health-records/' .
+                                            $profileId .
+                                            '/documents/' .
+                                            $sourceId .
+                                            '/file'
                                         );
                                     break;
                             }
@@ -479,6 +491,34 @@ $eventLabels = [
                                                 'Reason',
                                             'value' =>
                                                 $metadata['reason']
+                                        ];
+                                    }
+                                }elseif (
+                                    $sourceType === 'document'
+                                ) {
+                                    if (
+                                        !empty(
+                                            $metadata['hospital']
+                                        )
+                                    ) {
+                                        $metadataItems[] = [
+                                            'label' =>
+                                                'Hospital',
+                                            'value' =>
+                                                $metadata['hospital']
+                                        ];
+                                    }
+
+                                    if (
+                                        !empty(
+                                            $metadata['doctor']
+                                        )
+                                    ) {
+                                        $metadataItems[] = [
+                                            'label' =>
+                                                'Doctor',
+                                            'value' =>
+                                                $metadata['doctor']
                                         ];
                                     }
                                 }
