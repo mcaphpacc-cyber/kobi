@@ -122,7 +122,7 @@ document.addEventListener("DOMContentLoaded", () => {
     if (!dom.table) {
 
         console.error(
-            "KOBI Catalog: Table not found."
+           // "KOBI Catalog: Table not found."
         );
 
         return;
@@ -1284,3 +1284,21 @@ document.addEventListener("DOMContentLoaded", () => {
 
 });
 
+
+document.addEventListener('submit', function (event) {
+    const form = event.target.closest(
+        '.insurance-delete-form, .member-delete-form, .contact-delete-form'
+    );
+
+    if (!form) {
+        return;
+    }
+
+    const message =
+        form.dataset.confirmMessage ||
+        'Are you sure you want to continue?';
+
+    if (!window.confirm(message)) {
+        event.preventDefault();
+    }
+});

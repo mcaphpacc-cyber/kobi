@@ -345,7 +345,7 @@ if (!empty($_GET['featured'])) {
 
             <th>Gender</th>
 
-            <th class="text-center" style="width:130px;">
+            <th class="text-center">
                 Compare
             </th>
 

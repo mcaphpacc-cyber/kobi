@@ -631,11 +631,9 @@ function renderMatches()
 
     }
 
-    document.getElementById("resultsSummary").innerHTML =
-        renderSummary(summary);
+    document.getElementById("resultsSummary").innerHTML = renderSummary(summary);
 
-    dom.matchResults.innerHTML =
-        renderDiseaseCards(results);
+    dom.matchResults.innerHTML = renderDiseaseCards(results);
 }
 
 /******************************************************************
@@ -766,6 +764,10 @@ function renderDiseaseCard(item, rank)
             ✓ ${symptom.symptom_en}
         </div>
         `).join("");
+    const detailUrl =
+    window.KOBI.baseUrl +
+    "disease/" +
+    encodeURIComponent(item.disease.slug);
 
     let missing = `
         <div class="small text-success">
@@ -969,11 +971,11 @@ function renderDiseaseCard(item, rank)
                     </div>
 
                     <a
-                        href="javascript:void(0)" onclick="openDetailPage('${item.disease.slug}')"
-                        class="btn btn-primary" aria-label="View disease details">
-
+                        href="${detailUrl}"
+                        class="btn btn-primary disease-detail-link"
+                        aria-label="View disease details"
+                    >
                         View Details
-
                     </a>
 
                 </div>
@@ -1038,40 +1040,36 @@ function renderMissingSymptoms(item)
 
 function renderProgress(title, value, color)
 {
-    return `
+    const safeValue = Math.max(
+        0,
+        Math.min(100, Number(value) || 0)
+    );
 
+    return `
         <div class="mb-3">
 
-            <div
-                class="d-flex justify-content-between mb-1">
+            <div class="d-flex justify-content-between mb-1">
 
                 <small class="fw-semibold">
-
                     ${title}
-
                 </small>
 
                 <small class="text-muted">
-
-                    ${value}%
-
+                    ${safeValue}%
                 </small>
 
             </div>
 
-            <div class="progress rounded-pill" style="height:10px;">
-
-                <div
-                    class="progress-bar bg-${color} rounded-pill" role="progressbar"
-
-                    style="width:${value}%">
-
-                </div>
-
-            </div>
+            <progress
+                class="kobi-progress kobi-progress-${color}"
+                max="100"
+                value="${safeValue}"
+                aria-label="${title}"
+            >
+                ${safeValue}%
+            </progress>
 
         </div>
-
     `;
 }
 
@@ -2067,6 +2065,19 @@ function renderRecentSearches()
 
     bindRecentSearches();
 }
+
+document.addEventListener("click", function (event) {
+
+    const link =
+        event.target.closest(".disease-detail-link");
+
+    if (!link) {
+        return;
+    }
+
+    saveSearchState();
+
+});
 /******************************************************************
  * End of File
  ******************************************************************/

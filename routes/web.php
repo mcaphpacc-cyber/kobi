@@ -10,6 +10,7 @@ use App\Controllers\ComparisonController;
 use App\Controllers\AuthController;
 use App\Controllers\AccountController;
 use App\Controllers\SavedDiseaseController;
+use App\Controllers\HealthInsuranceController;
 
 /*
 |--------------------------------------------------------------------------
@@ -495,4 +496,154 @@ $this->router()->post(
     '/account/health-records/{profileId}/documents/{documentId}/delete',
     AccountController::class,
     'deleteHealthDocument'
+);
+
+
+/*
+|--------------------------------------------------------------------------
+| Health Record - Insurance
+|--------------------------------------------------------------------------
+*/
+
+$this->router()->get(
+    '/account/health-records/{profileId}/insurance',
+    HealthInsuranceController::class,
+    'index'
+);
+
+$this->router()->get(
+    '/account/health-records/{profileId}/insurance/create',
+    HealthInsuranceController::class,
+    'create'
+);
+
+$this->router()->post(
+    '/account/health-records/{profileId}/insurance',
+    HealthInsuranceController::class,
+    'store'
+);
+
+$this->router()->get(
+    '/account/health-records/{profileId}/insurance/{policyId}',
+    HealthInsuranceController::class,
+    'show'
+);
+
+$this->router()->get(
+    '/account/health-records/{profileId}/insurance/{policyId}/edit',
+    HealthInsuranceController::class,
+    'edit'
+);
+
+$this->router()->post(
+    '/account/health-records/{profileId}/insurance/{policyId}/update',
+    HealthInsuranceController::class,
+    'update'
+);
+
+$this->router()->post(
+    '/account/health-records/{profileId}/insurance/{policyId}/delete',
+    HealthInsuranceController::class,
+    'delete'
+);
+
+$this->router()->get(
+    '/account/health-records/{profileId}/insurance/{policyId}/members/create',
+    HealthInsuranceController::class,
+    'createMember'
+);
+
+$this->router()->post(
+    '/account/health-records/{profileId}/insurance/{policyId}/members',
+    HealthInsuranceController::class,
+    'storeMember'
+);
+
+$this->router()->get(
+    '/account/health-records/{profileId}/insurance/{policyId}/members/{memberId}/edit',
+    HealthInsuranceController::class,
+    'editMember'
+);
+
+$this->router()->post(
+    '/account/health-records/{profileId}/insurance/{policyId}/members/{memberId}/update',
+    HealthInsuranceController::class,
+    'updateMember'
+);
+
+$this->router()->post(
+    '/account/health-records/{profileId}/insurance/{policyId}/members/{memberId}/delete',
+    HealthInsuranceController::class,
+    'deleteMember'
+);
+
+$this->router()->get(
+    '/account/health-records/{profileId}/insurance/{policyId}/contacts/create',
+    HealthInsuranceController::class,
+    'createContact'
+);
+
+$this->router()->get(
+    '/account/health-records/{profileId}/insurance/{policyId}/contacts/{contactId}/edit',
+    HealthInsuranceController::class,
+    'editContact'
+);
+
+$this->router()->post(
+    '/account/health-records/{profileId}/insurance/{policyId}/contacts/{contactId}/update',
+    HealthInsuranceController::class,
+    'updateContact'
+);
+
+$this->router()->post(
+    '/account/health-records/{profileId}/insurance/{policyId}/contacts/{contactId}/delete',
+    HealthInsuranceController::class,
+    'deleteContact'
+);
+
+$this->router()->post(
+    '/account/health-records/{profileId}/insurance/{policyId}/contacts',
+    HealthInsuranceController::class,
+    'storeContact'
+);
+
+/*
+|--------------------------------------------------------------------------
+| Health Insurance - Linked Documents
+|--------------------------------------------------------------------------
+*/
+
+// Link document form
+$this->router()->get(
+    '/account/health-records/{profileId}/insurance/{policyId}/documents/create',
+    HealthInsuranceController::class,
+    'createDocument'
+);
+
+// Store document link
+$this->router()->post(
+    '/account/health-records/{profileId}/insurance/{policyId}/documents/store',
+    HealthInsuranceController::class,
+    'storeDocument'
+);
+
+// Edit linked document
+$this->router()->get(
+    '/account/health-records/{profileId}/insurance/{policyId}/documents/{linkId}/edit',
+    HealthInsuranceController::class,
+    'editDocument'
+);
+
+// Update linked document
+$this->router()->post(
+    '/account/health-records/{profileId}/insurance/{policyId}/documents/{linkId}/update',
+    HealthInsuranceController::class,
+    'updateDocument'
+);
+
+// Unlink document from insurance policy
+$this->router()->post(
+    '/account/health-records/{profileId}/insurance/{policyId}/documents/{linkId}/unlink',
+    HealthInsuranceController::class,
+    'unlinkDocument'
 );

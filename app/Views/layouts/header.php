@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="<?= e(config('locale')) ?>">
+<html>
 
 <head>
 
@@ -47,17 +47,8 @@ href="<?= asset('css/symptom-checker.css') ?>">
     rel="stylesheet"
     href="<?= asset('css/discovery.css') ?>">
 
+<script src="<?= asset('js/kobi-config.js') ?>"></script>
+
 </head>
-<script>
-window.KOBI = Object.freeze({
-
-    baseUrl: "<?= url(); ?>",
-
-    apiBase: "<?= url('api'); ?>",
-
-    locale: "<?= config('locale'); ?>"
-
-});
-</script>
 
 <body>

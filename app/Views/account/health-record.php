@@ -502,9 +502,16 @@
                                 important coverage information.
                             </p>
 
-                            <span class="btn btn-outline-secondary disabled">
-                                Coming Soon
-                            </span>
+                            <a
+                                href="<?= url(
+                                    '/account/health-records/' .
+                                    $profile['id'] .
+                                    '/insurance'
+                                ) ?>"
+                                class="btn btn-outline-primary"
+                            >
+                                View Insurances
+                            </a>
 
                         </div>
 
