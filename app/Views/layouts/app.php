@@ -15,3 +15,7 @@
 <?php if (str_contains($_SERVER['REQUEST_URI'], "symptom-checker")) {?>
     <script src="<?= asset('js/symptom-checker.js') ?>"></script>
 <?php }?>
+
+<?php if (str_contains($_SERVER['REQUEST_URI'], "/medicines")) {?>
+    <script src="<?= asset('js/health-medicine.js') ?>"></script>
+<?php }?>

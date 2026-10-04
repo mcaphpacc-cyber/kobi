@@ -721,3 +721,34 @@ section[id]
     border-radius:12px;
 
 }
+
+/* KOBI disease urgency panels */
+.kobi-urgency {
+    border: 1px solid transparent;
+    border-radius: 0.5rem;
+    padding: 1.25rem;
+}
+
+.kobi-urgency-mild {
+    background-color: #eaf7f0;
+    border-color: #198754;
+    color: #155d3b;
+}
+
+.kobi-urgency-moderate {
+    background-color: #fff8df;
+    border-color: #ffc107;
+    color: #664d03;
+}
+
+.kobi-urgency-urgent {
+    background-color: #fff0e0;
+    border-color: #fd7e14;
+    color: #7a3b00;
+}
+
+.kobi-urgency-emergency {
+    background-color: #fde8e8;
+    border-color: #dc3545;
+    color: #842029;
+}

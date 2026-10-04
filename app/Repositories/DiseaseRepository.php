@@ -248,7 +248,6 @@ class DiseaseRepository extends BaseRepository
         $id = (int) $disease['disease_id'];
 
         $content = [
-
             'overview_en'      => $disease['overview_en'] ?? '',
             'overview_hi'      => $disease['overview_hi'] ?? '',
 
@@ -262,8 +261,10 @@ class DiseaseRepository extends BaseRepository
             'diagnosis_hi'     => $disease['diagnosis_hi'] ?? '',
 
             'prevention_en'    => $disease['prevention_en'] ?? '',
-            'prevention_hi'    => $disease['prevention_hi'] ?? ''
+            'prevention_hi'    => $disease['prevention_hi'] ?? '',
 
+            'urgency_note_en'  => $disease['urgency_note_en'] ?? '',
+            'urgency_note_hi'  => $disease['urgency_note_hi'] ?? ''
         ];
 
 
@@ -472,11 +473,14 @@ class DiseaseRepository extends BaseRepository
                 d.id,
                 d.disease_en,
                 d.slug,
+                d.severity_level,
+                d.urgency_level,
                 dc.risk_factors_en,
                 dc.causes_en,
                 dc.diagnosis_en,
                 dc.prevention_en,
-                dc.overview_en
+                dc.overview_en,
+                dc.urgency_note_en AS urgency_note
             FROM diseases d
             INNER JOIN disease_symptoms ds
                 ON ds.disease_id = d.id
@@ -1228,6 +1232,85 @@ class DiseaseRepository extends BaseRepository
         return $this->fetchAll(
             $sql,
             $params
+        );
+    }
+
+    public function findForAdmin(int $diseaseId): ?array
+    {
+        $sql = "
+            SELECT
+                d.id,
+                d.disease_en,
+                d.disease_hi,
+                d.slug,
+                d.severity_level,
+                d.urgency_level,
+                dc.urgency_note_en,
+                dc.urgency_note_hi
+            FROM diseases d
+            LEFT JOIN disease_content dc
+                ON dc.disease_id = d.id
+            WHERE d.id = :id
+            LIMIT 1
+        ";
+
+        return $this->fetch(
+            $sql,
+            [
+                'id' => $diseaseId
+            ]
+        );
+    }
+
+    public function updateSeverityAndUrgency(
+        int $diseaseId,
+        string $severityLevel,
+        ?string $urgencyLevel,
+        ?string $urgencyNoteEn,
+        ?string $urgencyNoteHi
+    ): void {
+        $this->execute(
+            "
+            UPDATE diseases
+            SET
+                severity_level = :severity_level,
+                urgency_level = :urgency_level
+            WHERE id = :id
+            ",
+            [
+                'severity_level' => $severityLevel,
+                'urgency_level' => $urgencyLevel,
+                'id' => $diseaseId
+            ]
+        );
+
+        $this->execute(
+            "
+            INSERT INTO disease_content (
+                disease_id,
+                urgency_note_en,
+                urgency_note_hi
+            )
+            VALUES (
+                :disease_id,
+                :urgency_note_en,
+                :urgency_note_hi
+            )
+            ON DUPLICATE KEY UPDATE
+                urgency_note_en = VALUES(urgency_note_en),
+                urgency_note_hi = VALUES(urgency_note_hi)
+            ",
+            [
+                'disease_id' => $diseaseId,
+                'urgency_note_en' =>
+                    $urgencyNoteEn !== ''
+                        ? $urgencyNoteEn
+                        : null,
+                'urgency_note_hi' =>
+                    $urgencyNoteHi !== ''
+                        ? $urgencyNoteHi
+                        : null
+            ]
         );
     }
 }

@@ -19,6 +19,9 @@ use App\Services\MedicalSummaryService;
 use App\Services\MedicalSummaryShareService;
 use App\Services\HealthDocumentService;
 use App\Services\HealthProfileInvitationService;
+use App\Services\SubstanceService;
+use App\Services\EmailVerificationService;
+use App\Services\UserAuthIdentityService;
 
 class AccountController extends Controller
 {
@@ -36,7 +39,10 @@ class AccountController extends Controller
         private MedicalSummaryService $medicalSummaryService,
         private MedicalSummaryShareService $medicalSummaryShareService,
         private HealthDocumentService $healthDocumentService,
-        private HealthProfileInvitationService $healthProfileInvitationService
+        private HealthProfileInvitationService $healthProfileInvitationService,
+        private UserAuthIdentityService $userAuthIdentityService,
+        private EmailVerificationService $emailVerificationService,
+        private SubstanceService $substanceService
     ) {
     }
 
@@ -49,11 +55,25 @@ class AccountController extends Controller
 
         $user = $this->authService->user();
 
+        $identities =
+            $this->userAuthIdentityService
+                ->getForUser(
+                    (int) $user['id']
+                );
+
+        $hasPassword =
+            $this->userAuthIdentityService
+                ->hasPassword(
+                    (int) $user['id']
+                );
+
         $this->view(
             'account/index',
             [
                 'title' => 'My Account',
-                'user'  => $user
+                'user' => $user,
+                'identities' => $identities,
+                'hasPassword' => $hasPassword
             ]
         );
     }
@@ -1812,13 +1832,41 @@ class AccountController extends Controller
         {
             $this->verifyCsrf();
 
-            $this->authService->updateProfile(
+            $currentUser = $this->authService->user();
+
+            if (!$currentUser)
+            {
+                redirect('/login');
+            }
+
+            $newEmail = strtolower(
+                trim($_POST['email'] ?? '')
+            );
+
+            $emailChanged =
+                strtolower(
+                    (string) $currentUser['email']
+                ) !== $newEmail;
+
+            $user = $this->authService->updateProfile(
                 $_POST['name'] ?? '',
                 $_POST['email'] ?? ''
             );
 
-            redirect('/account?profile_updated=1');
+            if ($emailChanged)
+            {
+                $this->emailVerificationService->send(
+                    (int) $user['id']
+                );
 
+                redirect(
+                    '/account?email_verification_required=1'
+                );
+            }
+
+            redirect(
+                '/account?profile_updated=1'
+            );
         }
         catch (RuntimeException $exception)
         {
@@ -2916,6 +2964,86 @@ class AccountController extends Controller
                 ]
             );
         }
+    }
+
+    public function searchSubstances(): void
+    {
+        $keyword = trim($_GET['q'] ?? '');
+
+        if ($keyword === '') {
+            header('Content-Type: application/json');
+            echo json_encode([]);
+            return;
+        }
+
+        $results = $this->substanceService->search($keyword);
+
+        header('Content-Type: application/json');
+        echo json_encode($results);
+    }
+
+    public function unlinkAuthentication(): void
+    {
+        if (!$this->authService->check()) {
+            redirect('/login');
+        }
+
+        try {
+            $this->verifyCsrf();
+
+            $user = $this->authService->user();
+
+            if (!$user) {
+                redirect('/login');
+            }
+
+            $identityId = (int) (
+                $_POST['identity_id'] ?? 0
+            );
+
+            $this->userAuthIdentityService->unlink(
+                (int) $user['id'],
+                $identityId
+            );
+
+            redirect(
+                '/account?google_unlinked=1'
+            );
+
+        } catch (RuntimeException $exception) {
+
+            $user = $this->authService->user();
+
+            $identities =
+                $user
+                    ? $this->userAuthIdentityService
+                        ->getForUser(
+                            (int) $user['id']
+                        )
+                    : [];
+
+            $this->view(
+                'account/index',
+                [
+                    'title' => 'My Account',
+                    'user' => $user,
+                    'identities' => $identities,
+                    'error' => $exception->getMessage()
+                ]
+            );
+        }
+    }
+
+    public function hasPassword(
+        int $userId
+    ): bool {
+        if ($userId <= 0) {
+            return false;
+        }
+
+        return $this->userRepository->hasPassword(
+            $userId
+        );
     }
 
 }

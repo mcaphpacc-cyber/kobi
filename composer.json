@@ -5,7 +5,9 @@
     "license": "proprietary",
     "version": "0.1.0",
     "require": {
-        "php": "^8.2"
+        "php": "^8.2",
+        "google/apiclient": "^2.20",
+        "phpmailer/phpmailer": "^7.1"
     },
     "autoload": {
         "psr-4": {

@@ -1,5 +1,9 @@
 <!doctype html>
-<html>
+<html
+    lang="en"
+    data-base-url="<?= e(baseUrl()) ?>"
+    data-api-base="<?= e(url('api')) ?>"
+>
 
 <head>
 

@@ -77,6 +77,14 @@
                                 Change Password
                             </a>
 
+                            <a
+                                href="#authentication"
+                                class="list-group-item list-group-item-action"
+                            >
+                                <i class="bi bi-shield-lock me-2"></i>
+                                Connected Accounts
+                            </a>
+
                         </div>
 
                     </div>
@@ -163,6 +171,67 @@
 
                     <?php endif; ?>
 
+                    <?php if (
+                        isset($_GET['google_linked']) &&
+                        $_GET['google_linked'] === '1'
+                    ): ?>
+
+                        <div
+                            class="alert alert-success"
+                            role="alert"
+                        >
+                            Your Google account has been connected
+                            successfully.
+                        </div>
+
+                    <?php endif; ?>
+
+                    <?php if (
+                        isset($_GET['google_unlinked']) &&
+                        $_GET['google_unlinked'] === '1'
+                    ): ?>
+
+                        <div
+                            class="alert alert-success"
+                            role="alert"
+                        >
+                            Your Google account has been disconnected
+                            successfully.
+                        </div>
+
+                    <?php endif; ?>
+
+
+                    <?php if (
+                        isset($_GET['google_already_linked']) &&
+                        $_GET['google_already_linked'] === '1'
+                    ): ?>
+
+                        <div
+                            class="alert alert-info"
+                            role="alert"
+                        >
+                            Your Google account is already connected
+                            to this KOBI account.
+                        </div>
+
+                    <?php endif; ?>
+                    
+                    <?php if (
+                        isset($_GET['email_verification_required']) &&
+                        $_GET['email_verification_required'] === '1'
+                    ): ?>
+
+                        <div
+                            class="alert alert-warning"
+                            role="alert"
+                        >
+                            Your email address has been changed.
+                            A verification link has been sent to your new email address.
+                            Please verify your email address to continue using your account.
+                        </div>
+
+                    <?php endif; ?>
 
                     <form
                         method="POST"
@@ -327,6 +396,144 @@
                             Manage Preferences
 
                         </a>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+            <!-- Connected Accounts -->
+
+            <div
+                class="card shadow-sm mt-4"
+                id="authentication"
+            >
+
+                <div class="card-body">
+
+                    <h2 class="h5 mb-2">
+                        Connected Accounts
+                    </h2>
+
+                    <p class="text-muted mb-4">
+                        Manage the sign-in methods connected to
+                        your KOBI account.
+                    </p>
+
+
+                    <?php
+                    $googleIdentity = null;
+
+                    foreach (($identities ?? []) as $identity)
+                    {
+                        if (
+                            ($identity['provider'] ?? '') === 'google'
+                        ) {
+                            $googleIdentity = $identity;
+                            break;
+                        }
+                    }
+                    ?>
+
+
+                    <div
+                        class="d-flex flex-column flex-md-row
+                            justify-content-between
+                            align-items-md-center
+                            gap-3"
+                    >
+
+                        <div>
+
+                            <div class="fw-semibold">
+                                <i class="bi bi-google me-2"></i>
+                                Google
+                            </div>
+
+                            <?php if ($googleIdentity): ?>
+
+                                <div class="text-muted small mt-1">
+                                    Connected
+                                    <?php if (
+                                        !empty(
+                                            $googleIdentity['provider_email']
+                                        )
+                                    ): ?>
+                                        ·
+                                        <?= e(
+                                            $googleIdentity['provider_email']
+                                        ) ?>
+                                    <?php endif; ?>
+                                </div>
+
+                            <?php else: ?>
+
+                                <div class="text-muted small mt-1">
+                                    Not connected
+                                </div>
+
+                            <?php endif; ?>
+
+                        </div>
+
+
+                        <?php if ($googleIdentity): ?>
+
+                        <?php if ($hasPassword): ?>
+
+                            <form
+                                method="POST"
+                                action="<?= e(
+                                    url('/account/authentication/unlink')
+                                ) ?>"
+                                onsubmit="return confirm(
+                                    'Are you sure you want to disconnect Google from your KOBI account?'
+                                );"
+                            >
+
+                                <?= csrfField() ?>
+
+                                <input
+                                    type="hidden"
+                                    name="identity_id"
+                                    value="<?= e(
+                                        (string) $googleIdentity['id']
+                                    ) ?>"
+                                >
+
+                                <button
+                                    type="submit"
+                                    class="btn btn-outline-danger"
+                                >
+                                    Disconnect
+                                </button>
+
+                            </form>
+
+                        <?php else: ?>
+
+                            <span
+                                class="badge text-bg-success"
+                            >
+                                Connected
+                            </span>
+
+                        <?php endif; ?>
+
+                    <?php else: ?>
+
+                        <a
+                            href="<?= e(
+                                url('/account/google/link')
+                            ) ?>"
+                            class="btn btn-outline-dark"
+                        >
+                            <span class="me-2">G</span>
+                            Connect Google
+                        </a>
+
+                    <?php endif; ?>
 
                     </div>
 

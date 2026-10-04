@@ -19,13 +19,21 @@
 
                 <?php if (!empty($error)): ?>
 
-                    <div
-                        class="alert alert-danger"
-                        role="alert">
-
+                    <div class="alert alert-danger">
                         <?= e($error) ?>
-
                     </div>
+
+                    <?php if (!empty($verification_required)): ?>
+
+                        <div class="text-center mt-2 mb-3">
+                            <a
+                                href="<?= e(url('/verify-email/resend')) ?>"
+                            >
+                                Resend verification email
+                            </a>
+                        </div>
+
+                    <?php endif; ?>
 
                 <?php endif; ?>
 
@@ -86,7 +94,25 @@
                     </button>
 
                 </form>
+                <div class="text-end mt-2">
+                    <a href="<?= e(url('/forgot-password')) ?>">
+                        Forgot password?
+                    </a>
+                </div>
 
+                <div class="text-center my-4">
+                    <div class="text-muted small mb-3">
+                        OR
+                    </div>
+
+                    <a
+                        href="<?= url('/auth/google') ?>"
+                        class="btn btn-outline-dark w-100"
+                    >
+                        <span class="me-2">G</span>
+                        Continue with Google
+                    </a>
+                </div>
                 <div class="text-center mt-4">
 
                     <span class="text-muted">

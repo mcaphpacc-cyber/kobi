@@ -766,7 +766,7 @@ function renderDiseaseCard(item, rank)
         `).join("");
     const detailUrl =
     window.KOBI.baseUrl +
-    "disease/" +
+    "/disease/" +
     encodeURIComponent(item.disease.slug);
 
     let missing = `
@@ -1500,15 +1500,22 @@ function getSeverity(level)
         case "moderate":
             return {
                 label: "Moderate",
-                color: "info",
+                color: "warning",
                 icon: "bi bi-info-circle-fill"
             };
 
-        default:
+        case "mild":
             return {
                 label: "Mild",
                 color: "success",
                 icon: "bi bi-heart-fill"
+            };
+
+        default:
+            return {
+                label: "Unknown",
+                color: "secondary",
+                icon: "bi bi-question-circle-fill"
             };
     }
 }
@@ -1517,10 +1524,11 @@ function renderSeverity(item)
 {
     const severity =
         getSeverity(item.disease.severity_level);
+
     const note =
-    item.disease.urgency_note
-    ??
-    "Consult a qualified healthcare professional if symptoms persist or worsen.";
+        item.disease.urgency_note
+        ??
+        "Consult a qualified healthcare professional if symptoms persist or worsen.";
 
     return `
 
@@ -1537,17 +1545,25 @@ function renderSeverity(item)
                 <div class="flex-grow-1">
 
                     <h6 class="mb-1">
-
                         Severity
-
                     </h6>
 
                     <div
                         class="fw-bold text-${severity.color}">
 
                         ${severity.label}
-                        <span class="small text-muted mt-2 mb-0">${note}</span>
+
                     </div>
+
+                    ${
+                        note
+                            ? `
+                                <div class="small text-muted mt-2">
+                                    ${note}
+                                </div>
+                              `
+                            : ""
+                    }
 
                 </div>
 

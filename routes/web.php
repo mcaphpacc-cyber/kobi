@@ -11,6 +11,7 @@ use App\Controllers\AuthController;
 use App\Controllers\AccountController;
 use App\Controllers\SavedDiseaseController;
 use App\Controllers\HealthInsuranceController;
+use App\Controllers\GoogleAuthController;
 
 /*
 |--------------------------------------------------------------------------
@@ -79,6 +80,12 @@ $this->router()->get(
 );
 
 $this->router()->get(
+    '/api/substances/search',
+    AccountController::class,
+    'searchSubstances'
+);
+
+$this->router()->get(
     '/discovery',
     DiscoveryController::class,
     'index'
@@ -110,6 +117,48 @@ $this->router()->post(
 );
 
 $this->router()->get(
+    '/verify-email',
+    AuthController::class,
+    'verifyEmail'
+);
+
+$this->router()->get(
+    '/verify-email/resend',
+    AuthController::class,
+    'resendVerification'
+);
+
+$this->router()->post(
+    '/verify-email/resend',
+    AuthController::class,
+    'resendVerificationSubmit'
+);
+
+$this->router()->get(
+    '/forgot-password',
+    AuthController::class,
+    'forgotPassword'
+);
+
+$this->router()->post(
+    '/forgot-password',
+    AuthController::class,
+    'sendPasswordReset'
+);
+
+$this->router()->get(
+    '/reset-password',
+    AuthController::class,
+    'resetPassword'
+);
+
+$this->router()->post(
+    '/reset-password',
+    AuthController::class,
+    'resetPasswordSubmit'
+);
+
+$this->router()->get(
     '/login',
     AuthController::class,
     'login'
@@ -119,6 +168,30 @@ $this->router()->post(
     '/login',
     AuthController::class,
     'authenticate'
+);
+
+$this->router()->get(
+    '/auth/google',
+    GoogleAuthController::class,
+    'redirect'
+);
+
+$this->router()->get(
+    '/auth/google/callback',
+    GoogleAuthController::class,
+    'callback'
+);
+
+$this->router()->get(
+    '/account/google/link',
+    GoogleAuthController::class,
+    'link'
+);
+
+$this->router()->post(
+    '/account/authentication/unlink',
+    AccountController::class,
+    'unlinkAuthentication'
 );
 
 $this->router()->post(

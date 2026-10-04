@@ -6,18 +6,6 @@ $isSaved = $isSaved ?? false;
 
 $quickFacts = [];
 
-$quickFacts[] = [
-
-    'icon' => 'bi-exclamation-triangle',
-
-    'title' => 'Clinical Severity',
-
-    'value' => $knowledge['disease']['severity_level'] ?? 'Unknown',
-
-    'badge' => true
-
-];
-
 if (!empty($knowledge['disease']['body_system'])) {
 
     $quickFacts[] = [
@@ -93,18 +81,36 @@ $stats = [
 
 ];
 
+$isSaved = $isSaved ?? false;
+
+$severityColors = [
+    'mild'      => 'success',
+    'moderate'  => 'warning',
+    'urgent'    => 'warning',
+    'emergency' => 'danger'
+];
+
+$severityLevel = $disease['severity_level'] ?? '';
+
+$severityClass = $severityColors[$severityLevel] ?? 'secondary';
+
 ?>
 
-<div class="container py-4"> <a href="javascript:void(0)" onclick="window.location =
-    `${window.KOBI.baseUrl}/symptom-checker`;"
-       class="btn btn-outline-secondary btn-sm mb-4"> <i class="bi bi-arrow-left-circle me-2"></i> Back to Results </a>
+<div class="container py-4"> 
+  <a href="<?= url('/symptom-checker'); ?>"
+    class="btn btn-outline-secondary btn-sm mb-4">
+      <i class="bi bi-arrow-left-circle me-2"></i>
+      Back to Results
+  </a>
   <div class="card disease-hero shadow-sm border-0 mb-4">
     <div class="card-body">
       <h1 class="mb-2">
         <?= e($disease['disease_en']); ?>
       </h1>
-      <div class="d-flex flex-wrap gap-2 mt-2"> <span class="badge bg-warning text-dark"> <i class="bi bi-exclamation-triangle-fill me-1"></i>
-        <?= ucfirst($disease['severity_level'] ?? 'Unknown'); ?>
+      <div class="d-flex flex-wrap gap-2 mt-2"> 
+        <span class="badge bg-<?= e($severityClass); ?> <?= $severityClass === 'warning' ? 'text-dark' : ''; ?>">
+            <i class="bi bi-exclamation-triangle-fill me-1"></i>
+            <?= ucfirst($severityLevel ?: 'Unknown'); ?>
         </span>
         <?php if (!empty($disease['icd10_code'])) : ?>
         <span class="badge bg-secondary"> <i class="bi bi-upc-scan me-1"></i> ICD-10
@@ -176,82 +182,85 @@ $stats = [
     </div>
       <?php if (!empty($content['overview_en'])) : ?>
       <p class="mt-3 mb-0 text-muted">
-        <?= e(
-                        mb_strlen($content['overview_en']) > 180
-                            ? mb_substr($content['overview_en'], 0, 180) . '...'
-                            : $content['overview_en']
-                    ); ?>
+        <?= nl2br(e($content['overview_en'])); ?>
       </p>
       <?php endif; ?>
     </div>
     <div class="row g-3">
-        <?php
-
-          $severityColors = [
-
-              'low' => 'success',
-
-              'mild' => 'info',
-
-              'moderate' => 'warning',
-
-              'high' => 'danger',
-
-              'critical' => 'dark'
-
-          ];
-
-          $class =
-
-          $severityColors[
-              $knowledge['disease']['severity_level']
-          ] ?? 'secondary';
-
-        ?>
       <?php foreach ($quickFacts as $fact) : ?>
 
-      <div class="col">
+          <div class="col">
+              <div class="card h-100">
+                  <div class="card-body">
 
-          <div class="card h-100">
-
-              <div class="card-body">
-
-                  <div class="small text-muted mb-2">
-
-                      <i class="bi <?= $fact['icon']; ?> me-1"></i>
-
-                      <?= e($fact['title']); ?>
-
-                  </div>
-
-                  <?php if (!empty($fact['badge'])) : ?>
-
-                      <span class="badge bg-<?= $class; ?> text-dark">
-
-                          <?= e($fact['value']); ?>
-
-                      </span>
-
-                  <?php else : ?>
-
-                      <div class="fw-semibold">
-
-                          <?= e($fact['value']); ?>
-
+                      <div class="small text-muted mb-2">
+                          <i class="bi <?= e($fact['icon']); ?> me-1"></i>
+                          <?= e($fact['title']); ?>
                       </div>
 
-                  <?php endif; ?>
+                      <?php if (!empty($fact['badge'])) : ?>
 
+                          <span class="badge bg-<?= e($severityClass); ?> <?= $severityClass === 'warning' ? 'text-dark' : ''; ?>">
+                              <?= e($fact['value']); ?>
+                          </span>
+
+                      <?php else : ?>
+
+                          <div class="fw-semibold">
+                              <?= e($fact['value']); ?>
+                          </div>
+
+                      <?php endif; ?>
+
+                  </div>
+              </div>
+          </div>
+
+      <?php endforeach; ?>
+
+      </div>
+  </div>
+  <?php if (!empty($content['urgency_note_en'])) : ?>
+
+      <?php
+      $urgencyClass = 'kobi-urgency-moderate';
+
+      if (isset($severityLevel)) {
+          $urgencyClass = match ($severityLevel) {
+              'mild'      => 'kobi-urgency-mild',
+              'moderate'  => 'kobi-urgency-moderate',
+              'urgent'    => 'kobi-urgency-urgent',
+              'emergency' => 'kobi-urgency-emergency',
+              default     => 'kobi-urgency-moderate'
+          };
+      }
+
+      $urgencyTitle = ($severityLevel ?? '') === 'emergency'
+          ? 'Emergency Medical Attention'
+          : 'When to Seek Medical Attention';
+      ?>
+
+      <div class="kobi-urgency <?= e($urgencyClass); ?> shadow-sm mb-4" role="alert">
+
+          <div class="d-flex align-items-start">
+
+              <i class="bi bi-exclamation-triangle-fill fs-4 me-3 flex-shrink-0"></i>
+
+              <div>
+                  <div class="fw-bold mb-1">
+                      <?= e($urgencyTitle); ?>
+                  </div>
+
+                  <div>
+                      <?= nl2br(e($content['urgency_note_en'])); ?>
+                  </div>
               </div>
 
           </div>
 
       </div>
 
-      <?php endforeach; ?>
-
-      </div>
-  </div>
+  <?php endif; ?>
   <div class="row g-3 mb-4">
     <div class="col-6 col-lg-3">
       <div class="card text-center h-100">
@@ -959,5 +968,3 @@ if (!empty($knowledge['faqs'])) {?>
   </div>
 </section>
 <?php endif; ?>
-
-<script src="<?= asset('js/disease.js') ?>"></script>
