@@ -1,0 +1,3989 @@
+{
+  "status": "PASS",
+  "database": "kobi_phase2c4b2l_validation_20261009",
+  "environment": {
+    "php": "8.2.0",
+    "mariadb": "10.4.27-MariaDB",
+    "session_sql_mode": "NO_ZERO_IN_DATE,NO_ZERO_DATE,NO_ENGINE_SUBSTITUTION",
+    "global_sql_mode": "NO_ZERO_IN_DATE,NO_ZERO_DATE,NO_ENGINE_SUBSTITUTION",
+    "foreign_key_checks": 1
+  },
+  "checks": [
+    {
+      "name": "actual schema metadata and integrity objects",
+      "status": "PASS",
+      "detail": {
+        "tables": 7,
+        "triggers": 2,
+        "constraints": 160
+      }
+    },
+    {
+      "name": "disposable synthetic fixtures",
+      "status": "PASS",
+      "detail": "Only synthetic actors/diseases/systems; normal database never connected"
+    },
+    {
+      "name": "real HTTP login editor",
+      "status": "PASS",
+      "detail": {
+        "status": 302
+      }
+    },
+    {
+      "name": "real HTTP login reviewer",
+      "status": "PASS",
+      "detail": {
+        "status": 302
+      }
+    },
+    {
+      "name": "real HTTP login wrong",
+      "status": "PASS",
+      "detail": {
+        "status": 302
+      }
+    },
+    {
+      "name": "real HTTP login ordinary",
+      "status": "PASS",
+      "detail": {
+        "status": 302
+      }
+    },
+    {
+      "name": "authorized create form offers only permitted active system",
+      "status": "PASS",
+      "detail": {
+        "status": 200
+      }
+    },
+    {
+      "name": "create GET access anonymous",
+      "status": "PASS",
+      "detail": {
+        "status": 302,
+        "location": "http://127.0.0.1:8131/login"
+      }
+    },
+    {
+      "name": "create GET access wrong",
+      "status": "PASS",
+      "detail": {
+        "status": 200,
+        "location": null
+      }
+    },
+    {
+      "name": "create GET access ordinary",
+      "status": "PASS",
+      "detail": {
+        "status": 403,
+        "location": null
+      }
+    },
+    {
+      "name": "create GET access reviewer",
+      "status": "PASS",
+      "detail": {
+        "status": 403,
+        "location": null
+      }
+    },
+    {
+      "name": "protocol CSRF missing",
+      "status": "PASS",
+      "detail": {
+        "status": 403,
+        "database_unchanged": true
+      }
+    },
+    {
+      "name": "protocol CSRF invalid",
+      "status": "PASS",
+      "detail": {
+        "status": 403,
+        "database_unchanged": true
+      }
+    },
+    {
+      "name": "protocol HTTP creation and actual persisted defaults/history",
+      "status": "PASS",
+      "detail": {
+        "status": 302,
+        "protocol_id": 2291,
+        "location": "http://127.0.0.1:8131/admin/treatments/2291/edit?created=1"
+      }
+    },
+    {
+      "name": "duplicate creation safely rejected without mutation",
+      "status": "PASS",
+      "detail": {
+        "status": 422,
+        "database_unchanged": true
+      }
+    },
+    {
+      "name": "same pair distinct draft with first item stays revision 1",
+      "status": "PASS",
+      "detail": {
+        "status": 302,
+        "protocol_id": 2292
+      }
+    },
+    {
+      "name": "item-create GET loads editable actual parent",
+      "status": "PASS",
+      "detail": {
+        "status": 200
+      }
+    },
+    {
+      "name": "item CSRF missing",
+      "status": "PASS",
+      "detail": {
+        "status": 403,
+        "database_unchanged": true
+      }
+    },
+    {
+      "name": "item CSRF invalid",
+      "status": "PASS",
+      "detail": {
+        "status": 403,
+        "database_unchanged": true
+      }
+    },
+    {
+      "name": "later item HTTP revision 2291 from 1",
+      "status": "PASS",
+      "detail": {
+        "status": 302,
+        "before_revision": 1,
+        "after_revision": 2
+      }
+    },
+    {
+      "name": "later item HTTP revision 2292 from 1",
+      "status": "PASS",
+      "detail": {
+        "status": 302,
+        "before_revision": 1,
+        "after_revision": 2
+      }
+    },
+    {
+      "name": "later item HTTP revision 2292 from 2",
+      "status": "PASS",
+      "detail": {
+        "status": 302,
+        "before_revision": 2,
+        "after_revision": 3
+      }
+    },
+    {
+      "name": "stale repeated item POST returns 409 unchanged",
+      "status": "PASS",
+      "detail": {
+        "status": 409,
+        "database_unchanged": true
+      }
+    },
+    {
+      "name": "forged system protocol POST denied ordinary",
+      "status": "PASS",
+      "detail": {
+        "status": 403,
+        "database_unchanged": true
+      }
+    },
+    {
+      "name": "persisted parent item GET and POST denied ordinary",
+      "status": "PASS",
+      "detail": {
+        "get": 403,
+        "post": 403,
+        "database_unchanged": true
+      }
+    },
+    {
+      "name": "forged system protocol POST denied wrong",
+      "status": "PASS",
+      "detail": {
+        "status": 403,
+        "database_unchanged": true
+      }
+    },
+    {
+      "name": "persisted parent item GET and POST denied wrong",
+      "status": "PASS",
+      "detail": {
+        "get": 403,
+        "post": 403,
+        "database_unchanged": true
+      }
+    },
+    {
+      "name": "forged system protocol POST denied reviewer",
+      "status": "PASS",
+      "detail": {
+        "status": 403,
+        "database_unchanged": true
+      }
+    },
+    {
+      "name": "persisted parent item GET and POST denied reviewer",
+      "status": "PASS",
+      "detail": {
+        "get": 403,
+        "post": 403,
+        "database_unchanged": true
+      }
+    },
+    {
+      "name": "draft validation missing disease",
+      "status": "PASS",
+      "detail": {
+        "status": 422,
+        "database_unchanged": true
+      }
+    },
+    {
+      "name": "draft validation nonexistent disease",
+      "status": "PASS",
+      "detail": {
+        "status": 422,
+        "database_unchanged": true
+      }
+    },
+    {
+      "name": "draft validation malformed disease",
+      "status": "PASS",
+      "detail": {
+        "status": 422,
+        "database_unchanged": true
+      }
+    },
+    {
+      "name": "draft validation missing system",
+      "status": "PASS",
+      "detail": {
+        "status": 422,
+        "database_unchanged": true
+      }
+    },
+    {
+      "name": "draft validation nonexistent system",
+      "status": "PASS",
+      "detail": {
+        "status": 403,
+        "database_unchanged": true
+      }
+    },
+    {
+      "name": "draft validation inactive system",
+      "status": "PASS",
+      "detail": {
+        "status": 422,
+        "database_unchanged": true
+      }
+    },
+    {
+      "name": "draft validation forged system",
+      "status": "PASS",
+      "detail": {
+        "status": 403,
+        "database_unchanged": true
+      }
+    },
+    {
+      "name": "draft validation empty title",
+      "status": "PASS",
+      "detail": {
+        "status": 422,
+        "database_unchanged": true
+      }
+    },
+    {
+      "name": "draft validation overlong title",
+      "status": "PASS",
+      "detail": {
+        "status": 422,
+        "database_unchanged": true
+      }
+    },
+    {
+      "name": "draft validation nested invalid content",
+      "status": "PASS",
+      "detail": {
+        "status": 422,
+        "database_unchanged": true
+      }
+    },
+    {
+      "name": "draft validation overlong content",
+      "status": "PASS",
+      "detail": {
+        "status": 422,
+        "database_unchanged": true
+      }
+    },
+    {
+      "name": "draft validation unexpected actor",
+      "status": "PASS",
+      "detail": {
+        "status": 422,
+        "database_unchanged": true
+      }
+    },
+    {
+      "name": "draft validation forged approval",
+      "status": "PASS",
+      "detail": {
+        "status": 422,
+        "database_unchanged": true
+      }
+    },
+    {
+      "name": "draft validation invalid optional first item",
+      "status": "PASS",
+      "detail": {
+        "status": 422,
+        "database_unchanged": true
+      }
+    },
+    {
+      "name": "item validation invalid type",
+      "status": "PASS",
+      "detail": {
+        "status": 422,
+        "database_unchanged": true
+      }
+    },
+    {
+      "name": "item validation empty title",
+      "status": "PASS",
+      "detail": {
+        "status": 422,
+        "database_unchanged": true
+      }
+    },
+    {
+      "name": "item validation negative order",
+      "status": "PASS",
+      "detail": {
+        "status": 422,
+        "database_unchanged": true
+      }
+    },
+    {
+      "name": "item validation fractional order",
+      "status": "PASS",
+      "detail": {
+        "status": 422,
+        "database_unchanged": true
+      }
+    },
+    {
+      "name": "item validation exponent order",
+      "status": "PASS",
+      "detail": {
+        "status": 422,
+        "database_unchanged": true
+      }
+    },
+    {
+      "name": "item validation overflow order",
+      "status": "PASS",
+      "detail": {
+        "status": 422,
+        "database_unchanged": true
+      }
+    },
+    {
+      "name": "item validation overlong title",
+      "status": "PASS",
+      "detail": {
+        "status": 422,
+        "database_unchanged": true
+      }
+    },
+    {
+      "name": "item validation overlong instructions",
+      "status": "PASS",
+      "detail": {
+        "status": 422,
+        "database_unchanged": true
+      }
+    },
+    {
+      "name": "item validation forged parent",
+      "status": "PASS",
+      "detail": {
+        "status": 422,
+        "database_unchanged": true
+      }
+    },
+    {
+      "name": "invalid item route parent bad",
+      "status": "PASS",
+      "detail": {
+        "status": 422
+      }
+    },
+    {
+      "name": "invalid item route parent 0",
+      "status": "PASS",
+      "detail": {
+        "status": 422
+      }
+    },
+    {
+      "name": "invalid item route parent 999999",
+      "status": "PASS",
+      "detail": {
+        "status": 403
+      }
+    },
+    {
+      "name": "live database first-item/event transaction rollback after all writes",
+      "status": "PASS",
+      "detail": {
+        "real_protocol_item_event_inserts_rolled_back": true,
+        "database_unchanged": true
+      }
+    },
+    {
+      "name": "live database later-item revision/event rollback after item insert",
+      "status": "PASS",
+      "detail": {
+        "database_unchanged": true
+      }
+    },
+    {
+      "name": "actual canonical submission and independent approval fixture",
+      "status": "PASS",
+      "detail": {
+        "protocol_id": 2295,
+        "revision": 5,
+        "approval_id": 16
+      }
+    },
+    {
+      "name": "approved protocol item HTTP invalidates approval exactly once",
+      "status": "PASS",
+      "detail": {
+        "status": 302,
+        "before_revision": 5,
+        "after_revision": 6
+      }
+    },
+    {
+      "name": "isolated published fixture via existing canonical commands under HOLD",
+      "status": "PASS",
+      "detail": {
+        "protocol_id": 2296,
+        "isolated_synthetic_fixture_only": true,
+        "public_hold": "hold"
+      }
+    },
+    {
+      "name": "published protocol direct item GET and POST rejected unchanged",
+      "status": "PASS",
+      "detail": {
+        "get": 422,
+        "post": 422,
+        "database_unchanged": true
+      }
+    },
+    {
+      "name": "real controller permission infrastructure failure safely returns 503",
+      "status": "PASS",
+      "detail": {
+        "status": 503,
+        "probe": "real runtime/controller with controlled permission-repository failure double"
+      }
+    },
+    {
+      "name": "real HOLD public APIs and published candidate assessment",
+      "status": "PASS",
+      "detail": {
+        "assessment": "CANDIDATE",
+        "projection": null,
+        "disease_treatments": [],
+        "database_unchanged": true
+      }
+    },
+    {
+      "name": "real DiseaseController and comparison HTTP hide drafts and candidate",
+      "status": "PASS",
+      "detail": {
+        "disease": 200,
+        "comparison": 200,
+        "private_sentinels_absent": true,
+        "database_unchanged": true
+      }
+    },
+    {
+      "name": "real DiseaseService canonical treatments empty under HOLD",
+      "status": "PASS",
+      "detail": {
+        "treatments": [],
+        "database_unchanged": true
+      }
+    },
+    {
+      "name": "real MariaDB governed reader denies all newly created drafts",
+      "status": "PASS",
+      "detail": {
+        "draft_assessment": "DENY",
+        "projection": null,
+        "injected_policy_only": "governed",
+        "application_hold_unchanged": true
+      }
+    },
+    {
+      "name": "positive governed public projection exact allowlist without internal fields",
+      "status": "PASS",
+      "detail": {
+        "exact_protocol_item_reference_allowlists": true,
+        "internal_fields_absent": true
+      }
+    },
+    {
+      "name": "governed policy actual DiseaseService and comparison retain draft isolation",
+      "status": "PASS",
+      "detail": {
+        "draft_sentinels_absent": true,
+        "database_unchanged": true
+      }
+    },
+    {
+      "name": "actual public repository query count unchanged by more draft creation",
+      "status": "PASS",
+      "detail": {
+        "before": 8,
+        "after": 8,
+        "five_additional_drafts": true
+      }
+    },
+    {
+      "name": "actual foreign-key and event constraints reject invalid disposable writes",
+      "status": "PASS",
+      "detail": {
+        "mariadb_errors": [
+          1452,
+          4025
+        ],
+        "database_unchanged": true
+      }
+    },
+    {
+      "name": "permission failure repeat with complete HTTP context has no PHP warnings",
+      "status": "PASS",
+      "detail": {
+        "status": 503,
+        "no_php_warnings": true
+      }
+    },
+    {
+      "name": "actual browser-created protocol item and event rows",
+      "status": "PASS",
+      "detail": {
+        "protocol_id": 2293,
+        "revision": 2
+      }
+    },
+    {
+      "name": "browser editor authenticates through actual login",
+      "status": "PASS",
+      "detail": "success; real login/session",
+      "evidence": "Observed through cua_repl browser DOM/UI and console"
+    },
+    {
+      "name": "browser authorized draft create form loads",
+      "status": "PASS",
+      "detail": "active permitted system only",
+      "evidence": "Observed through cua_repl browser DOM/UI and console"
+    },
+    {
+      "name": "browser protocol POST redirects and shows draft revision 1",
+      "status": "PASS",
+      "detail": "/admin/treatments/2293/edit?created=1",
+      "evidence": "Observed through cua_repl browser DOM/UI and console"
+    },
+    {
+      "name": "browser item create form loads from editor link",
+      "status": "PASS",
+      "detail": "/admin/treatments/2293/items/create",
+      "evidence": "Observed through cua_repl browser DOM/UI and console"
+    },
+    {
+      "name": "browser item POST redirects and shows excluded item revision 2",
+      "status": "PASS",
+      "detail": "/admin/treatments/2293/edit?saved=1",
+      "evidence": "Observed through cua_repl browser DOM/UI and console"
+    },
+    {
+      "name": "browser public disease page shows zero treatments",
+      "status": "PASS",
+      "detail": "no private draft or item displayed",
+      "evidence": "Observed through cua_repl browser DOM/UI and console"
+    },
+    {
+      "name": "browser other-system actor is rejected on item form",
+      "status": "PASS",
+      "detail": "safe access denied page",
+      "evidence": "Observed through cua_repl browser DOM/UI and console"
+    },
+    {
+      "name": "browser pages have no console warning/error or CSP violation",
+      "status": "PASS",
+      "detail": "console warn/error logs empty",
+      "evidence": "Observed through cua_repl browser DOM/UI and console"
+    }
+  ],
+  "metadata": {
+    "treatment_protocols": {
+      "ddl": {
+        "Table": "treatment_protocols",
+        "Create Table": "CREATE TABLE `treatment_protocols` (\n  `id` int(11) NOT NULL AUTO_INCREMENT,\n  `disease_id` int(11) NOT NULL,\n  `treatment_system_id` int(11) NOT NULL,\n  `title_en` varchar(255) DEFAULT NULL,\n  `title_hi` varchar(255) DEFAULT NULL,\n  `overview_en` text DEFAULT NULL,\n  `overview_hi` text DEFAULT NULL,\n  `review_state` enum('draft','pending_review','changes_required','approved') NOT NULL DEFAULT 'draft',\n  `publication_status` enum('unpublished','published','withdrawn') NOT NULL DEFAULT 'unpublished',\n  `content_revision` int(10) unsigned NOT NULL DEFAULT 1,\n  `approved_review_id` bigint(20) unsigned DEFAULT NULL,\n  `risk_eligibility` enum('eligible','not_eligible','not_assessed') NOT NULL DEFAULT 'not_assessed',\n  `published_locales` set('en','hi') NOT NULL DEFAULT '',\n  `evidence_classification` enum('evidence_supported','insufficient_evidence','evidence_does_not_support','not_assessed') NOT NULL DEFAULT 'not_assessed',\n  `content_purpose` enum('clinical_management','traditional_practice','supportive_care','wellness_self_care','mixed') DEFAULT NULL,\n  `evidence_summary_en` text DEFAULT NULL,\n  `evidence_summary_hi` text DEFAULT NULL,\n  `applicability_en` text DEFAULT NULL,\n  `applicability_hi` text DEFAULT NULL,\n  `limitations_en` text DEFAULT NULL,\n  `limitations_hi` text DEFAULT NULL,\n  `updated_at` datetime(6) DEFAULT NULL,\n  `updated_by` int(11) DEFAULT NULL,\n  PRIMARY KEY (`id`),\n  KEY `idx_protocol_disease` (`disease_id`),\n  KEY `idx_protocol_system` (`treatment_system_id`),\n  KEY `idx_treatment_public_candidates` (`disease_id`,`publication_status`,`review_state`,`treatment_system_id`,`id`),\n  KEY `idx_treatment_updated_by` (`updated_by`),\n  KEY `idx_treatment_approved_revision` (`id`,`content_revision`,`approved_review_id`),\n  CONSTRAINT `fk_treatment_approved_revision` FOREIGN KEY (`id`, `content_revision`, `approved_review_id`) REFERENCES `treatment_protocol_events` (`protocol_id`, `content_revision`, `id`) ON DELETE NO ACTION ON UPDATE NO ACTION,\n  CONSTRAINT `fk_treatment_updated_by` FOREIGN KEY (`updated_by`) REFERENCES `users` (`id`),\n  CONSTRAINT `treatment_protocols_ibfk_1` FOREIGN KEY (`disease_id`) REFERENCES `diseases` (`id`),\n  CONSTRAINT `treatment_protocols_ibfk_2` FOREIGN KEY (`treatment_system_id`) REFERENCES `treatment_systems` (`id`),\n  CONSTRAINT `chk_treatment_revision` CHECK (`content_revision` >= 1),\n  CONSTRAINT `chk_treatment_risk_value` CHECK (`risk_eligibility` is not null and `risk_eligibility` in ('eligible','not_eligible','not_assessed')),\n  CONSTRAINT `chk_treatment_approval_pointer` CHECK (`review_state` = 'approved' = (`approved_review_id` is not null)),\n  CONSTRAINT `chk_treatment_publication` CHECK (`publication_status` = 'published' and `review_state` = 'approved' and `published_locales` <> '' or `publication_status` <> 'published' and `published_locales` = '')\n) ENGINE=InnoDB AUTO_INCREMENT=2291 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci"
+      },
+      "columns": [
+        {
+          "Field": "id",
+          "Type": "int(11)",
+          "Collation": null,
+          "Null": "NO",
+          "Key": "PRI",
+          "Default": null,
+          "Extra": "auto_increment",
+          "Privileges": "select,insert,update,references",
+          "Comment": ""
+        },
+        {
+          "Field": "disease_id",
+          "Type": "int(11)",
+          "Collation": null,
+          "Null": "NO",
+          "Key": "MUL",
+          "Default": null,
+          "Extra": "",
+          "Privileges": "select,insert,update,references",
+          "Comment": ""
+        },
+        {
+          "Field": "treatment_system_id",
+          "Type": "int(11)",
+          "Collation": null,
+          "Null": "NO",
+          "Key": "MUL",
+          "Default": null,
+          "Extra": "",
+          "Privileges": "select,insert,update,references",
+          "Comment": ""
+        },
+        {
+          "Field": "title_en",
+          "Type": "varchar(255)",
+          "Collation": "utf8mb4_general_ci",
+          "Null": "YES",
+          "Key": "",
+          "Default": null,
+          "Extra": "",
+          "Privileges": "select,insert,update,references",
+          "Comment": ""
+        },
+        {
+          "Field": "title_hi",
+          "Type": "varchar(255)",
+          "Collation": "utf8mb4_general_ci",
+          "Null": "YES",
+          "Key": "",
+          "Default": null,
+          "Extra": "",
+          "Privileges": "select,insert,update,references",
+          "Comment": ""
+        },
+        {
+          "Field": "overview_en",
+          "Type": "text",
+          "Collation": "utf8mb4_general_ci",
+          "Null": "YES",
+          "Key": "",
+          "Default": null,
+          "Extra": "",
+          "Privileges": "select,insert,update,references",
+          "Comment": ""
+        },
+        {
+          "Field": "overview_hi",
+          "Type": "text",
+          "Collation": "utf8mb4_general_ci",
+          "Null": "YES",
+          "Key": "",
+          "Default": null,
+          "Extra": "",
+          "Privileges": "select,insert,update,references",
+          "Comment": ""
+        },
+        {
+          "Field": "review_state",
+          "Type": "enum('draft','pending_review','changes_required','approved')",
+          "Collation": "utf8mb4_general_ci",
+          "Null": "NO",
+          "Key": "",
+          "Default": "draft",
+          "Extra": "",
+          "Privileges": "select,insert,update,references",
+          "Comment": ""
+        },
+        {
+          "Field": "publication_status",
+          "Type": "enum('unpublished','published','withdrawn')",
+          "Collation": "utf8mb4_general_ci",
+          "Null": "NO",
+          "Key": "",
+          "Default": "unpublished",
+          "Extra": "",
+          "Privileges": "select,insert,update,references",
+          "Comment": ""
+        },
+        {
+          "Field": "content_revision",
+          "Type": "int(10) unsigned",
+          "Collation": null,
+          "Null": "NO",
+          "Key": "",
+          "Default": "1",
+          "Extra": "",
+          "Privileges": "select,insert,update,references",
+          "Comment": ""
+        },
+        {
+          "Field": "approved_review_id",
+          "Type": "bigint(20) unsigned",
+          "Collation": null,
+          "Null": "YES",
+          "Key": "",
+          "Default": null,
+          "Extra": "",
+          "Privileges": "select,insert,update,references",
+          "Comment": ""
+        },
+        {
+          "Field": "risk_eligibility",
+          "Type": "enum('eligible','not_eligible','not_assessed')",
+          "Collation": "utf8mb4_general_ci",
+          "Null": "NO",
+          "Key": "",
+          "Default": "not_assessed",
+          "Extra": "",
+          "Privileges": "select,insert,update,references",
+          "Comment": ""
+        },
+        {
+          "Field": "published_locales",
+          "Type": "set('en','hi')",
+          "Collation": "utf8mb4_general_ci",
+          "Null": "NO",
+          "Key": "",
+          "Default": "",
+          "Extra": "",
+          "Privileges": "select,insert,update,references",
+          "Comment": ""
+        },
+        {
+          "Field": "evidence_classification",
+          "Type": "enum('evidence_supported','insufficient_evidence','evidence_does_not_support','not_assessed')",
+          "Collation": "utf8mb4_general_ci",
+          "Null": "NO",
+          "Key": "",
+          "Default": "not_assessed",
+          "Extra": "",
+          "Privileges": "select,insert,update,references",
+          "Comment": ""
+        },
+        {
+          "Field": "content_purpose",
+          "Type": "enum('clinical_management','traditional_practice','supportive_care','wellness_self_care','mixed')",
+          "Collation": "utf8mb4_general_ci",
+          "Null": "YES",
+          "Key": "",
+          "Default": null,
+          "Extra": "",
+          "Privileges": "select,insert,update,references",
+          "Comment": ""
+        },
+        {
+          "Field": "evidence_summary_en",
+          "Type": "text",
+          "Collation": "utf8mb4_general_ci",
+          "Null": "YES",
+          "Key": "",
+          "Default": null,
+          "Extra": "",
+          "Privileges": "select,insert,update,references",
+          "Comment": ""
+        },
+        {
+          "Field": "evidence_summary_hi",
+          "Type": "text",
+          "Collation": "utf8mb4_general_ci",
+          "Null": "YES",
+          "Key": "",
+          "Default": null,
+          "Extra": "",
+          "Privileges": "select,insert,update,references",
+          "Comment": ""
+        },
+        {
+          "Field": "applicability_en",
+          "Type": "text",
+          "Collation": "utf8mb4_general_ci",
+          "Null": "YES",
+          "Key": "",
+          "Default": null,
+          "Extra": "",
+          "Privileges": "select,insert,update,references",
+          "Comment": ""
+        },
+        {
+          "Field": "applicability_hi",
+          "Type": "text",
+          "Collation": "utf8mb4_general_ci",
+          "Null": "YES",
+          "Key": "",
+          "Default": null,
+          "Extra": "",
+          "Privileges": "select,insert,update,references",
+          "Comment": ""
+        },
+        {
+          "Field": "limitations_en",
+          "Type": "text",
+          "Collation": "utf8mb4_general_ci",
+          "Null": "YES",
+          "Key": "",
+          "Default": null,
+          "Extra": "",
+          "Privileges": "select,insert,update,references",
+          "Comment": ""
+        },
+        {
+          "Field": "limitations_hi",
+          "Type": "text",
+          "Collation": "utf8mb4_general_ci",
+          "Null": "YES",
+          "Key": "",
+          "Default": null,
+          "Extra": "",
+          "Privileges": "select,insert,update,references",
+          "Comment": ""
+        },
+        {
+          "Field": "updated_at",
+          "Type": "datetime(6)",
+          "Collation": null,
+          "Null": "YES",
+          "Key": "",
+          "Default": null,
+          "Extra": "",
+          "Privileges": "select,insert,update,references",
+          "Comment": ""
+        },
+        {
+          "Field": "updated_by",
+          "Type": "int(11)",
+          "Collation": null,
+          "Null": "YES",
+          "Key": "MUL",
+          "Default": null,
+          "Extra": "",
+          "Privileges": "select,insert,update,references",
+          "Comment": ""
+        }
+      ],
+      "indexes": [
+        {
+          "Table": "treatment_protocols",
+          "Non_unique": 0,
+          "Key_name": "PRIMARY",
+          "Seq_in_index": 1,
+          "Column_name": "id",
+          "Collation": "A",
+          "Cardinality": 0,
+          "Sub_part": null,
+          "Packed": null,
+          "Null": "",
+          "Index_type": "BTREE",
+          "Comment": "",
+          "Index_comment": ""
+        },
+        {
+          "Table": "treatment_protocols",
+          "Non_unique": 1,
+          "Key_name": "idx_protocol_disease",
+          "Seq_in_index": 1,
+          "Column_name": "disease_id",
+          "Collation": "A",
+          "Cardinality": 0,
+          "Sub_part": null,
+          "Packed": null,
+          "Null": "",
+          "Index_type": "BTREE",
+          "Comment": "",
+          "Index_comment": ""
+        },
+        {
+          "Table": "treatment_protocols",
+          "Non_unique": 1,
+          "Key_name": "idx_protocol_system",
+          "Seq_in_index": 1,
+          "Column_name": "treatment_system_id",
+          "Collation": "A",
+          "Cardinality": 0,
+          "Sub_part": null,
+          "Packed": null,
+          "Null": "",
+          "Index_type": "BTREE",
+          "Comment": "",
+          "Index_comment": ""
+        },
+        {
+          "Table": "treatment_protocols",
+          "Non_unique": 1,
+          "Key_name": "idx_treatment_public_candidates",
+          "Seq_in_index": 1,
+          "Column_name": "disease_id",
+          "Collation": "A",
+          "Cardinality": 0,
+          "Sub_part": null,
+          "Packed": null,
+          "Null": "",
+          "Index_type": "BTREE",
+          "Comment": "",
+          "Index_comment": ""
+        },
+        {
+          "Table": "treatment_protocols",
+          "Non_unique": 1,
+          "Key_name": "idx_treatment_public_candidates",
+          "Seq_in_index": 2,
+          "Column_name": "publication_status",
+          "Collation": "A",
+          "Cardinality": 0,
+          "Sub_part": null,
+          "Packed": null,
+          "Null": "",
+          "Index_type": "BTREE",
+          "Comment": "",
+          "Index_comment": ""
+        },
+        {
+          "Table": "treatment_protocols",
+          "Non_unique": 1,
+          "Key_name": "idx_treatment_public_candidates",
+          "Seq_in_index": 3,
+          "Column_name": "review_state",
+          "Collation": "A",
+          "Cardinality": 0,
+          "Sub_part": null,
+          "Packed": null,
+          "Null": "",
+          "Index_type": "BTREE",
+          "Comment": "",
+          "Index_comment": ""
+        },
+        {
+          "Table": "treatment_protocols",
+          "Non_unique": 1,
+          "Key_name": "idx_treatment_public_candidates",
+          "Seq_in_index": 4,
+          "Column_name": "treatment_system_id",
+          "Collation": "A",
+          "Cardinality": 0,
+          "Sub_part": null,
+          "Packed": null,
+          "Null": "",
+          "Index_type": "BTREE",
+          "Comment": "",
+          "Index_comment": ""
+        },
+        {
+          "Table": "treatment_protocols",
+          "Non_unique": 1,
+          "Key_name": "idx_treatment_public_candidates",
+          "Seq_in_index": 5,
+          "Column_name": "id",
+          "Collation": "A",
+          "Cardinality": 0,
+          "Sub_part": null,
+          "Packed": null,
+          "Null": "",
+          "Index_type": "BTREE",
+          "Comment": "",
+          "Index_comment": ""
+        },
+        {
+          "Table": "treatment_protocols",
+          "Non_unique": 1,
+          "Key_name": "idx_treatment_updated_by",
+          "Seq_in_index": 1,
+          "Column_name": "updated_by",
+          "Collation": "A",
+          "Cardinality": 0,
+          "Sub_part": null,
+          "Packed": null,
+          "Null": "YES",
+          "Index_type": "BTREE",
+          "Comment": "",
+          "Index_comment": ""
+        },
+        {
+          "Table": "treatment_protocols",
+          "Non_unique": 1,
+          "Key_name": "idx_treatment_approved_revision",
+          "Seq_in_index": 1,
+          "Column_name": "id",
+          "Collation": "A",
+          "Cardinality": 0,
+          "Sub_part": null,
+          "Packed": null,
+          "Null": "",
+          "Index_type": "BTREE",
+          "Comment": "",
+          "Index_comment": ""
+        },
+        {
+          "Table": "treatment_protocols",
+          "Non_unique": 1,
+          "Key_name": "idx_treatment_approved_revision",
+          "Seq_in_index": 2,
+          "Column_name": "content_revision",
+          "Collation": "A",
+          "Cardinality": 0,
+          "Sub_part": null,
+          "Packed": null,
+          "Null": "",
+          "Index_type": "BTREE",
+          "Comment": "",
+          "Index_comment": ""
+        },
+        {
+          "Table": "treatment_protocols",
+          "Non_unique": 1,
+          "Key_name": "idx_treatment_approved_revision",
+          "Seq_in_index": 3,
+          "Column_name": "approved_review_id",
+          "Collation": "A",
+          "Cardinality": 0,
+          "Sub_part": null,
+          "Packed": null,
+          "Null": "YES",
+          "Index_type": "BTREE",
+          "Comment": "",
+          "Index_comment": ""
+        }
+      ]
+    },
+    "treatment_protocol_items": {
+      "ddl": {
+        "Table": "treatment_protocol_items",
+        "Create Table": "CREATE TABLE `treatment_protocol_items` (\n  `id` int(11) NOT NULL AUTO_INCREMENT,\n  `protocol_id` int(11) NOT NULL,\n  `item_type` enum('medicine','herb','exercise','acupoint','diet','therapy','lifestyle') DEFAULT NULL,\n  `title_en` varchar(255) DEFAULT NULL,\n  `title_hi` varchar(255) DEFAULT NULL,\n  `instructions_en` text DEFAULT NULL,\n  `instructions_hi` text DEFAULT NULL,\n  `sort_order` int(11) DEFAULT 0,\n  `is_included` tinyint(3) unsigned NOT NULL DEFAULT 0,\n  `evidence_classification` enum('evidence_supported','insufficient_evidence','evidence_does_not_support','not_assessed') NOT NULL DEFAULT 'not_assessed',\n  `content_purpose` enum('clinical_management','traditional_practice','supportive_care','wellness_self_care','mixed') DEFAULT NULL,\n  `limitations_en` text DEFAULT NULL,\n  `limitations_hi` text DEFAULT NULL,\n  PRIMARY KEY (`id`),\n  KEY `idx_protocol_items` (`protocol_id`),\n  KEY `idx_treatment_item_display` (`protocol_id`,`is_included`,`sort_order`,`id`),\n  CONSTRAINT `treatment_protocol_items_ibfk_1` FOREIGN KEY (`protocol_id`) REFERENCES `treatment_protocols` (`id`),\n  CONSTRAINT `chk_treatment_item_included` CHECK (`is_included` in (0,1))\n) ENGINE=InnoDB AUTO_INCREMENT=3401 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci"
+      },
+      "columns": [
+        {
+          "Field": "id",
+          "Type": "int(11)",
+          "Collation": null,
+          "Null": "NO",
+          "Key": "PRI",
+          "Default": null,
+          "Extra": "auto_increment",
+          "Privileges": "select,insert,update,references",
+          "Comment": ""
+        },
+        {
+          "Field": "protocol_id",
+          "Type": "int(11)",
+          "Collation": null,
+          "Null": "NO",
+          "Key": "MUL",
+          "Default": null,
+          "Extra": "",
+          "Privileges": "select,insert,update,references",
+          "Comment": ""
+        },
+        {
+          "Field": "item_type",
+          "Type": "enum('medicine','herb','exercise','acupoint','diet','therapy','lifestyle')",
+          "Collation": "utf8mb4_general_ci",
+          "Null": "YES",
+          "Key": "",
+          "Default": null,
+          "Extra": "",
+          "Privileges": "select,insert,update,references",
+          "Comment": ""
+        },
+        {
+          "Field": "title_en",
+          "Type": "varchar(255)",
+          "Collation": "utf8mb4_general_ci",
+          "Null": "YES",
+          "Key": "",
+          "Default": null,
+          "Extra": "",
+          "Privileges": "select,insert,update,references",
+          "Comment": ""
+        },
+        {
+          "Field": "title_hi",
+          "Type": "varchar(255)",
+          "Collation": "utf8mb4_general_ci",
+          "Null": "YES",
+          "Key": "",
+          "Default": null,
+          "Extra": "",
+          "Privileges": "select,insert,update,references",
+          "Comment": ""
+        },
+        {
+          "Field": "instructions_en",
+          "Type": "text",
+          "Collation": "utf8mb4_general_ci",
+          "Null": "YES",
+          "Key": "",
+          "Default": null,
+          "Extra": "",
+          "Privileges": "select,insert,update,references",
+          "Comment": ""
+        },
+        {
+          "Field": "instructions_hi",
+          "Type": "text",
+          "Collation": "utf8mb4_general_ci",
+          "Null": "YES",
+          "Key": "",
+          "Default": null,
+          "Extra": "",
+          "Privileges": "select,insert,update,references",
+          "Comment": ""
+        },
+        {
+          "Field": "sort_order",
+          "Type": "int(11)",
+          "Collation": null,
+          "Null": "YES",
+          "Key": "",
+          "Default": "0",
+          "Extra": "",
+          "Privileges": "select,insert,update,references",
+          "Comment": ""
+        },
+        {
+          "Field": "is_included",
+          "Type": "tinyint(3) unsigned",
+          "Collation": null,
+          "Null": "NO",
+          "Key": "",
+          "Default": "0",
+          "Extra": "",
+          "Privileges": "select,insert,update,references",
+          "Comment": ""
+        },
+        {
+          "Field": "evidence_classification",
+          "Type": "enum('evidence_supported','insufficient_evidence','evidence_does_not_support','not_assessed')",
+          "Collation": "utf8mb4_general_ci",
+          "Null": "NO",
+          "Key": "",
+          "Default": "not_assessed",
+          "Extra": "",
+          "Privileges": "select,insert,update,references",
+          "Comment": ""
+        },
+        {
+          "Field": "content_purpose",
+          "Type": "enum('clinical_management','traditional_practice','supportive_care','wellness_self_care','mixed')",
+          "Collation": "utf8mb4_general_ci",
+          "Null": "YES",
+          "Key": "",
+          "Default": null,
+          "Extra": "",
+          "Privileges": "select,insert,update,references",
+          "Comment": ""
+        },
+        {
+          "Field": "limitations_en",
+          "Type": "text",
+          "Collation": "utf8mb4_general_ci",
+          "Null": "YES",
+          "Key": "",
+          "Default": null,
+          "Extra": "",
+          "Privileges": "select,insert,update,references",
+          "Comment": ""
+        },
+        {
+          "Field": "limitations_hi",
+          "Type": "text",
+          "Collation": "utf8mb4_general_ci",
+          "Null": "YES",
+          "Key": "",
+          "Default": null,
+          "Extra": "",
+          "Privileges": "select,insert,update,references",
+          "Comment": ""
+        }
+      ],
+      "indexes": [
+        {
+          "Table": "treatment_protocol_items",
+          "Non_unique": 0,
+          "Key_name": "PRIMARY",
+          "Seq_in_index": 1,
+          "Column_name": "id",
+          "Collation": "A",
+          "Cardinality": 0,
+          "Sub_part": null,
+          "Packed": null,
+          "Null": "",
+          "Index_type": "BTREE",
+          "Comment": "",
+          "Index_comment": ""
+        },
+        {
+          "Table": "treatment_protocol_items",
+          "Non_unique": 1,
+          "Key_name": "idx_protocol_items",
+          "Seq_in_index": 1,
+          "Column_name": "protocol_id",
+          "Collation": "A",
+          "Cardinality": 0,
+          "Sub_part": null,
+          "Packed": null,
+          "Null": "",
+          "Index_type": "BTREE",
+          "Comment": "",
+          "Index_comment": ""
+        },
+        {
+          "Table": "treatment_protocol_items",
+          "Non_unique": 1,
+          "Key_name": "idx_treatment_item_display",
+          "Seq_in_index": 1,
+          "Column_name": "protocol_id",
+          "Collation": "A",
+          "Cardinality": 0,
+          "Sub_part": null,
+          "Packed": null,
+          "Null": "",
+          "Index_type": "BTREE",
+          "Comment": "",
+          "Index_comment": ""
+        },
+        {
+          "Table": "treatment_protocol_items",
+          "Non_unique": 1,
+          "Key_name": "idx_treatment_item_display",
+          "Seq_in_index": 2,
+          "Column_name": "is_included",
+          "Collation": "A",
+          "Cardinality": 0,
+          "Sub_part": null,
+          "Packed": null,
+          "Null": "",
+          "Index_type": "BTREE",
+          "Comment": "",
+          "Index_comment": ""
+        },
+        {
+          "Table": "treatment_protocol_items",
+          "Non_unique": 1,
+          "Key_name": "idx_treatment_item_display",
+          "Seq_in_index": 3,
+          "Column_name": "sort_order",
+          "Collation": "A",
+          "Cardinality": 0,
+          "Sub_part": null,
+          "Packed": null,
+          "Null": "YES",
+          "Index_type": "BTREE",
+          "Comment": "",
+          "Index_comment": ""
+        },
+        {
+          "Table": "treatment_protocol_items",
+          "Non_unique": 1,
+          "Key_name": "idx_treatment_item_display",
+          "Seq_in_index": 4,
+          "Column_name": "id",
+          "Collation": "A",
+          "Cardinality": 0,
+          "Sub_part": null,
+          "Packed": null,
+          "Null": "",
+          "Index_type": "BTREE",
+          "Comment": "",
+          "Index_comment": ""
+        }
+      ]
+    },
+    "treatment_protocol_events": {
+      "ddl": {
+        "Table": "treatment_protocol_events",
+        "Create Table": "CREATE TABLE `treatment_protocol_events` (\n  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,\n  `protocol_id` int(11) NOT NULL,\n  `content_revision` int(10) unsigned NOT NULL,\n  `event_type` enum('legacy_initialized','content_changed','submitted','approved','changes_required','review_reset','published','withdrawn','publication_locales_changed','source_invalidated','risk_assessed') NOT NULL,\n  `actor_id` int(11) DEFAULT NULL,\n  `occurred_at` datetime(6) NOT NULL DEFAULT current_timestamp(6),\n  `locales` set('en','hi') NOT NULL DEFAULT '',\n  `notes` text DEFAULT NULL,\n  `review_due_at` datetime(6) DEFAULT NULL,\n  `independence_confirmed` tinyint(3) unsigned NOT NULL DEFAULT 0,\n  `content_snapshot` longtext DEFAULT NULL,\n  `content_hash` char(64) CHARACTER SET ascii COLLATE ascii_bin DEFAULT NULL,\n  PRIMARY KEY (`id`),\n  UNIQUE KEY `uq_treatment_event_revision` (`protocol_id`,`content_revision`,`id`),\n  KEY `idx_treatment_event_history` (`protocol_id`,`id`),\n  KEY `idx_treatment_event_action` (`protocol_id`,`event_type`,`content_revision`,`id`),\n  KEY `idx_treatment_event_actor` (`actor_id`,`event_type`),\n  CONSTRAINT `fk_treatment_event_actor` FOREIGN KEY (`actor_id`) REFERENCES `users` (`id`),\n  CONSTRAINT `fk_treatment_event_protocol` FOREIGN KEY (`protocol_id`) REFERENCES `treatment_protocols` (`id`),\n  CONSTRAINT `chk_treatment_event_revision` CHECK (`content_revision` >= 1),\n  CONSTRAINT `chk_treatment_event_type` CHECK (`event_type` is not null and `event_type` in ('legacy_initialized','content_changed','submitted','approved','changes_required','review_reset','published','withdrawn','publication_locales_changed','source_invalidated','risk_assessed')),\n  CONSTRAINT `chk_treatment_event_actor` CHECK (`event_type` = 'legacy_initialized' or `actor_id` is not null),\n  CONSTRAINT `chk_treatment_event_independence` CHECK (`independence_confirmed` in (0,1)),\n  CONSTRAINT `chk_treatment_event_json` CHECK (`content_snapshot` is null or json_valid(`content_snapshot`)),\n  CONSTRAINT `chk_treatment_event_snapshot` CHECK (`event_type` not in ('submitted','approved') or `locales` <> '' and `content_snapshot` is not null and `content_hash` is not null),\n  CONSTRAINT `chk_treatment_risk_event` CHECK (`event_type` <> 'risk_assessed' or `independence_confirmed` = 1 and `content_snapshot` is not null and `content_hash` is not null and `notes` is not null and char_length(trim(`notes`)) > 0),\n  CONSTRAINT `chk_treatment_risk_payload` CHECK (`event_type` <> 'risk_assessed' or coalesce(json_type(json_extract(`content_snapshot`,'$.protocol.risk_eligibility')) = 'STRING' and cast(json_unquote(json_extract(`content_snapshot`,'$.protocol.risk_eligibility')) as char charset binary) in ('eligible','not_eligible','not_assessed') and json_type(json_extract(`content_snapshot`,'$.protocol.id')) = 'INTEGER' and json_extract(`content_snapshot`,'$.protocol.id') = `protocol_id` and json_type(json_extract(`content_snapshot`,'$.protocol.content_revision')) = 'INTEGER' and json_extract(`content_snapshot`,'$.protocol.content_revision') = `content_revision`,0)),\n  CONSTRAINT `chk_treatment_event_hash` CHECK (`content_hash` is null or `content_hash` regexp '^[0-9a-f]{64}$'),\n  CONSTRAINT `chk_treatment_event_reason` CHECK (`event_type` not in ('approved','changes_required','withdrawn','review_reset','source_invalidated') or `notes` is not null and char_length(trim(`notes`)) > 0),\n  CONSTRAINT `chk_treatment_event_approval` CHECK (`event_type` <> 'approved' or `actor_id` is not null and `independence_confirmed` = 1 and `review_due_at` is not null and `review_due_at` > `occurred_at`)\n) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci"
+      },
+      "columns": [
+        {
+          "Field": "id",
+          "Type": "bigint(20) unsigned",
+          "Collation": null,
+          "Null": "NO",
+          "Key": "PRI",
+          "Default": null,
+          "Extra": "auto_increment",
+          "Privileges": "select,insert,update,references",
+          "Comment": ""
+        },
+        {
+          "Field": "protocol_id",
+          "Type": "int(11)",
+          "Collation": null,
+          "Null": "NO",
+          "Key": "MUL",
+          "Default": null,
+          "Extra": "",
+          "Privileges": "select,insert,update,references",
+          "Comment": ""
+        },
+        {
+          "Field": "content_revision",
+          "Type": "int(10) unsigned",
+          "Collation": null,
+          "Null": "NO",
+          "Key": "",
+          "Default": null,
+          "Extra": "",
+          "Privileges": "select,insert,update,references",
+          "Comment": ""
+        },
+        {
+          "Field": "event_type",
+          "Type": "enum('legacy_initialized','content_changed','submitted','approved','changes_required','review_reset','published','withdrawn','publication_locales_changed','source_invalidated','risk_assessed')",
+          "Collation": "utf8mb4_unicode_ci",
+          "Null": "NO",
+          "Key": "",
+          "Default": null,
+          "Extra": "",
+          "Privileges": "select,insert,update,references",
+          "Comment": ""
+        },
+        {
+          "Field": "actor_id",
+          "Type": "int(11)",
+          "Collation": null,
+          "Null": "YES",
+          "Key": "MUL",
+          "Default": null,
+          "Extra": "",
+          "Privileges": "select,insert,update,references",
+          "Comment": ""
+        },
+        {
+          "Field": "occurred_at",
+          "Type": "datetime(6)",
+          "Collation": null,
+          "Null": "NO",
+          "Key": "",
+          "Default": "current_timestamp(6)",
+          "Extra": "",
+          "Privileges": "select,insert,update,references",
+          "Comment": ""
+        },
+        {
+          "Field": "locales",
+          "Type": "set('en','hi')",
+          "Collation": "utf8mb4_unicode_ci",
+          "Null": "NO",
+          "Key": "",
+          "Default": "",
+          "Extra": "",
+          "Privileges": "select,insert,update,references",
+          "Comment": ""
+        },
+        {
+          "Field": "notes",
+          "Type": "text",
+          "Collation": "utf8mb4_unicode_ci",
+          "Null": "YES",
+          "Key": "",
+          "Default": null,
+          "Extra": "",
+          "Privileges": "select,insert,update,references",
+          "Comment": ""
+        },
+        {
+          "Field": "review_due_at",
+          "Type": "datetime(6)",
+          "Collation": null,
+          "Null": "YES",
+          "Key": "",
+          "Default": null,
+          "Extra": "",
+          "Privileges": "select,insert,update,references",
+          "Comment": ""
+        },
+        {
+          "Field": "independence_confirmed",
+          "Type": "tinyint(3) unsigned",
+          "Collation": null,
+          "Null": "NO",
+          "Key": "",
+          "Default": "0",
+          "Extra": "",
+          "Privileges": "select,insert,update,references",
+          "Comment": ""
+        },
+        {
+          "Field": "content_snapshot",
+          "Type": "longtext",
+          "Collation": "utf8mb4_unicode_ci",
+          "Null": "YES",
+          "Key": "",
+          "Default": null,
+          "Extra": "",
+          "Privileges": "select,insert,update,references",
+          "Comment": ""
+        },
+        {
+          "Field": "content_hash",
+          "Type": "char(64)",
+          "Collation": "ascii_bin",
+          "Null": "YES",
+          "Key": "",
+          "Default": null,
+          "Extra": "",
+          "Privileges": "select,insert,update,references",
+          "Comment": ""
+        }
+      ],
+      "indexes": [
+        {
+          "Table": "treatment_protocol_events",
+          "Non_unique": 0,
+          "Key_name": "PRIMARY",
+          "Seq_in_index": 1,
+          "Column_name": "id",
+          "Collation": "A",
+          "Cardinality": 0,
+          "Sub_part": null,
+          "Packed": null,
+          "Null": "",
+          "Index_type": "BTREE",
+          "Comment": "",
+          "Index_comment": ""
+        },
+        {
+          "Table": "treatment_protocol_events",
+          "Non_unique": 0,
+          "Key_name": "uq_treatment_event_revision",
+          "Seq_in_index": 1,
+          "Column_name": "protocol_id",
+          "Collation": "A",
+          "Cardinality": 0,
+          "Sub_part": null,
+          "Packed": null,
+          "Null": "",
+          "Index_type": "BTREE",
+          "Comment": "",
+          "Index_comment": ""
+        },
+        {
+          "Table": "treatment_protocol_events",
+          "Non_unique": 0,
+          "Key_name": "uq_treatment_event_revision",
+          "Seq_in_index": 2,
+          "Column_name": "content_revision",
+          "Collation": "A",
+          "Cardinality": 0,
+          "Sub_part": null,
+          "Packed": null,
+          "Null": "",
+          "Index_type": "BTREE",
+          "Comment": "",
+          "Index_comment": ""
+        },
+        {
+          "Table": "treatment_protocol_events",
+          "Non_unique": 0,
+          "Key_name": "uq_treatment_event_revision",
+          "Seq_in_index": 3,
+          "Column_name": "id",
+          "Collation": "A",
+          "Cardinality": 0,
+          "Sub_part": null,
+          "Packed": null,
+          "Null": "",
+          "Index_type": "BTREE",
+          "Comment": "",
+          "Index_comment": ""
+        },
+        {
+          "Table": "treatment_protocol_events",
+          "Non_unique": 1,
+          "Key_name": "idx_treatment_event_history",
+          "Seq_in_index": 1,
+          "Column_name": "protocol_id",
+          "Collation": "A",
+          "Cardinality": 0,
+          "Sub_part": null,
+          "Packed": null,
+          "Null": "",
+          "Index_type": "BTREE",
+          "Comment": "",
+          "Index_comment": ""
+        },
+        {
+          "Table": "treatment_protocol_events",
+          "Non_unique": 1,
+          "Key_name": "idx_treatment_event_history",
+          "Seq_in_index": 2,
+          "Column_name": "id",
+          "Collation": "A",
+          "Cardinality": 0,
+          "Sub_part": null,
+          "Packed": null,
+          "Null": "",
+          "Index_type": "BTREE",
+          "Comment": "",
+          "Index_comment": ""
+        },
+        {
+          "Table": "treatment_protocol_events",
+          "Non_unique": 1,
+          "Key_name": "idx_treatment_event_action",
+          "Seq_in_index": 1,
+          "Column_name": "protocol_id",
+          "Collation": "A",
+          "Cardinality": 0,
+          "Sub_part": null,
+          "Packed": null,
+          "Null": "",
+          "Index_type": "BTREE",
+          "Comment": "",
+          "Index_comment": ""
+        },
+        {
+          "Table": "treatment_protocol_events",
+          "Non_unique": 1,
+          "Key_name": "idx_treatment_event_action",
+          "Seq_in_index": 2,
+          "Column_name": "event_type",
+          "Collation": "A",
+          "Cardinality": 0,
+          "Sub_part": null,
+          "Packed": null,
+          "Null": "",
+          "Index_type": "BTREE",
+          "Comment": "",
+          "Index_comment": ""
+        },
+        {
+          "Table": "treatment_protocol_events",
+          "Non_unique": 1,
+          "Key_name": "idx_treatment_event_action",
+          "Seq_in_index": 3,
+          "Column_name": "content_revision",
+          "Collation": "A",
+          "Cardinality": 0,
+          "Sub_part": null,
+          "Packed": null,
+          "Null": "",
+          "Index_type": "BTREE",
+          "Comment": "",
+          "Index_comment": ""
+        },
+        {
+          "Table": "treatment_protocol_events",
+          "Non_unique": 1,
+          "Key_name": "idx_treatment_event_action",
+          "Seq_in_index": 4,
+          "Column_name": "id",
+          "Collation": "A",
+          "Cardinality": 0,
+          "Sub_part": null,
+          "Packed": null,
+          "Null": "",
+          "Index_type": "BTREE",
+          "Comment": "",
+          "Index_comment": ""
+        },
+        {
+          "Table": "treatment_protocol_events",
+          "Non_unique": 1,
+          "Key_name": "idx_treatment_event_actor",
+          "Seq_in_index": 1,
+          "Column_name": "actor_id",
+          "Collation": "A",
+          "Cardinality": 0,
+          "Sub_part": null,
+          "Packed": null,
+          "Null": "YES",
+          "Index_type": "BTREE",
+          "Comment": "",
+          "Index_comment": ""
+        },
+        {
+          "Table": "treatment_protocol_events",
+          "Non_unique": 1,
+          "Key_name": "idx_treatment_event_actor",
+          "Seq_in_index": 2,
+          "Column_name": "event_type",
+          "Collation": "A",
+          "Cardinality": 0,
+          "Sub_part": null,
+          "Packed": null,
+          "Null": "",
+          "Index_type": "BTREE",
+          "Comment": "",
+          "Index_comment": ""
+        }
+      ]
+    },
+    "treatment_sources": {
+      "ddl": {
+        "Table": "treatment_sources",
+        "Create Table": "CREATE TABLE `treatment_sources` (\n  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,\n  `source_type` enum('guideline','systematic_review','research_study','official_monograph','professional_guidance','traditional_text','other') NOT NULL,\n  `title` varchar(500) NOT NULL,\n  `author_or_organization` varchar(255) DEFAULT NULL,\n  `publication` varchar(255) DEFAULT NULL,\n  `citation_text` text NOT NULL,\n  `url` varchar(2048) DEFAULT NULL,\n  `identifier` varchar(255) DEFAULT NULL,\n  `publication_date` date DEFAULT NULL,\n  `edition_or_version` varchar(100) DEFAULT NULL,\n  `accessed_on` date DEFAULT NULL,\n  `status` enum('unverified','verified','withdrawn') NOT NULL DEFAULT 'unverified',\n  `created_by` int(11) NOT NULL,\n  `created_at` datetime(6) NOT NULL DEFAULT current_timestamp(6),\n  `verified_by` int(11) DEFAULT NULL,\n  `verified_at` datetime(6) DEFAULT NULL,\n  `withdrawn_by` int(11) DEFAULT NULL,\n  `withdrawn_at` datetime(6) DEFAULT NULL,\n  `withdrawal_reason` text DEFAULT NULL,\n  `replaces_source_id` bigint(20) unsigned DEFAULT NULL,\n  PRIMARY KEY (`id`),\n  KEY `idx_treatment_source_status` (`status`,`id`),\n  KEY `idx_treatment_source_creator` (`created_by`),\n  KEY `idx_treatment_source_verifier` (`verified_by`),\n  KEY `idx_treatment_source_withdrawer` (`withdrawn_by`),\n  KEY `idx_treatment_source_replaces` (`replaces_source_id`),\n  CONSTRAINT `fk_treatment_source_creator` FOREIGN KEY (`created_by`) REFERENCES `users` (`id`),\n  CONSTRAINT `fk_treatment_source_replaces` FOREIGN KEY (`replaces_source_id`) REFERENCES `treatment_sources` (`id`),\n  CONSTRAINT `fk_treatment_source_verifier` FOREIGN KEY (`verified_by`) REFERENCES `users` (`id`),\n  CONSTRAINT `fk_treatment_source_withdrawer` FOREIGN KEY (`withdrawn_by`) REFERENCES `users` (`id`),\n  CONSTRAINT `chk_treatment_source_identity` CHECK (char_length(trim(`title`)) > 0 and char_length(trim(`citation_text`)) > 0),\n  CONSTRAINT `chk_treatment_source_lifecycle` CHECK (`status` = 'unverified' and `verified_by` is null and `verified_at` is null and `withdrawn_by` is null and `withdrawn_at` is null and `withdrawal_reason` is null or `status` = 'verified' and `verified_by` is not null and `verified_at` is not null and `withdrawn_by` is null and `withdrawn_at` is null and `withdrawal_reason` is null or `status` = 'withdrawn' and `withdrawn_by` is not null and `withdrawn_at` is not null and `withdrawal_reason` is not null and char_length(trim(`withdrawal_reason`)) > 0 and (`verified_by` is null and `verified_at` is null or `verified_by` is not null and `verified_at` is not null))\n) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci"
+      },
+      "columns": [
+        {
+          "Field": "id",
+          "Type": "bigint(20) unsigned",
+          "Collation": null,
+          "Null": "NO",
+          "Key": "PRI",
+          "Default": null,
+          "Extra": "auto_increment",
+          "Privileges": "select,insert,update,references",
+          "Comment": ""
+        },
+        {
+          "Field": "source_type",
+          "Type": "enum('guideline','systematic_review','research_study','official_monograph','professional_guidance','traditional_text','other')",
+          "Collation": "utf8mb4_unicode_ci",
+          "Null": "NO",
+          "Key": "",
+          "Default": null,
+          "Extra": "",
+          "Privileges": "select,insert,update,references",
+          "Comment": ""
+        },
+        {
+          "Field": "title",
+          "Type": "varchar(500)",
+          "Collation": "utf8mb4_unicode_ci",
+          "Null": "NO",
+          "Key": "",
+          "Default": null,
+          "Extra": "",
+          "Privileges": "select,insert,update,references",
+          "Comment": ""
+        },
+        {
+          "Field": "author_or_organization",
+          "Type": "varchar(255)",
+          "Collation": "utf8mb4_unicode_ci",
+          "Null": "YES",
+          "Key": "",
+          "Default": null,
+          "Extra": "",
+          "Privileges": "select,insert,update,references",
+          "Comment": ""
+        },
+        {
+          "Field": "publication",
+          "Type": "varchar(255)",
+          "Collation": "utf8mb4_unicode_ci",
+          "Null": "YES",
+          "Key": "",
+          "Default": null,
+          "Extra": "",
+          "Privileges": "select,insert,update,references",
+          "Comment": ""
+        },
+        {
+          "Field": "citation_text",
+          "Type": "text",
+          "Collation": "utf8mb4_unicode_ci",
+          "Null": "NO",
+          "Key": "",
+          "Default": null,
+          "Extra": "",
+          "Privileges": "select,insert,update,references",
+          "Comment": ""
+        },
+        {
+          "Field": "url",
+          "Type": "varchar(2048)",
+          "Collation": "utf8mb4_unicode_ci",
+          "Null": "YES",
+          "Key": "",
+          "Default": null,
+          "Extra": "",
+          "Privileges": "select,insert,update,references",
+          "Comment": ""
+        },
+        {
+          "Field": "identifier",
+          "Type": "varchar(255)",
+          "Collation": "utf8mb4_unicode_ci",
+          "Null": "YES",
+          "Key": "",
+          "Default": null,
+          "Extra": "",
+          "Privileges": "select,insert,update,references",
+          "Comment": ""
+        },
+        {
+          "Field": "publication_date",
+          "Type": "date",
+          "Collation": null,
+          "Null": "YES",
+          "Key": "",
+          "Default": null,
+          "Extra": "",
+          "Privileges": "select,insert,update,references",
+          "Comment": ""
+        },
+        {
+          "Field": "edition_or_version",
+          "Type": "varchar(100)",
+          "Collation": "utf8mb4_unicode_ci",
+          "Null": "YES",
+          "Key": "",
+          "Default": null,
+          "Extra": "",
+          "Privileges": "select,insert,update,references",
+          "Comment": ""
+        },
+        {
+          "Field": "accessed_on",
+          "Type": "date",
+          "Collation": null,
+          "Null": "YES",
+          "Key": "",
+          "Default": null,
+          "Extra": "",
+          "Privileges": "select,insert,update,references",
+          "Comment": ""
+        },
+        {
+          "Field": "status",
+          "Type": "enum('unverified','verified','withdrawn')",
+          "Collation": "utf8mb4_unicode_ci",
+          "Null": "NO",
+          "Key": "MUL",
+          "Default": "unverified",
+          "Extra": "",
+          "Privileges": "select,insert,update,references",
+          "Comment": ""
+        },
+        {
+          "Field": "created_by",
+          "Type": "int(11)",
+          "Collation": null,
+          "Null": "NO",
+          "Key": "MUL",
+          "Default": null,
+          "Extra": "",
+          "Privileges": "select,insert,update,references",
+          "Comment": ""
+        },
+        {
+          "Field": "created_at",
+          "Type": "datetime(6)",
+          "Collation": null,
+          "Null": "NO",
+          "Key": "",
+          "Default": "current_timestamp(6)",
+          "Extra": "",
+          "Privileges": "select,insert,update,references",
+          "Comment": ""
+        },
+        {
+          "Field": "verified_by",
+          "Type": "int(11)",
+          "Collation": null,
+          "Null": "YES",
+          "Key": "MUL",
+          "Default": null,
+          "Extra": "",
+          "Privileges": "select,insert,update,references",
+          "Comment": ""
+        },
+        {
+          "Field": "verified_at",
+          "Type": "datetime(6)",
+          "Collation": null,
+          "Null": "YES",
+          "Key": "",
+          "Default": null,
+          "Extra": "",
+          "Privileges": "select,insert,update,references",
+          "Comment": ""
+        },
+        {
+          "Field": "withdrawn_by",
+          "Type": "int(11)",
+          "Collation": null,
+          "Null": "YES",
+          "Key": "MUL",
+          "Default": null,
+          "Extra": "",
+          "Privileges": "select,insert,update,references",
+          "Comment": ""
+        },
+        {
+          "Field": "withdrawn_at",
+          "Type": "datetime(6)",
+          "Collation": null,
+          "Null": "YES",
+          "Key": "",
+          "Default": null,
+          "Extra": "",
+          "Privileges": "select,insert,update,references",
+          "Comment": ""
+        },
+        {
+          "Field": "withdrawal_reason",
+          "Type": "text",
+          "Collation": "utf8mb4_unicode_ci",
+          "Null": "YES",
+          "Key": "",
+          "Default": null,
+          "Extra": "",
+          "Privileges": "select,insert,update,references",
+          "Comment": ""
+        },
+        {
+          "Field": "replaces_source_id",
+          "Type": "bigint(20) unsigned",
+          "Collation": null,
+          "Null": "YES",
+          "Key": "MUL",
+          "Default": null,
+          "Extra": "",
+          "Privileges": "select,insert,update,references",
+          "Comment": ""
+        }
+      ],
+      "indexes": [
+        {
+          "Table": "treatment_sources",
+          "Non_unique": 0,
+          "Key_name": "PRIMARY",
+          "Seq_in_index": 1,
+          "Column_name": "id",
+          "Collation": "A",
+          "Cardinality": 0,
+          "Sub_part": null,
+          "Packed": null,
+          "Null": "",
+          "Index_type": "BTREE",
+          "Comment": "",
+          "Index_comment": ""
+        },
+        {
+          "Table": "treatment_sources",
+          "Non_unique": 1,
+          "Key_name": "idx_treatment_source_status",
+          "Seq_in_index": 1,
+          "Column_name": "status",
+          "Collation": "A",
+          "Cardinality": 0,
+          "Sub_part": null,
+          "Packed": null,
+          "Null": "",
+          "Index_type": "BTREE",
+          "Comment": "",
+          "Index_comment": ""
+        },
+        {
+          "Table": "treatment_sources",
+          "Non_unique": 1,
+          "Key_name": "idx_treatment_source_status",
+          "Seq_in_index": 2,
+          "Column_name": "id",
+          "Collation": "A",
+          "Cardinality": 0,
+          "Sub_part": null,
+          "Packed": null,
+          "Null": "",
+          "Index_type": "BTREE",
+          "Comment": "",
+          "Index_comment": ""
+        },
+        {
+          "Table": "treatment_sources",
+          "Non_unique": 1,
+          "Key_name": "idx_treatment_source_creator",
+          "Seq_in_index": 1,
+          "Column_name": "created_by",
+          "Collation": "A",
+          "Cardinality": 0,
+          "Sub_part": null,
+          "Packed": null,
+          "Null": "",
+          "Index_type": "BTREE",
+          "Comment": "",
+          "Index_comment": ""
+        },
+        {
+          "Table": "treatment_sources",
+          "Non_unique": 1,
+          "Key_name": "idx_treatment_source_verifier",
+          "Seq_in_index": 1,
+          "Column_name": "verified_by",
+          "Collation": "A",
+          "Cardinality": 0,
+          "Sub_part": null,
+          "Packed": null,
+          "Null": "YES",
+          "Index_type": "BTREE",
+          "Comment": "",
+          "Index_comment": ""
+        },
+        {
+          "Table": "treatment_sources",
+          "Non_unique": 1,
+          "Key_name": "idx_treatment_source_withdrawer",
+          "Seq_in_index": 1,
+          "Column_name": "withdrawn_by",
+          "Collation": "A",
+          "Cardinality": 0,
+          "Sub_part": null,
+          "Packed": null,
+          "Null": "YES",
+          "Index_type": "BTREE",
+          "Comment": "",
+          "Index_comment": ""
+        },
+        {
+          "Table": "treatment_sources",
+          "Non_unique": 1,
+          "Key_name": "idx_treatment_source_replaces",
+          "Seq_in_index": 1,
+          "Column_name": "replaces_source_id",
+          "Collation": "A",
+          "Cardinality": 0,
+          "Sub_part": null,
+          "Packed": null,
+          "Null": "YES",
+          "Index_type": "BTREE",
+          "Comment": "",
+          "Index_comment": ""
+        }
+      ]
+    },
+    "treatment_protocol_sources": {
+      "ddl": {
+        "Table": "treatment_protocol_sources",
+        "Create Table": "CREATE TABLE `treatment_protocol_sources` (\n  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,\n  `protocol_id` int(11) NOT NULL,\n  `source_id` bigint(20) unsigned NOT NULL,\n  `claim_scope` text NOT NULL,\n  `locator` varchar(500) DEFAULT NULL,\n  PRIMARY KEY (`id`),\n  UNIQUE KEY `uq_protocol_source` (`protocol_id`,`source_id`),\n  KEY `idx_treatment_source_protocol` (`source_id`,`protocol_id`),\n  CONSTRAINT `fk_treatment_protocol_source_protocol` FOREIGN KEY (`protocol_id`) REFERENCES `treatment_protocols` (`id`),\n  CONSTRAINT `fk_treatment_protocol_source_source` FOREIGN KEY (`source_id`) REFERENCES `treatment_sources` (`id`),\n  CONSTRAINT `chk_treatment_protocol_claim` CHECK (char_length(trim(`claim_scope`)) > 0)\n) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci"
+      },
+      "columns": [
+        {
+          "Field": "id",
+          "Type": "bigint(20) unsigned",
+          "Collation": null,
+          "Null": "NO",
+          "Key": "PRI",
+          "Default": null,
+          "Extra": "auto_increment",
+          "Privileges": "select,insert,update,references",
+          "Comment": ""
+        },
+        {
+          "Field": "protocol_id",
+          "Type": "int(11)",
+          "Collation": null,
+          "Null": "NO",
+          "Key": "MUL",
+          "Default": null,
+          "Extra": "",
+          "Privileges": "select,insert,update,references",
+          "Comment": ""
+        },
+        {
+          "Field": "source_id",
+          "Type": "bigint(20) unsigned",
+          "Collation": null,
+          "Null": "NO",
+          "Key": "MUL",
+          "Default": null,
+          "Extra": "",
+          "Privileges": "select,insert,update,references",
+          "Comment": ""
+        },
+        {
+          "Field": "claim_scope",
+          "Type": "text",
+          "Collation": "utf8mb4_unicode_ci",
+          "Null": "NO",
+          "Key": "",
+          "Default": null,
+          "Extra": "",
+          "Privileges": "select,insert,update,references",
+          "Comment": ""
+        },
+        {
+          "Field": "locator",
+          "Type": "varchar(500)",
+          "Collation": "utf8mb4_unicode_ci",
+          "Null": "YES",
+          "Key": "",
+          "Default": null,
+          "Extra": "",
+          "Privileges": "select,insert,update,references",
+          "Comment": ""
+        }
+      ],
+      "indexes": [
+        {
+          "Table": "treatment_protocol_sources",
+          "Non_unique": 0,
+          "Key_name": "PRIMARY",
+          "Seq_in_index": 1,
+          "Column_name": "id",
+          "Collation": "A",
+          "Cardinality": 0,
+          "Sub_part": null,
+          "Packed": null,
+          "Null": "",
+          "Index_type": "BTREE",
+          "Comment": "",
+          "Index_comment": ""
+        },
+        {
+          "Table": "treatment_protocol_sources",
+          "Non_unique": 0,
+          "Key_name": "uq_protocol_source",
+          "Seq_in_index": 1,
+          "Column_name": "protocol_id",
+          "Collation": "A",
+          "Cardinality": 0,
+          "Sub_part": null,
+          "Packed": null,
+          "Null": "",
+          "Index_type": "BTREE",
+          "Comment": "",
+          "Index_comment": ""
+        },
+        {
+          "Table": "treatment_protocol_sources",
+          "Non_unique": 0,
+          "Key_name": "uq_protocol_source",
+          "Seq_in_index": 2,
+          "Column_name": "source_id",
+          "Collation": "A",
+          "Cardinality": 0,
+          "Sub_part": null,
+          "Packed": null,
+          "Null": "",
+          "Index_type": "BTREE",
+          "Comment": "",
+          "Index_comment": ""
+        },
+        {
+          "Table": "treatment_protocol_sources",
+          "Non_unique": 1,
+          "Key_name": "idx_treatment_source_protocol",
+          "Seq_in_index": 1,
+          "Column_name": "source_id",
+          "Collation": "A",
+          "Cardinality": 0,
+          "Sub_part": null,
+          "Packed": null,
+          "Null": "",
+          "Index_type": "BTREE",
+          "Comment": "",
+          "Index_comment": ""
+        },
+        {
+          "Table": "treatment_protocol_sources",
+          "Non_unique": 1,
+          "Key_name": "idx_treatment_source_protocol",
+          "Seq_in_index": 2,
+          "Column_name": "protocol_id",
+          "Collation": "A",
+          "Cardinality": 0,
+          "Sub_part": null,
+          "Packed": null,
+          "Null": "",
+          "Index_type": "BTREE",
+          "Comment": "",
+          "Index_comment": ""
+        }
+      ]
+    },
+    "treatment_item_sources": {
+      "ddl": {
+        "Table": "treatment_item_sources",
+        "Create Table": "CREATE TABLE `treatment_item_sources` (\n  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,\n  `item_id` int(11) NOT NULL,\n  `source_id` bigint(20) unsigned NOT NULL,\n  `claim_scope` text NOT NULL,\n  `locator` varchar(500) DEFAULT NULL,\n  PRIMARY KEY (`id`),\n  UNIQUE KEY `uq_item_source` (`item_id`,`source_id`),\n  KEY `idx_treatment_source_item` (`source_id`,`item_id`),\n  CONSTRAINT `fk_treatment_item_source_item` FOREIGN KEY (`item_id`) REFERENCES `treatment_protocol_items` (`id`),\n  CONSTRAINT `fk_treatment_item_source_source` FOREIGN KEY (`source_id`) REFERENCES `treatment_sources` (`id`),\n  CONSTRAINT `chk_treatment_item_claim` CHECK (char_length(trim(`claim_scope`)) > 0)\n) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci"
+      },
+      "columns": [
+        {
+          "Field": "id",
+          "Type": "bigint(20) unsigned",
+          "Collation": null,
+          "Null": "NO",
+          "Key": "PRI",
+          "Default": null,
+          "Extra": "auto_increment",
+          "Privileges": "select,insert,update,references",
+          "Comment": ""
+        },
+        {
+          "Field": "item_id",
+          "Type": "int(11)",
+          "Collation": null,
+          "Null": "NO",
+          "Key": "MUL",
+          "Default": null,
+          "Extra": "",
+          "Privileges": "select,insert,update,references",
+          "Comment": ""
+        },
+        {
+          "Field": "source_id",
+          "Type": "bigint(20) unsigned",
+          "Collation": null,
+          "Null": "NO",
+          "Key": "MUL",
+          "Default": null,
+          "Extra": "",
+          "Privileges": "select,insert,update,references",
+          "Comment": ""
+        },
+        {
+          "Field": "claim_scope",
+          "Type": "text",
+          "Collation": "utf8mb4_unicode_ci",
+          "Null": "NO",
+          "Key": "",
+          "Default": null,
+          "Extra": "",
+          "Privileges": "select,insert,update,references",
+          "Comment": ""
+        },
+        {
+          "Field": "locator",
+          "Type": "varchar(500)",
+          "Collation": "utf8mb4_unicode_ci",
+          "Null": "YES",
+          "Key": "",
+          "Default": null,
+          "Extra": "",
+          "Privileges": "select,insert,update,references",
+          "Comment": ""
+        }
+      ],
+      "indexes": [
+        {
+          "Table": "treatment_item_sources",
+          "Non_unique": 0,
+          "Key_name": "PRIMARY",
+          "Seq_in_index": 1,
+          "Column_name": "id",
+          "Collation": "A",
+          "Cardinality": 0,
+          "Sub_part": null,
+          "Packed": null,
+          "Null": "",
+          "Index_type": "BTREE",
+          "Comment": "",
+          "Index_comment": ""
+        },
+        {
+          "Table": "treatment_item_sources",
+          "Non_unique": 0,
+          "Key_name": "uq_item_source",
+          "Seq_in_index": 1,
+          "Column_name": "item_id",
+          "Collation": "A",
+          "Cardinality": 0,
+          "Sub_part": null,
+          "Packed": null,
+          "Null": "",
+          "Index_type": "BTREE",
+          "Comment": "",
+          "Index_comment": ""
+        },
+        {
+          "Table": "treatment_item_sources",
+          "Non_unique": 0,
+          "Key_name": "uq_item_source",
+          "Seq_in_index": 2,
+          "Column_name": "source_id",
+          "Collation": "A",
+          "Cardinality": 0,
+          "Sub_part": null,
+          "Packed": null,
+          "Null": "",
+          "Index_type": "BTREE",
+          "Comment": "",
+          "Index_comment": ""
+        },
+        {
+          "Table": "treatment_item_sources",
+          "Non_unique": 1,
+          "Key_name": "idx_treatment_source_item",
+          "Seq_in_index": 1,
+          "Column_name": "source_id",
+          "Collation": "A",
+          "Cardinality": 0,
+          "Sub_part": null,
+          "Packed": null,
+          "Null": "",
+          "Index_type": "BTREE",
+          "Comment": "",
+          "Index_comment": ""
+        },
+        {
+          "Table": "treatment_item_sources",
+          "Non_unique": 1,
+          "Key_name": "idx_treatment_source_item",
+          "Seq_in_index": 2,
+          "Column_name": "item_id",
+          "Collation": "A",
+          "Cardinality": 0,
+          "Sub_part": null,
+          "Packed": null,
+          "Null": "",
+          "Index_type": "BTREE",
+          "Comment": "",
+          "Index_comment": ""
+        }
+      ]
+    },
+    "treatment_editorial_permissions": {
+      "ddl": {
+        "Table": "treatment_editorial_permissions",
+        "Create Table": "CREATE TABLE `treatment_editorial_permissions` (\n  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,\n  `user_id` int(11) NOT NULL,\n  `treatment_system_id` int(11) NOT NULL,\n  `can_edit` tinyint(3) unsigned NOT NULL DEFAULT 0,\n  `can_review` tinyint(3) unsigned NOT NULL DEFAULT 0,\n  `can_publish` tinyint(3) unsigned NOT NULL DEFAULT 0,\n  `qualification_scope` text DEFAULT NULL,\n  `authorized_by` int(11) NOT NULL,\n  `granted_at` datetime(6) NOT NULL DEFAULT current_timestamp(6),\n  `revoked_by` int(11) DEFAULT NULL,\n  `revoked_at` datetime(6) DEFAULT NULL,\n  `revocation_reason` text DEFAULT NULL,\n  `active_slot` tinyint(3) unsigned GENERATED ALWAYS AS (case when `revoked_at` is null then 1 else NULL end) STORED,\n  PRIMARY KEY (`id`),\n  UNIQUE KEY `uq_treatment_active_grant` (`user_id`,`treatment_system_id`,`active_slot`),\n  KEY `idx_treatment_grant_system` (`treatment_system_id`,`user_id`),\n  KEY `idx_treatment_grant_authorizer` (`authorized_by`),\n  KEY `idx_treatment_grant_revoker` (`revoked_by`),\n  CONSTRAINT `fk_treatment_grant_authorizer` FOREIGN KEY (`authorized_by`) REFERENCES `users` (`id`),\n  CONSTRAINT `fk_treatment_grant_revoker` FOREIGN KEY (`revoked_by`) REFERENCES `users` (`id`),\n  CONSTRAINT `fk_treatment_grant_system` FOREIGN KEY (`treatment_system_id`) REFERENCES `treatment_systems` (`id`),\n  CONSTRAINT `fk_treatment_grant_user` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`),\n  CONSTRAINT `chk_treatment_grant_capabilities` CHECK (`can_edit` in (0,1) and `can_review` in (0,1) and `can_publish` in (0,1) and (`can_edit` = 1 or `can_review` = 1 or `can_publish` = 1)),\n  CONSTRAINT `chk_treatment_grant_qualification` CHECK (`can_review` = 0 or `qualification_scope` is not null and char_length(trim(`qualification_scope`)) > 0),\n  CONSTRAINT `chk_treatment_grant_revocation` CHECK (`revoked_by` is null and `revoked_at` is null and `revocation_reason` is null or `revoked_by` is not null and `revoked_at` is not null and `revocation_reason` is not null and char_length(trim(`revocation_reason`)) > 0)\n) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci"
+      },
+      "columns": [
+        {
+          "Field": "id",
+          "Type": "bigint(20) unsigned",
+          "Collation": null,
+          "Null": "NO",
+          "Key": "PRI",
+          "Default": null,
+          "Extra": "auto_increment",
+          "Privileges": "select,insert,update,references",
+          "Comment": ""
+        },
+        {
+          "Field": "user_id",
+          "Type": "int(11)",
+          "Collation": null,
+          "Null": "NO",
+          "Key": "MUL",
+          "Default": null,
+          "Extra": "",
+          "Privileges": "select,insert,update,references",
+          "Comment": ""
+        },
+        {
+          "Field": "treatment_system_id",
+          "Type": "int(11)",
+          "Collation": null,
+          "Null": "NO",
+          "Key": "MUL",
+          "Default": null,
+          "Extra": "",
+          "Privileges": "select,insert,update,references",
+          "Comment": ""
+        },
+        {
+          "Field": "can_edit",
+          "Type": "tinyint(3) unsigned",
+          "Collation": null,
+          "Null": "NO",
+          "Key": "",
+          "Default": "0",
+          "Extra": "",
+          "Privileges": "select,insert,update,references",
+          "Comment": ""
+        },
+        {
+          "Field": "can_review",
+          "Type": "tinyint(3) unsigned",
+          "Collation": null,
+          "Null": "NO",
+          "Key": "",
+          "Default": "0",
+          "Extra": "",
+          "Privileges": "select,insert,update,references",
+          "Comment": ""
+        },
+        {
+          "Field": "can_publish",
+          "Type": "tinyint(3) unsigned",
+          "Collation": null,
+          "Null": "NO",
+          "Key": "",
+          "Default": "0",
+          "Extra": "",
+          "Privileges": "select,insert,update,references",
+          "Comment": ""
+        },
+        {
+          "Field": "qualification_scope",
+          "Type": "text",
+          "Collation": "utf8mb4_unicode_ci",
+          "Null": "YES",
+          "Key": "",
+          "Default": null,
+          "Extra": "",
+          "Privileges": "select,insert,update,references",
+          "Comment": ""
+        },
+        {
+          "Field": "authorized_by",
+          "Type": "int(11)",
+          "Collation": null,
+          "Null": "NO",
+          "Key": "MUL",
+          "Default": null,
+          "Extra": "",
+          "Privileges": "select,insert,update,references",
+          "Comment": ""
+        },
+        {
+          "Field": "granted_at",
+          "Type": "datetime(6)",
+          "Collation": null,
+          "Null": "NO",
+          "Key": "",
+          "Default": "current_timestamp(6)",
+          "Extra": "",
+          "Privileges": "select,insert,update,references",
+          "Comment": ""
+        },
+        {
+          "Field": "revoked_by",
+          "Type": "int(11)",
+          "Collation": null,
+          "Null": "YES",
+          "Key": "MUL",
+          "Default": null,
+          "Extra": "",
+          "Privileges": "select,insert,update,references",
+          "Comment": ""
+        },
+        {
+          "Field": "revoked_at",
+          "Type": "datetime(6)",
+          "Collation": null,
+          "Null": "YES",
+          "Key": "",
+          "Default": null,
+          "Extra": "",
+          "Privileges": "select,insert,update,references",
+          "Comment": ""
+        },
+        {
+          "Field": "revocation_reason",
+          "Type": "text",
+          "Collation": "utf8mb4_unicode_ci",
+          "Null": "YES",
+          "Key": "",
+          "Default": null,
+          "Extra": "",
+          "Privileges": "select,insert,update,references",
+          "Comment": ""
+        },
+        {
+          "Field": "active_slot",
+          "Type": "tinyint(3) unsigned",
+          "Collation": null,
+          "Null": "YES",
+          "Key": "",
+          "Default": null,
+          "Extra": "STORED GENERATED",
+          "Privileges": "select,insert,update,references",
+          "Comment": ""
+        }
+      ],
+      "indexes": [
+        {
+          "Table": "treatment_editorial_permissions",
+          "Non_unique": 0,
+          "Key_name": "PRIMARY",
+          "Seq_in_index": 1,
+          "Column_name": "id",
+          "Collation": "A",
+          "Cardinality": 0,
+          "Sub_part": null,
+          "Packed": null,
+          "Null": "",
+          "Index_type": "BTREE",
+          "Comment": "",
+          "Index_comment": ""
+        },
+        {
+          "Table": "treatment_editorial_permissions",
+          "Non_unique": 0,
+          "Key_name": "uq_treatment_active_grant",
+          "Seq_in_index": 1,
+          "Column_name": "user_id",
+          "Collation": "A",
+          "Cardinality": 0,
+          "Sub_part": null,
+          "Packed": null,
+          "Null": "",
+          "Index_type": "BTREE",
+          "Comment": "",
+          "Index_comment": ""
+        },
+        {
+          "Table": "treatment_editorial_permissions",
+          "Non_unique": 0,
+          "Key_name": "uq_treatment_active_grant",
+          "Seq_in_index": 2,
+          "Column_name": "treatment_system_id",
+          "Collation": "A",
+          "Cardinality": 0,
+          "Sub_part": null,
+          "Packed": null,
+          "Null": "",
+          "Index_type": "BTREE",
+          "Comment": "",
+          "Index_comment": ""
+        },
+        {
+          "Table": "treatment_editorial_permissions",
+          "Non_unique": 0,
+          "Key_name": "uq_treatment_active_grant",
+          "Seq_in_index": 3,
+          "Column_name": "active_slot",
+          "Collation": "A",
+          "Cardinality": 0,
+          "Sub_part": null,
+          "Packed": null,
+          "Null": "YES",
+          "Index_type": "BTREE",
+          "Comment": "",
+          "Index_comment": ""
+        },
+        {
+          "Table": "treatment_editorial_permissions",
+          "Non_unique": 1,
+          "Key_name": "idx_treatment_grant_system",
+          "Seq_in_index": 1,
+          "Column_name": "treatment_system_id",
+          "Collation": "A",
+          "Cardinality": 0,
+          "Sub_part": null,
+          "Packed": null,
+          "Null": "",
+          "Index_type": "BTREE",
+          "Comment": "",
+          "Index_comment": ""
+        },
+        {
+          "Table": "treatment_editorial_permissions",
+          "Non_unique": 1,
+          "Key_name": "idx_treatment_grant_system",
+          "Seq_in_index": 2,
+          "Column_name": "user_id",
+          "Collation": "A",
+          "Cardinality": 0,
+          "Sub_part": null,
+          "Packed": null,
+          "Null": "",
+          "Index_type": "BTREE",
+          "Comment": "",
+          "Index_comment": ""
+        },
+        {
+          "Table": "treatment_editorial_permissions",
+          "Non_unique": 1,
+          "Key_name": "idx_treatment_grant_authorizer",
+          "Seq_in_index": 1,
+          "Column_name": "authorized_by",
+          "Collation": "A",
+          "Cardinality": 0,
+          "Sub_part": null,
+          "Packed": null,
+          "Null": "",
+          "Index_type": "BTREE",
+          "Comment": "",
+          "Index_comment": ""
+        },
+        {
+          "Table": "treatment_editorial_permissions",
+          "Non_unique": 1,
+          "Key_name": "idx_treatment_grant_revoker",
+          "Seq_in_index": 1,
+          "Column_name": "revoked_by",
+          "Collation": "A",
+          "Cardinality": 0,
+          "Sub_part": null,
+          "Packed": null,
+          "Null": "YES",
+          "Index_type": "BTREE",
+          "Comment": "",
+          "Index_comment": ""
+        }
+      ]
+    }
+  },
+  "constraints": [
+    {
+      "TABLE_NAME": "body_parts",
+      "CONSTRAINT_NAME": "PRIMARY",
+      "CONSTRAINT_TYPE": "PRIMARY KEY"
+    },
+    {
+      "TABLE_NAME": "body_parts",
+      "CONSTRAINT_NAME": "slug",
+      "CONSTRAINT_TYPE": "UNIQUE"
+    },
+    {
+      "TABLE_NAME": "causes",
+      "CONSTRAINT_NAME": "PRIMARY",
+      "CONSTRAINT_TYPE": "PRIMARY KEY"
+    },
+    {
+      "TABLE_NAME": "diseases",
+      "CONSTRAINT_NAME": "diseases_ibfk_1",
+      "CONSTRAINT_TYPE": "FOREIGN KEY"
+    },
+    {
+      "TABLE_NAME": "diseases",
+      "CONSTRAINT_NAME": "PRIMARY",
+      "CONSTRAINT_TYPE": "PRIMARY KEY"
+    },
+    {
+      "TABLE_NAME": "diseases",
+      "CONSTRAINT_NAME": "slug",
+      "CONSTRAINT_TYPE": "UNIQUE"
+    },
+    {
+      "TABLE_NAME": "disease_causes",
+      "CONSTRAINT_NAME": "fk_disease_causes_cause",
+      "CONSTRAINT_TYPE": "FOREIGN KEY"
+    },
+    {
+      "TABLE_NAME": "disease_causes",
+      "CONSTRAINT_NAME": "fk_disease_causes_disease",
+      "CONSTRAINT_TYPE": "FOREIGN KEY"
+    },
+    {
+      "TABLE_NAME": "disease_causes",
+      "CONSTRAINT_NAME": "PRIMARY",
+      "CONSTRAINT_TYPE": "PRIMARY KEY"
+    },
+    {
+      "TABLE_NAME": "disease_content",
+      "CONSTRAINT_NAME": "disease_content_ibfk_1",
+      "CONSTRAINT_TYPE": "FOREIGN KEY"
+    },
+    {
+      "TABLE_NAME": "disease_content",
+      "CONSTRAINT_NAME": "PRIMARY",
+      "CONSTRAINT_TYPE": "PRIMARY KEY"
+    },
+    {
+      "TABLE_NAME": "disease_content",
+      "CONSTRAINT_NAME": "unique_disease_content",
+      "CONSTRAINT_TYPE": "UNIQUE"
+    },
+    {
+      "TABLE_NAME": "disease_diets",
+      "CONSTRAINT_NAME": "disease_diets_ibfk_1",
+      "CONSTRAINT_TYPE": "FOREIGN KEY"
+    },
+    {
+      "TABLE_NAME": "disease_diets",
+      "CONSTRAINT_NAME": "PRIMARY",
+      "CONSTRAINT_TYPE": "PRIMARY KEY"
+    },
+    {
+      "TABLE_NAME": "disease_faqs",
+      "CONSTRAINT_NAME": "disease_faqs_ibfk_1",
+      "CONSTRAINT_TYPE": "FOREIGN KEY"
+    },
+    {
+      "TABLE_NAME": "disease_faqs",
+      "CONSTRAINT_NAME": "PRIMARY",
+      "CONSTRAINT_TYPE": "PRIMARY KEY"
+    },
+    {
+      "TABLE_NAME": "disease_preventions",
+      "CONSTRAINT_NAME": "disease_preventions_ibfk_1",
+      "CONSTRAINT_TYPE": "FOREIGN KEY"
+    },
+    {
+      "TABLE_NAME": "disease_preventions",
+      "CONSTRAINT_NAME": "PRIMARY",
+      "CONSTRAINT_TYPE": "PRIMARY KEY"
+    },
+    {
+      "TABLE_NAME": "disease_seo",
+      "CONSTRAINT_NAME": "disease_seo_ibfk_1",
+      "CONSTRAINT_TYPE": "FOREIGN KEY"
+    },
+    {
+      "TABLE_NAME": "disease_seo",
+      "CONSTRAINT_NAME": "PRIMARY",
+      "CONSTRAINT_TYPE": "PRIMARY KEY"
+    },
+    {
+      "TABLE_NAME": "disease_symptoms",
+      "CONSTRAINT_NAME": "disease_symptoms_ibfk_1",
+      "CONSTRAINT_TYPE": "FOREIGN KEY"
+    },
+    {
+      "TABLE_NAME": "disease_symptoms",
+      "CONSTRAINT_NAME": "disease_symptoms_ibfk_2",
+      "CONSTRAINT_TYPE": "FOREIGN KEY"
+    },
+    {
+      "TABLE_NAME": "disease_symptoms",
+      "CONSTRAINT_NAME": "PRIMARY",
+      "CONSTRAINT_TYPE": "PRIMARY KEY"
+    },
+    {
+      "TABLE_NAME": "featured_diseases",
+      "CONSTRAINT_NAME": "featured_diseases_ibfk_1",
+      "CONSTRAINT_TYPE": "FOREIGN KEY"
+    },
+    {
+      "TABLE_NAME": "featured_diseases",
+      "CONSTRAINT_NAME": "PRIMARY",
+      "CONSTRAINT_TYPE": "PRIMARY KEY"
+    },
+    {
+      "TABLE_NAME": "health_allergies",
+      "CONSTRAINT_NAME": "fk_health_allergy_profile",
+      "CONSTRAINT_TYPE": "FOREIGN KEY"
+    },
+    {
+      "TABLE_NAME": "health_allergies",
+      "CONSTRAINT_NAME": "PRIMARY",
+      "CONSTRAINT_TYPE": "PRIMARY KEY"
+    },
+    {
+      "TABLE_NAME": "health_conditions",
+      "CONSTRAINT_NAME": "fk_health_condition_profile",
+      "CONSTRAINT_TYPE": "FOREIGN KEY"
+    },
+    {
+      "TABLE_NAME": "health_conditions",
+      "CONSTRAINT_NAME": "PRIMARY",
+      "CONSTRAINT_TYPE": "PRIMARY KEY"
+    },
+    {
+      "TABLE_NAME": "health_documents",
+      "CONSTRAINT_NAME": "fk_health_document_profile",
+      "CONSTRAINT_TYPE": "FOREIGN KEY"
+    },
+    {
+      "TABLE_NAME": "health_documents",
+      "CONSTRAINT_NAME": "fk_health_document_uploaded_by",
+      "CONSTRAINT_TYPE": "FOREIGN KEY"
+    },
+    {
+      "TABLE_NAME": "health_documents",
+      "CONSTRAINT_NAME": "PRIMARY",
+      "CONSTRAINT_TYPE": "PRIMARY KEY"
+    },
+    {
+      "TABLE_NAME": "health_insurance_contacts",
+      "CONSTRAINT_NAME": "fk_insurance_contact_policy",
+      "CONSTRAINT_TYPE": "FOREIGN KEY"
+    },
+    {
+      "TABLE_NAME": "health_insurance_contacts",
+      "CONSTRAINT_NAME": "PRIMARY",
+      "CONSTRAINT_TYPE": "PRIMARY KEY"
+    },
+    {
+      "TABLE_NAME": "health_insurance_documents",
+      "CONSTRAINT_NAME": "fk_insurance_document_document",
+      "CONSTRAINT_TYPE": "FOREIGN KEY"
+    },
+    {
+      "TABLE_NAME": "health_insurance_documents",
+      "CONSTRAINT_NAME": "fk_insurance_document_policy",
+      "CONSTRAINT_TYPE": "FOREIGN KEY"
+    },
+    {
+      "TABLE_NAME": "health_insurance_documents",
+      "CONSTRAINT_NAME": "PRIMARY",
+      "CONSTRAINT_TYPE": "PRIMARY KEY"
+    },
+    {
+      "TABLE_NAME": "health_insurance_documents",
+      "CONSTRAINT_NAME": "uq_insurance_policy_document",
+      "CONSTRAINT_TYPE": "UNIQUE"
+    },
+    {
+      "TABLE_NAME": "health_insurance_members",
+      "CONSTRAINT_NAME": "fk_insurance_member_policy",
+      "CONSTRAINT_TYPE": "FOREIGN KEY"
+    },
+    {
+      "TABLE_NAME": "health_insurance_members",
+      "CONSTRAINT_NAME": "fk_insurance_member_profile",
+      "CONSTRAINT_TYPE": "FOREIGN KEY"
+    },
+    {
+      "TABLE_NAME": "health_insurance_members",
+      "CONSTRAINT_NAME": "PRIMARY",
+      "CONSTRAINT_TYPE": "PRIMARY KEY"
+    },
+    {
+      "TABLE_NAME": "health_insurance_policies",
+      "CONSTRAINT_NAME": "fk_insurance_policy_created_by",
+      "CONSTRAINT_TYPE": "FOREIGN KEY"
+    },
+    {
+      "TABLE_NAME": "health_insurance_policies",
+      "CONSTRAINT_NAME": "fk_insurance_policy_profile",
+      "CONSTRAINT_TYPE": "FOREIGN KEY"
+    },
+    {
+      "TABLE_NAME": "health_insurance_policies",
+      "CONSTRAINT_NAME": "PRIMARY",
+      "CONSTRAINT_TYPE": "PRIMARY KEY"
+    },
+    {
+      "TABLE_NAME": "health_medicines",
+      "CONSTRAINT_NAME": "fk_health_medicine_profile",
+      "CONSTRAINT_TYPE": "FOREIGN KEY"
+    },
+    {
+      "TABLE_NAME": "health_medicines",
+      "CONSTRAINT_NAME": "PRIMARY",
+      "CONSTRAINT_TYPE": "PRIMARY KEY"
+    },
+    {
+      "TABLE_NAME": "health_procedures",
+      "CONSTRAINT_NAME": "fk_health_procedure_profile",
+      "CONSTRAINT_TYPE": "FOREIGN KEY"
+    },
+    {
+      "TABLE_NAME": "health_procedures",
+      "CONSTRAINT_NAME": "PRIMARY",
+      "CONSTRAINT_TYPE": "PRIMARY KEY"
+    },
+    {
+      "TABLE_NAME": "health_profiles",
+      "CONSTRAINT_NAME": "fk_health_profile_created_by",
+      "CONSTRAINT_TYPE": "FOREIGN KEY"
+    },
+    {
+      "TABLE_NAME": "health_profiles",
+      "CONSTRAINT_NAME": "PRIMARY",
+      "CONSTRAINT_TYPE": "PRIMARY KEY"
+    },
+    {
+      "TABLE_NAME": "health_profile_invitations",
+      "CONSTRAINT_NAME": "fk_health_profile_invitation_invited_by",
+      "CONSTRAINT_TYPE": "FOREIGN KEY"
+    },
+    {
+      "TABLE_NAME": "health_profile_invitations",
+      "CONSTRAINT_NAME": "fk_health_profile_invitation_profile",
+      "CONSTRAINT_TYPE": "FOREIGN KEY"
+    },
+    {
+      "TABLE_NAME": "health_profile_invitations",
+      "CONSTRAINT_NAME": "PRIMARY",
+      "CONSTRAINT_TYPE": "PRIMARY KEY"
+    },
+    {
+      "TABLE_NAME": "health_profile_invitations",
+      "CONSTRAINT_NAME": "uq_health_profile_invitation_token",
+      "CONSTRAINT_TYPE": "UNIQUE"
+    },
+    {
+      "TABLE_NAME": "health_profile_members",
+      "CONSTRAINT_NAME": "fk_health_profile_member_profile",
+      "CONSTRAINT_TYPE": "FOREIGN KEY"
+    },
+    {
+      "TABLE_NAME": "health_profile_members",
+      "CONSTRAINT_NAME": "fk_health_profile_member_user",
+      "CONSTRAINT_TYPE": "FOREIGN KEY"
+    },
+    {
+      "TABLE_NAME": "health_profile_members",
+      "CONSTRAINT_NAME": "PRIMARY",
+      "CONSTRAINT_TYPE": "PRIMARY KEY"
+    },
+    {
+      "TABLE_NAME": "health_profile_members",
+      "CONSTRAINT_NAME": "uq_health_profile_member",
+      "CONSTRAINT_TYPE": "UNIQUE"
+    },
+    {
+      "TABLE_NAME": "kobi_combinations",
+      "CONSTRAINT_NAME": "PRIMARY",
+      "CONSTRAINT_TYPE": "PRIMARY KEY"
+    },
+    {
+      "TABLE_NAME": "kobi_combinations",
+      "CONSTRAINT_NAME": "uq_combination_name_normalized",
+      "CONSTRAINT_TYPE": "UNIQUE"
+    },
+    {
+      "TABLE_NAME": "kobi_combination_items",
+      "CONSTRAINT_NAME": "fk_combination_item_combination",
+      "CONSTRAINT_TYPE": "FOREIGN KEY"
+    },
+    {
+      "TABLE_NAME": "kobi_combination_items",
+      "CONSTRAINT_NAME": "fk_combination_item_form",
+      "CONSTRAINT_TYPE": "FOREIGN KEY"
+    },
+    {
+      "TABLE_NAME": "kobi_combination_items",
+      "CONSTRAINT_NAME": "fk_combination_item_substance",
+      "CONSTRAINT_TYPE": "FOREIGN KEY"
+    },
+    {
+      "TABLE_NAME": "kobi_combination_items",
+      "CONSTRAINT_NAME": "PRIMARY",
+      "CONSTRAINT_TYPE": "PRIMARY KEY"
+    },
+    {
+      "TABLE_NAME": "kobi_form_components",
+      "CONSTRAINT_NAME": "fk_component_form",
+      "CONSTRAINT_TYPE": "FOREIGN KEY"
+    },
+    {
+      "TABLE_NAME": "kobi_form_components",
+      "CONSTRAINT_NAME": "fk_component_substance",
+      "CONSTRAINT_TYPE": "FOREIGN KEY"
+    },
+    {
+      "TABLE_NAME": "kobi_form_components",
+      "CONSTRAINT_NAME": "PRIMARY",
+      "CONSTRAINT_TYPE": "PRIMARY KEY"
+    },
+    {
+      "TABLE_NAME": "kobi_identity_reviews",
+      "CONSTRAINT_NAME": "fk_review_alias",
+      "CONSTRAINT_TYPE": "FOREIGN KEY"
+    },
+    {
+      "TABLE_NAME": "kobi_identity_reviews",
+      "CONSTRAINT_NAME": "fk_review_form",
+      "CONSTRAINT_TYPE": "FOREIGN KEY"
+    },
+    {
+      "TABLE_NAME": "kobi_identity_reviews",
+      "CONSTRAINT_NAME": "fk_review_substance",
+      "CONSTRAINT_TYPE": "FOREIGN KEY"
+    },
+    {
+      "TABLE_NAME": "kobi_identity_reviews",
+      "CONSTRAINT_NAME": "PRIMARY",
+      "CONSTRAINT_TYPE": "PRIMARY KEY"
+    },
+    {
+      "TABLE_NAME": "kobi_substances",
+      "CONSTRAINT_NAME": "PRIMARY",
+      "CONSTRAINT_TYPE": "PRIMARY KEY"
+    },
+    {
+      "TABLE_NAME": "kobi_substances",
+      "CONSTRAINT_NAME": "uq_substance_canonical_normalized",
+      "CONSTRAINT_TYPE": "UNIQUE"
+    },
+    {
+      "TABLE_NAME": "kobi_substance_aliases",
+      "CONSTRAINT_NAME": "fk_alias_substance",
+      "CONSTRAINT_TYPE": "FOREIGN KEY"
+    },
+    {
+      "TABLE_NAME": "kobi_substance_aliases",
+      "CONSTRAINT_NAME": "PRIMARY",
+      "CONSTRAINT_TYPE": "PRIMARY KEY"
+    },
+    {
+      "TABLE_NAME": "kobi_substance_forms",
+      "CONSTRAINT_NAME": "fk_form_substance",
+      "CONSTRAINT_TYPE": "FOREIGN KEY"
+    },
+    {
+      "TABLE_NAME": "kobi_substance_forms",
+      "CONSTRAINT_NAME": "PRIMARY",
+      "CONSTRAINT_TYPE": "PRIMARY KEY"
+    },
+    {
+      "TABLE_NAME": "kobi_substance_forms",
+      "CONSTRAINT_NAME": "uq_substance_form",
+      "CONSTRAINT_TYPE": "UNIQUE"
+    },
+    {
+      "TABLE_NAME": "kobi_who_inn_evidence",
+      "CONSTRAINT_NAME": "fk_who_substance",
+      "CONSTRAINT_TYPE": "FOREIGN KEY"
+    },
+    {
+      "TABLE_NAME": "kobi_who_inn_evidence",
+      "CONSTRAINT_NAME": "PRIMARY",
+      "CONSTRAINT_TYPE": "PRIMARY KEY"
+    },
+    {
+      "TABLE_NAME": "medical_summary_shares",
+      "CONSTRAINT_NAME": "fk_medical_summary_share_creator",
+      "CONSTRAINT_TYPE": "FOREIGN KEY"
+    },
+    {
+      "TABLE_NAME": "medical_summary_shares",
+      "CONSTRAINT_NAME": "fk_medical_summary_share_profile",
+      "CONSTRAINT_TYPE": "FOREIGN KEY"
+    },
+    {
+      "TABLE_NAME": "medical_summary_shares",
+      "CONSTRAINT_NAME": "fk_medical_summary_share_revoked_by",
+      "CONSTRAINT_TYPE": "FOREIGN KEY"
+    },
+    {
+      "TABLE_NAME": "medical_summary_shares",
+      "CONSTRAINT_NAME": "PRIMARY",
+      "CONSTRAINT_TYPE": "PRIMARY KEY"
+    },
+    {
+      "TABLE_NAME": "medical_summary_shares",
+      "CONSTRAINT_NAME": "uq_medical_summary_share_token",
+      "CONSTRAINT_TYPE": "UNIQUE"
+    },
+    {
+      "TABLE_NAME": "medical_summary_share_access_logs",
+      "CONSTRAINT_NAME": "fk_medical_summary_share_access_share",
+      "CONSTRAINT_TYPE": "FOREIGN KEY"
+    },
+    {
+      "TABLE_NAME": "medical_summary_share_access_logs",
+      "CONSTRAINT_NAME": "PRIMARY",
+      "CONSTRAINT_TYPE": "PRIMARY KEY"
+    },
+    {
+      "TABLE_NAME": "symptoms",
+      "CONSTRAINT_NAME": "PRIMARY",
+      "CONSTRAINT_TYPE": "PRIMARY KEY"
+    },
+    {
+      "TABLE_NAME": "treatment_editorial_permissions",
+      "CONSTRAINT_NAME": "chk_treatment_grant_capabilities",
+      "CONSTRAINT_TYPE": "CHECK"
+    },
+    {
+      "TABLE_NAME": "treatment_editorial_permissions",
+      "CONSTRAINT_NAME": "chk_treatment_grant_qualification",
+      "CONSTRAINT_TYPE": "CHECK"
+    },
+    {
+      "TABLE_NAME": "treatment_editorial_permissions",
+      "CONSTRAINT_NAME": "chk_treatment_grant_revocation",
+      "CONSTRAINT_TYPE": "CHECK"
+    },
+    {
+      "TABLE_NAME": "treatment_editorial_permissions",
+      "CONSTRAINT_NAME": "fk_treatment_grant_authorizer",
+      "CONSTRAINT_TYPE": "FOREIGN KEY"
+    },
+    {
+      "TABLE_NAME": "treatment_editorial_permissions",
+      "CONSTRAINT_NAME": "fk_treatment_grant_revoker",
+      "CONSTRAINT_TYPE": "FOREIGN KEY"
+    },
+    {
+      "TABLE_NAME": "treatment_editorial_permissions",
+      "CONSTRAINT_NAME": "fk_treatment_grant_system",
+      "CONSTRAINT_TYPE": "FOREIGN KEY"
+    },
+    {
+      "TABLE_NAME": "treatment_editorial_permissions",
+      "CONSTRAINT_NAME": "fk_treatment_grant_user",
+      "CONSTRAINT_TYPE": "FOREIGN KEY"
+    },
+    {
+      "TABLE_NAME": "treatment_editorial_permissions",
+      "CONSTRAINT_NAME": "PRIMARY",
+      "CONSTRAINT_TYPE": "PRIMARY KEY"
+    },
+    {
+      "TABLE_NAME": "treatment_editorial_permissions",
+      "CONSTRAINT_NAME": "uq_treatment_active_grant",
+      "CONSTRAINT_TYPE": "UNIQUE"
+    },
+    {
+      "TABLE_NAME": "treatment_item_sources",
+      "CONSTRAINT_NAME": "chk_treatment_item_claim",
+      "CONSTRAINT_TYPE": "CHECK"
+    },
+    {
+      "TABLE_NAME": "treatment_item_sources",
+      "CONSTRAINT_NAME": "fk_treatment_item_source_item",
+      "CONSTRAINT_TYPE": "FOREIGN KEY"
+    },
+    {
+      "TABLE_NAME": "treatment_item_sources",
+      "CONSTRAINT_NAME": "fk_treatment_item_source_source",
+      "CONSTRAINT_TYPE": "FOREIGN KEY"
+    },
+    {
+      "TABLE_NAME": "treatment_item_sources",
+      "CONSTRAINT_NAME": "PRIMARY",
+      "CONSTRAINT_TYPE": "PRIMARY KEY"
+    },
+    {
+      "TABLE_NAME": "treatment_item_sources",
+      "CONSTRAINT_NAME": "uq_item_source",
+      "CONSTRAINT_TYPE": "UNIQUE"
+    },
+    {
+      "TABLE_NAME": "treatment_protocols",
+      "CONSTRAINT_NAME": "chk_treatment_approval_pointer",
+      "CONSTRAINT_TYPE": "CHECK"
+    },
+    {
+      "TABLE_NAME": "treatment_protocols",
+      "CONSTRAINT_NAME": "chk_treatment_publication",
+      "CONSTRAINT_TYPE": "CHECK"
+    },
+    {
+      "TABLE_NAME": "treatment_protocols",
+      "CONSTRAINT_NAME": "chk_treatment_revision",
+      "CONSTRAINT_TYPE": "CHECK"
+    },
+    {
+      "TABLE_NAME": "treatment_protocols",
+      "CONSTRAINT_NAME": "chk_treatment_risk_value",
+      "CONSTRAINT_TYPE": "CHECK"
+    },
+    {
+      "TABLE_NAME": "treatment_protocols",
+      "CONSTRAINT_NAME": "fk_treatment_approved_revision",
+      "CONSTRAINT_TYPE": "FOREIGN KEY"
+    },
+    {
+      "TABLE_NAME": "treatment_protocols",
+      "CONSTRAINT_NAME": "fk_treatment_updated_by",
+      "CONSTRAINT_TYPE": "FOREIGN KEY"
+    },
+    {
+      "TABLE_NAME": "treatment_protocols",
+      "CONSTRAINT_NAME": "PRIMARY",
+      "CONSTRAINT_TYPE": "PRIMARY KEY"
+    },
+    {
+      "TABLE_NAME": "treatment_protocols",
+      "CONSTRAINT_NAME": "treatment_protocols_ibfk_1",
+      "CONSTRAINT_TYPE": "FOREIGN KEY"
+    },
+    {
+      "TABLE_NAME": "treatment_protocols",
+      "CONSTRAINT_NAME": "treatment_protocols_ibfk_2",
+      "CONSTRAINT_TYPE": "FOREIGN KEY"
+    },
+    {
+      "TABLE_NAME": "treatment_protocol_events",
+      "CONSTRAINT_NAME": "chk_treatment_event_actor",
+      "CONSTRAINT_TYPE": "CHECK"
+    },
+    {
+      "TABLE_NAME": "treatment_protocol_events",
+      "CONSTRAINT_NAME": "chk_treatment_event_approval",
+      "CONSTRAINT_TYPE": "CHECK"
+    },
+    {
+      "TABLE_NAME": "treatment_protocol_events",
+      "CONSTRAINT_NAME": "chk_treatment_event_hash",
+      "CONSTRAINT_TYPE": "CHECK"
+    },
+    {
+      "TABLE_NAME": "treatment_protocol_events",
+      "CONSTRAINT_NAME": "chk_treatment_event_independence",
+      "CONSTRAINT_TYPE": "CHECK"
+    },
+    {
+      "TABLE_NAME": "treatment_protocol_events",
+      "CONSTRAINT_NAME": "chk_treatment_event_json",
+      "CONSTRAINT_TYPE": "CHECK"
+    },
+    {
+      "TABLE_NAME": "treatment_protocol_events",
+      "CONSTRAINT_NAME": "chk_treatment_event_reason",
+      "CONSTRAINT_TYPE": "CHECK"
+    },
+    {
+      "TABLE_NAME": "treatment_protocol_events",
+      "CONSTRAINT_NAME": "chk_treatment_event_revision",
+      "CONSTRAINT_TYPE": "CHECK"
+    },
+    {
+      "TABLE_NAME": "treatment_protocol_events",
+      "CONSTRAINT_NAME": "chk_treatment_event_snapshot",
+      "CONSTRAINT_TYPE": "CHECK"
+    },
+    {
+      "TABLE_NAME": "treatment_protocol_events",
+      "CONSTRAINT_NAME": "chk_treatment_event_type",
+      "CONSTRAINT_TYPE": "CHECK"
+    },
+    {
+      "TABLE_NAME": "treatment_protocol_events",
+      "CONSTRAINT_NAME": "chk_treatment_risk_event",
+      "CONSTRAINT_TYPE": "CHECK"
+    },
+    {
+      "TABLE_NAME": "treatment_protocol_events",
+      "CONSTRAINT_NAME": "chk_treatment_risk_payload",
+      "CONSTRAINT_TYPE": "CHECK"
+    },
+    {
+      "TABLE_NAME": "treatment_protocol_events",
+      "CONSTRAINT_NAME": "fk_treatment_event_actor",
+      "CONSTRAINT_TYPE": "FOREIGN KEY"
+    },
+    {
+      "TABLE_NAME": "treatment_protocol_events",
+      "CONSTRAINT_NAME": "fk_treatment_event_protocol",
+      "CONSTRAINT_TYPE": "FOREIGN KEY"
+    },
+    {
+      "TABLE_NAME": "treatment_protocol_events",
+      "CONSTRAINT_NAME": "PRIMARY",
+      "CONSTRAINT_TYPE": "PRIMARY KEY"
+    },
+    {
+      "TABLE_NAME": "treatment_protocol_events",
+      "CONSTRAINT_NAME": "uq_treatment_event_revision",
+      "CONSTRAINT_TYPE": "UNIQUE"
+    },
+    {
+      "TABLE_NAME": "treatment_protocol_items",
+      "CONSTRAINT_NAME": "chk_treatment_item_included",
+      "CONSTRAINT_TYPE": "CHECK"
+    },
+    {
+      "TABLE_NAME": "treatment_protocol_items",
+      "CONSTRAINT_NAME": "PRIMARY",
+      "CONSTRAINT_TYPE": "PRIMARY KEY"
+    },
+    {
+      "TABLE_NAME": "treatment_protocol_items",
+      "CONSTRAINT_NAME": "treatment_protocol_items_ibfk_1",
+      "CONSTRAINT_TYPE": "FOREIGN KEY"
+    },
+    {
+      "TABLE_NAME": "treatment_protocol_sources",
+      "CONSTRAINT_NAME": "chk_treatment_protocol_claim",
+      "CONSTRAINT_TYPE": "CHECK"
+    },
+    {
+      "TABLE_NAME": "treatment_protocol_sources",
+      "CONSTRAINT_NAME": "fk_treatment_protocol_source_protocol",
+      "CONSTRAINT_TYPE": "FOREIGN KEY"
+    },
+    {
+      "TABLE_NAME": "treatment_protocol_sources",
+      "CONSTRAINT_NAME": "fk_treatment_protocol_source_source",
+      "CONSTRAINT_TYPE": "FOREIGN KEY"
+    },
+    {
+      "TABLE_NAME": "treatment_protocol_sources",
+      "CONSTRAINT_NAME": "PRIMARY",
+      "CONSTRAINT_TYPE": "PRIMARY KEY"
+    },
+    {
+      "TABLE_NAME": "treatment_protocol_sources",
+      "CONSTRAINT_NAME": "uq_protocol_source",
+      "CONSTRAINT_TYPE": "UNIQUE"
+    },
+    {
+      "TABLE_NAME": "treatment_sources",
+      "CONSTRAINT_NAME": "chk_treatment_source_identity",
+      "CONSTRAINT_TYPE": "CHECK"
+    },
+    {
+      "TABLE_NAME": "treatment_sources",
+      "CONSTRAINT_NAME": "chk_treatment_source_lifecycle",
+      "CONSTRAINT_TYPE": "CHECK"
+    },
+    {
+      "TABLE_NAME": "treatment_sources",
+      "CONSTRAINT_NAME": "fk_treatment_source_creator",
+      "CONSTRAINT_TYPE": "FOREIGN KEY"
+    },
+    {
+      "TABLE_NAME": "treatment_sources",
+      "CONSTRAINT_NAME": "fk_treatment_source_replaces",
+      "CONSTRAINT_TYPE": "FOREIGN KEY"
+    },
+    {
+      "TABLE_NAME": "treatment_sources",
+      "CONSTRAINT_NAME": "fk_treatment_source_verifier",
+      "CONSTRAINT_TYPE": "FOREIGN KEY"
+    },
+    {
+      "TABLE_NAME": "treatment_sources",
+      "CONSTRAINT_NAME": "fk_treatment_source_withdrawer",
+      "CONSTRAINT_TYPE": "FOREIGN KEY"
+    },
+    {
+      "TABLE_NAME": "treatment_sources",
+      "CONSTRAINT_NAME": "PRIMARY",
+      "CONSTRAINT_TYPE": "PRIMARY KEY"
+    },
+    {
+      "TABLE_NAME": "treatment_systems",
+      "CONSTRAINT_NAME": "PRIMARY",
+      "CONSTRAINT_TYPE": "PRIMARY KEY"
+    },
+    {
+      "TABLE_NAME": "treatment_systems",
+      "CONSTRAINT_NAME": "slug",
+      "CONSTRAINT_TYPE": "UNIQUE"
+    },
+    {
+      "TABLE_NAME": "users",
+      "CONSTRAINT_NAME": "PRIMARY",
+      "CONSTRAINT_TYPE": "PRIMARY KEY"
+    },
+    {
+      "TABLE_NAME": "users",
+      "CONSTRAINT_NAME": "unique_user_email",
+      "CONSTRAINT_TYPE": "UNIQUE"
+    },
+    {
+      "TABLE_NAME": "user_auth_identities",
+      "CONSTRAINT_NAME": "fk_auth_identity_user",
+      "CONSTRAINT_TYPE": "FOREIGN KEY"
+    },
+    {
+      "TABLE_NAME": "user_auth_identities",
+      "CONSTRAINT_NAME": "PRIMARY",
+      "CONSTRAINT_TYPE": "PRIMARY KEY"
+    },
+    {
+      "TABLE_NAME": "user_auth_identities",
+      "CONSTRAINT_NAME": "uq_auth_identity_provider_user",
+      "CONSTRAINT_TYPE": "UNIQUE"
+    },
+    {
+      "TABLE_NAME": "user_auth_tokens",
+      "CONSTRAINT_NAME": "fk_user_auth_tokens_user",
+      "CONSTRAINT_TYPE": "FOREIGN KEY"
+    },
+    {
+      "TABLE_NAME": "user_auth_tokens",
+      "CONSTRAINT_NAME": "PRIMARY",
+      "CONSTRAINT_TYPE": "PRIMARY KEY"
+    },
+    {
+      "TABLE_NAME": "user_auth_tokens",
+      "CONSTRAINT_NAME": "uq_user_auth_token_hash",
+      "CONSTRAINT_TYPE": "UNIQUE"
+    },
+    {
+      "TABLE_NAME": "user_saved_diseases",
+      "CONSTRAINT_NAME": "PRIMARY",
+      "CONSTRAINT_TYPE": "PRIMARY KEY"
+    },
+    {
+      "TABLE_NAME": "user_saved_diseases",
+      "CONSTRAINT_NAME": "unique_user_disease",
+      "CONSTRAINT_TYPE": "UNIQUE"
+    },
+    {
+      "TABLE_NAME": "user_saved_diseases",
+      "CONSTRAINT_NAME": "user_saved_diseases_disease_fk",
+      "CONSTRAINT_TYPE": "FOREIGN KEY"
+    },
+    {
+      "TABLE_NAME": "user_saved_diseases",
+      "CONSTRAINT_NAME": "user_saved_diseases_user_fk",
+      "CONSTRAINT_TYPE": "FOREIGN KEY"
+    },
+    {
+      "TABLE_NAME": "user_treatment_preferences",
+      "CONSTRAINT_NAME": "fk_user_treatment_system",
+      "CONSTRAINT_TYPE": "FOREIGN KEY"
+    },
+    {
+      "TABLE_NAME": "user_treatment_preferences",
+      "CONSTRAINT_NAME": "fk_user_treatment_user",
+      "CONSTRAINT_TYPE": "FOREIGN KEY"
+    },
+    {
+      "TABLE_NAME": "user_treatment_preferences",
+      "CONSTRAINT_NAME": "PRIMARY",
+      "CONSTRAINT_TYPE": "PRIMARY KEY"
+    },
+    {
+      "TABLE_NAME": "user_treatment_preferences",
+      "CONSTRAINT_NAME": "uq_user_treatment_order",
+      "CONSTRAINT_TYPE": "UNIQUE"
+    },
+    {
+      "TABLE_NAME": "user_treatment_preferences",
+      "CONSTRAINT_NAME": "uq_user_treatment_system",
+      "CONSTRAINT_TYPE": "UNIQUE"
+    }
+  ],
+  "triggers": [
+    {
+      "TRIGGER_NAME": "trg_treatment_source_no_self_insert",
+      "EVENT_MANIPULATION": "INSERT",
+      "ACTION_TIMING": "AFTER",
+      "ACTION_STATEMENT": "BEGIN\r\n  IF NEW.replaces_source_id = NEW.id THEN\r\n    SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'A treatment source cannot replace itself.';\r\n  END IF;\r\nEND",
+      "SQL_MODE": "NO_ZERO_IN_DATE,NO_ZERO_DATE,NO_ENGINE_SUBSTITUTION"
+    },
+    {
+      "TRIGGER_NAME": "trg_treatment_source_no_self_update",
+      "EVENT_MANIPULATION": "UPDATE",
+      "ACTION_TIMING": "AFTER",
+      "ACTION_STATEMENT": "BEGIN\r\n  IF NEW.replaces_source_id = NEW.id THEN\r\n    SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'A treatment source cannot replace itself.';\r\n  END IF;\r\nEND",
+      "SQL_MODE": "NO_ZERO_IN_DATE,NO_ZERO_DATE,NO_ENGINE_SUBSTITUTION"
+    }
+  ],
+  "persisted": {
+    "protocol_initial": {
+      "id": 2291,
+      "disease_id": 1,
+      "treatment_system_id": 1,
+      "title_en": "LIVE_DRAFT_PRIVATE_4B2L",
+      "title_hi": null,
+      "overview_en": "Synthetic initial content",
+      "overview_hi": null,
+      "review_state": "draft",
+      "publication_status": "unpublished",
+      "content_revision": 1,
+      "approved_review_id": null,
+      "risk_eligibility": "not_assessed",
+      "published_locales": "",
+      "evidence_classification": "not_assessed",
+      "content_purpose": null,
+      "evidence_summary_en": null,
+      "evidence_summary_hi": null,
+      "applicability_en": null,
+      "applicability_hi": null,
+      "limitations_en": null,
+      "limitations_hi": null,
+      "updated_at": "2026-10-08 19:30:59.747157",
+      "updated_by": 1
+    },
+    "creation_events": [
+      {
+        "id": 1,
+        "protocol_id": 2291,
+        "content_revision": 1,
+        "event_type": "content_changed",
+        "actor_id": 1,
+        "occurred_at": "2026-10-08 19:30:59.749036",
+        "locales": "",
+        "notes": "New treatment protocol draft created.",
+        "review_due_at": null,
+        "independence_confirmed": 0,
+        "content_snapshot": null,
+        "content_hash": null
+      }
+    ],
+    "atomic_first_protocol": {
+      "id": 2292,
+      "disease_id": 1,
+      "treatment_system_id": 1,
+      "title_en": null,
+      "title_hi": "प्रारंभिक मसौदा",
+      "overview_en": null,
+      "overview_hi": null,
+      "review_state": "draft",
+      "publication_status": "unpublished",
+      "content_revision": 1,
+      "approved_review_id": null,
+      "risk_eligibility": "not_assessed",
+      "published_locales": "",
+      "evidence_classification": "not_assessed",
+      "content_purpose": null,
+      "evidence_summary_en": null,
+      "evidence_summary_hi": null,
+      "applicability_en": null,
+      "applicability_hi": null,
+      "limitations_en": null,
+      "limitations_hi": null,
+      "updated_at": "2026-10-08 19:31:00.111764",
+      "updated_by": 1
+    },
+    "atomic_first_item": {
+      "id": 3401,
+      "protocol_id": 2292,
+      "item_type": "herb",
+      "title_en": null,
+      "title_hi": "प्रारंभिक मद",
+      "instructions_en": null,
+      "instructions_hi": null,
+      "sort_order": 0,
+      "is_included": 0,
+      "evidence_classification": "not_assessed",
+      "content_purpose": null,
+      "limitations_en": null,
+      "limitations_hi": null
+    },
+    "later-2291": {
+      "protocol": {
+        "id": 2291,
+        "disease_id": 1,
+        "treatment_system_id": 1,
+        "title_en": "LIVE_DRAFT_PRIVATE_4B2L",
+        "title_hi": null,
+        "overview_en": "Synthetic initial content",
+        "overview_hi": null,
+        "review_state": "draft",
+        "publication_status": "unpublished",
+        "content_revision": 2,
+        "approved_review_id": null,
+        "risk_eligibility": "not_assessed",
+        "published_locales": "",
+        "evidence_classification": "not_assessed",
+        "content_purpose": null,
+        "evidence_summary_en": null,
+        "evidence_summary_hi": null,
+        "applicability_en": null,
+        "applicability_hi": null,
+        "limitations_en": null,
+        "limitations_hi": null,
+        "updated_at": "2026-10-08 19:31:01.029866",
+        "updated_by": 1
+      },
+      "item": {
+        "id": 3402,
+        "protocol_id": 2291,
+        "item_type": "lifestyle",
+        "title_en": "LIVE_ITEM_PRIVATE_4B2L",
+        "title_hi": null,
+        "instructions_en": "Synthetic instructions",
+        "instructions_hi": null,
+        "sort_order": 0,
+        "is_included": 0,
+        "evidence_classification": "not_assessed",
+        "content_purpose": null,
+        "limitations_en": null,
+        "limitations_hi": null
+      },
+      "events": [
+        {
+          "id": 1,
+          "protocol_id": 2291,
+          "content_revision": 1,
+          "event_type": "content_changed",
+          "actor_id": 1,
+          "occurred_at": "2026-10-08 19:30:59.749036",
+          "locales": "",
+          "notes": "New treatment protocol draft created.",
+          "review_due_at": null,
+          "independence_confirmed": 0,
+          "content_snapshot": null,
+          "content_hash": null
+        },
+        {
+          "id": 3,
+          "protocol_id": 2291,
+          "content_revision": 2,
+          "event_type": "content_changed",
+          "actor_id": 1,
+          "occurred_at": "2026-10-08 19:31:01.030329",
+          "locales": "",
+          "notes": "New treatment item added.",
+          "review_due_at": null,
+          "independence_confirmed": 0,
+          "content_snapshot": null,
+          "content_hash": null
+        }
+      ]
+    },
+    "later-2292": {
+      "protocol": {
+        "id": 2292,
+        "disease_id": 1,
+        "treatment_system_id": 1,
+        "title_en": null,
+        "title_hi": "प्रारंभिक मसौदा",
+        "overview_en": null,
+        "overview_hi": null,
+        "review_state": "draft",
+        "publication_status": "unpublished",
+        "content_revision": 3,
+        "approved_review_id": null,
+        "risk_eligibility": "not_assessed",
+        "published_locales": "",
+        "evidence_classification": "not_assessed",
+        "content_purpose": null,
+        "evidence_summary_en": null,
+        "evidence_summary_hi": null,
+        "applicability_en": null,
+        "applicability_hi": null,
+        "limitations_en": null,
+        "limitations_hi": null,
+        "updated_at": "2026-10-08 19:31:01.377666",
+        "updated_by": 1
+      },
+      "item": {
+        "id": 3404,
+        "protocol_id": 2292,
+        "item_type": "lifestyle",
+        "title_en": "LIVE_ITEM_PRIVATE_4B2L",
+        "title_hi": null,
+        "instructions_en": "Synthetic instructions",
+        "instructions_hi": null,
+        "sort_order": 0,
+        "is_included": 0,
+        "evidence_classification": "not_assessed",
+        "content_purpose": null,
+        "limitations_en": null,
+        "limitations_hi": null
+      },
+      "events": [
+        {
+          "id": 2,
+          "protocol_id": 2292,
+          "content_revision": 1,
+          "event_type": "content_changed",
+          "actor_id": 1,
+          "occurred_at": "2026-10-08 19:31:00.118472",
+          "locales": "",
+          "notes": "New treatment protocol draft created.",
+          "review_due_at": null,
+          "independence_confirmed": 0,
+          "content_snapshot": null,
+          "content_hash": null
+        },
+        {
+          "id": 4,
+          "protocol_id": 2292,
+          "content_revision": 2,
+          "event_type": "content_changed",
+          "actor_id": 1,
+          "occurred_at": "2026-10-08 19:31:01.205594",
+          "locales": "",
+          "notes": "New treatment item added.",
+          "review_due_at": null,
+          "independence_confirmed": 0,
+          "content_snapshot": null,
+          "content_hash": null
+        },
+        {
+          "id": 5,
+          "protocol_id": 2292,
+          "content_revision": 3,
+          "event_type": "content_changed",
+          "actor_id": 1,
+          "occurred_at": "2026-10-08 19:31:01.378392",
+          "locales": "",
+          "notes": "New treatment item added.",
+          "review_due_at": null,
+          "independence_confirmed": 0,
+          "content_snapshot": null,
+          "content_hash": null
+        }
+      ]
+    },
+    "approved_before_item": {
+      "id": 2295,
+      "disease_id": 1,
+      "treatment_system_id": 1,
+      "title_en": "APPROVED_PRIVATE_FIXTURE",
+      "title_hi": null,
+      "overview_en": "Synthetic overview",
+      "overview_hi": null,
+      "review_state": "approved",
+      "publication_status": "unpublished",
+      "content_revision": 5,
+      "approved_review_id": 16,
+      "risk_eligibility": "eligible",
+      "published_locales": "",
+      "evidence_classification": "evidence_supported",
+      "content_purpose": "supportive_care",
+      "evidence_summary_en": null,
+      "evidence_summary_hi": null,
+      "applicability_en": "Synthetic applicability",
+      "applicability_hi": null,
+      "limitations_en": "Synthetic educational limitation",
+      "limitations_hi": null,
+      "updated_at": "2026-10-08 19:34:01.986924",
+      "updated_by": 2
+    },
+    "approved_after_item": {
+      "protocol": {
+        "id": 2295,
+        "disease_id": 1,
+        "treatment_system_id": 1,
+        "title_en": "APPROVED_PRIVATE_FIXTURE",
+        "title_hi": null,
+        "overview_en": "Synthetic overview",
+        "overview_hi": null,
+        "review_state": "draft",
+        "publication_status": "unpublished",
+        "content_revision": 6,
+        "approved_review_id": null,
+        "risk_eligibility": "eligible",
+        "published_locales": "",
+        "evidence_classification": "evidence_supported",
+        "content_purpose": "supportive_care",
+        "evidence_summary_en": null,
+        "evidence_summary_hi": null,
+        "applicability_en": "Synthetic applicability",
+        "applicability_hi": null,
+        "limitations_en": "Synthetic educational limitation",
+        "limitations_hi": null,
+        "updated_at": "2026-10-08 19:34:02.442892",
+        "updated_by": 1
+      },
+      "events": [
+        {
+          "id": 10,
+          "protocol_id": 2295,
+          "content_revision": 1,
+          "event_type": "content_changed",
+          "actor_id": 1,
+          "occurred_at": "2026-10-08 19:34:01.909858",
+          "locales": "",
+          "notes": "New treatment protocol draft created.",
+          "review_due_at": null,
+          "independence_confirmed": 0,
+          "content_snapshot": null,
+          "content_hash": null
+        },
+        {
+          "id": 11,
+          "protocol_id": 2295,
+          "content_revision": 2,
+          "event_type": "content_changed",
+          "actor_id": 1,
+          "occurred_at": "2026-10-08 19:34:01.926133",
+          "locales": "",
+          "notes": "Governed protocol/item content changed.",
+          "review_due_at": null,
+          "independence_confirmed": 0,
+          "content_snapshot": null,
+          "content_hash": null
+        },
+        {
+          "id": 12,
+          "protocol_id": 2295,
+          "content_revision": 3,
+          "event_type": "content_changed",
+          "actor_id": 1,
+          "occurred_at": "2026-10-08 19:34:01.949595",
+          "locales": "",
+          "notes": "Treatment source relationship changed.",
+          "review_due_at": null,
+          "independence_confirmed": 0,
+          "content_snapshot": null,
+          "content_hash": null
+        },
+        {
+          "id": 13,
+          "protocol_id": 2295,
+          "content_revision": 4,
+          "event_type": "content_changed",
+          "actor_id": 1,
+          "occurred_at": "2026-10-08 19:34:01.967080",
+          "locales": "",
+          "notes": "Treatment source relationship changed.",
+          "review_due_at": null,
+          "independence_confirmed": 0,
+          "content_snapshot": null,
+          "content_hash": null
+        },
+        {
+          "id": 14,
+          "protocol_id": 2295,
+          "content_revision": 5,
+          "event_type": "risk_assessed",
+          "actor_id": 2,
+          "occurred_at": "2026-10-08 19:34:01.988511",
+          "locales": "",
+          "notes": "Synthetic independent policy decision",
+          "review_due_at": null,
+          "independence_confirmed": 1,
+          "content_snapshot": "{\"format_version\":1,\"item_sources\":[{\"claim_scope\":\"Synthetic item claim\",\"id\":1,\"item_id\":3408,\"locator\":null,\"source_id\":1}],\"items\":[{\"content_purpose\":\"supportive_care\",\"evidence_classification\":\"evidence_supported\",\"id\":3408,\"instructions_en\":\"Synthetic instruction\",\"instructions_hi\":null,\"is_included\":true,\"item_type\":\"lifestyle\",\"limitations_en\":\"Synthetic item limitation\",\"limitations_hi\":null,\"protocol_id\":2295,\"sort_order\":1,\"title_en\":\"Synthetic assessed item\",\"title_hi\":null}],\"locales\":[],\"protocol\":{\"applicability_en\":\"Synthetic applicability\",\"applicability_hi\":null,\"content_purpose\":\"supportive_care\",\"content_revision\":5,\"disease_id\":1,\"evidence_classification\":\"evidence_supported\",\"evidence_summary_en\":null,\"evidence_summary_hi\":null,\"id\":2295,\"limitations_en\":\"Synthetic educational limitation\",\"limitations_hi\":null,\"overview_en\":\"Synthetic overview\",\"overview_hi\":null,\"risk_eligibility\":\"eligible\",\"title_en\":\"APPROVED_PRIVATE_FIXTURE\",\"title_hi\":null,\"treatment_system_id\":1},\"protocol_sources\":[{\"claim_scope\":\"Synthetic protocol claim\",\"id\":1,\"locator\":null,\"protocol_id\":2295,\"source_id\":1}],\"sources\":[{\"accessed_on\":null,\"author_or_organization\":null,\"citation_text\":\"Synthetic citation, no medical claim\",\"edition_or_version\":null,\"id\":1,\"identifier\":null,\"publication\":null,\"publication_date\":null,\"replaces_source_id\":null,\"source_type\":\"guideline\",\"title\":\"Synthetic validation source\",\"url\":null}]}",
+          "content_hash": "4f20af887ab966c40236576634a68f851714a415bd7bb1fd19513a2c443b44a0"
+        },
+        {
+          "id": 15,
+          "protocol_id": 2295,
+          "content_revision": 5,
+          "event_type": "submitted",
+          "actor_id": 1,
+          "occurred_at": "2026-10-08 19:34:02.009304",
+          "locales": "en",
+          "notes": null,
+          "review_due_at": null,
+          "independence_confirmed": 0,
+          "content_snapshot": "{\"format_version\":1,\"item_sources\":[{\"claim_scope\":\"Synthetic item claim\",\"id\":1,\"item_id\":3408,\"locator\":null,\"source_id\":1}],\"items\":[{\"content_purpose\":\"supportive_care\",\"evidence_classification\":\"evidence_supported\",\"id\":3408,\"instructions_en\":\"Synthetic instruction\",\"instructions_hi\":null,\"is_included\":true,\"item_type\":\"lifestyle\",\"limitations_en\":\"Synthetic item limitation\",\"limitations_hi\":null,\"protocol_id\":2295,\"sort_order\":1,\"title_en\":\"Synthetic assessed item\",\"title_hi\":null}],\"locales\":[\"en\"],\"protocol\":{\"applicability_en\":\"Synthetic applicability\",\"applicability_hi\":null,\"content_purpose\":\"supportive_care\",\"content_revision\":5,\"disease_id\":1,\"evidence_classification\":\"evidence_supported\",\"evidence_summary_en\":null,\"evidence_summary_hi\":null,\"id\":2295,\"limitations_en\":\"Synthetic educational limitation\",\"limitations_hi\":null,\"overview_en\":\"Synthetic overview\",\"overview_hi\":null,\"risk_eligibility\":\"eligible\",\"title_en\":\"APPROVED_PRIVATE_FIXTURE\",\"title_hi\":null,\"treatment_system_id\":1},\"protocol_sources\":[{\"claim_scope\":\"Synthetic protocol claim\",\"id\":1,\"locator\":null,\"protocol_id\":2295,\"source_id\":1}],\"sources\":[{\"accessed_on\":null,\"author_or_organization\":null,\"citation_text\":\"Synthetic citation, no medical claim\",\"edition_or_version\":null,\"id\":1,\"identifier\":null,\"publication\":null,\"publication_date\":null,\"replaces_source_id\":null,\"source_type\":\"guideline\",\"title\":\"Synthetic validation source\",\"url\":null}]}",
+          "content_hash": "d6abd48a8ebec6f13666555b06ba0fd59d251a9fc9ab8d3e01a9b90a9563db98"
+        },
+        {
+          "id": 16,
+          "protocol_id": 2295,
+          "content_revision": 5,
+          "event_type": "approved",
+          "actor_id": 2,
+          "occurred_at": "2026-10-08 19:34:02.035914",
+          "locales": "en",
+          "notes": "Synthetic independent fixture approval",
+          "review_due_at": "2099-01-01 00:00:00.000000",
+          "independence_confirmed": 1,
+          "content_snapshot": "{\"format_version\":1,\"item_sources\":[{\"claim_scope\":\"Synthetic item claim\",\"id\":1,\"item_id\":3408,\"locator\":null,\"source_id\":1}],\"items\":[{\"content_purpose\":\"supportive_care\",\"evidence_classification\":\"evidence_supported\",\"id\":3408,\"instructions_en\":\"Synthetic instruction\",\"instructions_hi\":null,\"is_included\":true,\"item_type\":\"lifestyle\",\"limitations_en\":\"Synthetic item limitation\",\"limitations_hi\":null,\"protocol_id\":2295,\"sort_order\":1,\"title_en\":\"Synthetic assessed item\",\"title_hi\":null}],\"locales\":[\"en\"],\"protocol\":{\"applicability_en\":\"Synthetic applicability\",\"applicability_hi\":null,\"content_purpose\":\"supportive_care\",\"content_revision\":5,\"disease_id\":1,\"evidence_classification\":\"evidence_supported\",\"evidence_summary_en\":null,\"evidence_summary_hi\":null,\"id\":2295,\"limitations_en\":\"Synthetic educational limitation\",\"limitations_hi\":null,\"overview_en\":\"Synthetic overview\",\"overview_hi\":null,\"risk_eligibility\":\"eligible\",\"title_en\":\"APPROVED_PRIVATE_FIXTURE\",\"title_hi\":null,\"treatment_system_id\":1},\"protocol_sources\":[{\"claim_scope\":\"Synthetic protocol claim\",\"id\":1,\"locator\":null,\"protocol_id\":2295,\"source_id\":1}],\"sources\":[{\"accessed_on\":null,\"author_or_organization\":null,\"citation_text\":\"Synthetic citation, no medical claim\",\"edition_or_version\":null,\"id\":1,\"identifier\":null,\"publication\":null,\"publication_date\":null,\"replaces_source_id\":null,\"source_type\":\"guideline\",\"title\":\"Synthetic validation source\",\"url\":null}]}",
+          "content_hash": "d6abd48a8ebec6f13666555b06ba0fd59d251a9fc9ab8d3e01a9b90a9563db98"
+        },
+        {
+          "id": 17,
+          "protocol_id": 2295,
+          "content_revision": 6,
+          "event_type": "content_changed",
+          "actor_id": 1,
+          "occurred_at": "2026-10-08 19:34:02.443839",
+          "locales": "",
+          "notes": "New treatment item added.",
+          "review_due_at": null,
+          "independence_confirmed": 0,
+          "content_snapshot": null,
+          "content_hash": null
+        }
+      ]
+    },
+    "published_fixture": {
+      "id": 2296,
+      "disease_id": 1,
+      "treatment_system_id": 1,
+      "title_en": "PUBLISHED_SYNTHETIC_FIXTURE_ONLY",
+      "title_hi": null,
+      "overview_en": "Synthetic overview",
+      "overview_hi": null,
+      "review_state": "approved",
+      "publication_status": "published",
+      "content_revision": 5,
+      "approved_review_id": 24,
+      "risk_eligibility": "eligible",
+      "published_locales": "en",
+      "evidence_classification": "evidence_supported",
+      "content_purpose": "supportive_care",
+      "evidence_summary_en": null,
+      "evidence_summary_hi": null,
+      "applicability_en": "Synthetic applicability",
+      "applicability_hi": null,
+      "limitations_en": "Synthetic educational limitation",
+      "limitations_hi": null,
+      "updated_at": "2026-10-08 19:34:02.540167",
+      "updated_by": 2
+    },
+    "browser": {
+      "protocol": {
+        "id": 2293,
+        "disease_id": 1,
+        "treatment_system_id": 1,
+        "title_en": "BROWSER_PRIVATE_DRAFT_4B2L",
+        "title_hi": null,
+        "overview_en": "Synthetic browser validation content",
+        "overview_hi": null,
+        "review_state": "draft",
+        "publication_status": "unpublished",
+        "content_revision": 2,
+        "approved_review_id": null,
+        "risk_eligibility": "not_assessed",
+        "published_locales": "",
+        "evidence_classification": "not_assessed",
+        "content_purpose": null,
+        "evidence_summary_en": null,
+        "evidence_summary_hi": null,
+        "applicability_en": null,
+        "applicability_hi": null,
+        "limitations_en": null,
+        "limitations_hi": null,
+        "updated_at": "2026-10-08 19:31:33.425911",
+        "updated_by": 1
+      },
+      "items": [
+        {
+          "id": 3405,
+          "protocol_id": 2293,
+          "item_type": "lifestyle",
+          "title_en": "BROWSER_PRIVATE_ITEM_4B2L",
+          "title_hi": null,
+          "instructions_en": "Synthetic browser instructions",
+          "instructions_hi": null,
+          "sort_order": 0,
+          "is_included": 0,
+          "evidence_classification": "not_assessed",
+          "content_purpose": null,
+          "limitations_en": null,
+          "limitations_hi": null
+        }
+      ],
+      "events": [
+        {
+          "id": 6,
+          "protocol_id": 2293,
+          "content_revision": 1,
+          "event_type": "content_changed",
+          "actor_id": 1,
+          "occurred_at": "2026-10-08 19:31:19.764346",
+          "locales": "",
+          "notes": "New treatment protocol draft created.",
+          "review_due_at": null,
+          "independence_confirmed": 0,
+          "content_snapshot": null,
+          "content_hash": null
+        },
+        {
+          "id": 7,
+          "protocol_id": 2293,
+          "content_revision": 2,
+          "event_type": "content_changed",
+          "actor_id": 1,
+          "occurred_at": "2026-10-08 19:31:33.427636",
+          "locales": "",
+          "notes": "New treatment item added.",
+          "review_due_at": null,
+          "independence_confirmed": 0,
+          "content_snapshot": null,
+          "content_hash": null
+        }
+      ]
+    }
+  },
+  "fixture_ids": {
+    "protocol": 2291,
+    "initial": 2292,
+    "approved": 2295,
+    "published": 2296
+  },
+  "public_projection": {
+    "protocol_id": 2296,
+    "disease_id": 1,
+    "treatment_system_id": 1,
+    "treatment_system_name": "Validation system",
+    "treatment_system_slug": "validation-system",
+    "locale": "en",
+    "title": "PUBLISHED_SYNTHETIC_FIXTURE_ONLY",
+    "overview": "Synthetic overview",
+    "content_purpose": "supportive_care",
+    "evidence_classification": "evidence_supported",
+    "evidence_summary": null,
+    "applicability": "Synthetic applicability",
+    "limitations": "Synthetic educational limitation",
+    "included_items": [
+      {
+        "item_id": 3410,
+        "item_type": "lifestyle",
+        "title": "Synthetic assessed item",
+        "instructions": "Synthetic instruction",
+        "limitations": "Synthetic item limitation",
+        "references": [
+          {
+            "reference_id": 2,
+            "source_id": 2,
+            "claim_scope": "Synthetic item claim",
+            "locator": null,
+            "source_type": "guideline",
+            "title": "Synthetic validation source",
+            "author_or_organization": null,
+            "publication": null,
+            "citation_text": "Synthetic citation, no medical claim",
+            "url": null,
+            "identifier": null,
+            "publication_date": null,
+            "edition_or_version": null,
+            "accessed_on": null
+          }
+        ]
+      }
+    ],
+    "references": [
+      {
+        "reference_id": 2,
+        "source_id": 2,
+        "claim_scope": "Synthetic protocol claim",
+        "locator": null,
+        "source_type": "guideline",
+        "title": "Synthetic validation source",
+        "author_or_organization": null,
+        "publication": null,
+        "citation_text": "Synthetic citation, no medical claim",
+        "url": null,
+        "identifier": null,
+        "publication_date": null,
+        "edition_or_version": null,
+        "accessed_on": null
+      }
+    ]
+  },
+  "harness_notes": [
+    "mysql_install_db bootstrap succeeded; optional Windows service registration failed with OpenSCManager error 5. No service was installed. Used temporary process instead.",
+    "Sandboxed startup/connect attempts did not remain available. Approved local process execution provided persistent loopback isolation.",
+    "Initial metadata probe mistakenly expected four triggers. Authoritative schema and actual metadata both have two; corrected harness expectation before seeding/application testing.",
+    "First CLI permission-failure render lacked REQUEST_URI and produced two layout warnings. Completed HTTP-context repeat passes with PHP warnings converted to failures; actual HTTP/browser pages had no warnings.",
+    "Temporary server startup explicitly reproduced the configured non-strict SQL mode; no SET SQL_MODE, global configuration change or persistent application change was made.",
+    "Governed read tests inject a policy fixture into real database-backed services only. HTTP/application HOLD configuration remains active.",
+    "The single published-state fixture was synthetic and confined to the disposable database, as expressly permitted by validation section 14. No normal/public content was published."
+  ],
+  "sql_mode_at_end": {
+    "session_sql_mode": "NO_ZERO_IN_DATE,NO_ZERO_DATE,NO_ENGINE_SUBSTITUTION",
+    "global_sql_mode": "NO_ZERO_IN_DATE,NO_ZERO_DATE,NO_ENGINE_SUBSTITUTION"
+  },
+  "live_checks": 80,
+  "regressions": {
+    "treatment-creation": 110,
+    "treatment-admin-hardening": 39,
+    "treatment-publication-correction": 17,
+    "treatment-publication": 105,
+    "treatment-governance": 88,
+    "treatment-editorial": 73,
+    "treatment-review": 130,
+    "treatment-prerequisites": {
+      "risk": 29,
+      "lifecycle": 7,
+      "comparison": 11
+    },
+    "auth-phase1": 45
+  },
+  "regression_exit_codes": {
+    "treatment-creation": 0,
+    "treatment-admin-hardening": 0,
+    "treatment-publication-correction": 0,
+    "treatment-publication": 0,
+    "treatment-governance": 0,
+    "treatment-editorial": 0,
+    "treatment-review": 0,
+    "treatment-prerequisites": 0,
+    "auth-phase1": 0
+  },
+  "distinct_regression_checks": 654,
+  "distinct_total": 734,
+  "cleanup": {
+    "database_before_drop": "kobi_phase2c4b2l_validation_20261009",
+    "database_removed": true,
+    "final_sql_mode": {
+      "session_sql_mode": "NO_ZERO_IN_DATE,NO_ZERO_DATE,NO_ENGINE_SUBSTITUTION",
+      "global_sql_mode": "NO_ZERO_IN_DATE,NO_ZERO_DATE,NO_ENGINE_SUBSTITUTION"
+    },
+    "normal_database_connection": "never made",
+    "temporary_processes_stopped": true,
+    "temporary_directory_removed": true,
+    "browser_tab_closed": true,
+    "normal_log_cleanup": "Removed only the two exact validation suffix entries; verified every prior byte retained."
+  }
+}

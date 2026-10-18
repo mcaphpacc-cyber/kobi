@@ -5,15 +5,21 @@ declare(strict_types=1);
 namespace App\Services;
 
 use Google\Client as GoogleClient;
-use Google\Service\Oauth2;
 use RuntimeException;
 
 class GoogleAuthService
 {
-    private GoogleClient $client;
+    private ?GoogleClient $client = null;
 
-    public function __construct()
+    /**
+     * Initialize inside the controller action's error boundary, not during DI resolution.
+     */
+    private function client(): GoogleClient
     {
+        if ($this->client !== null) {
+            return $this->client;
+        }
+
         $clientId = trim(
             (string) env('GOOGLE_CLIENT_ID', '')
         );
@@ -36,33 +42,35 @@ class GoogleAuthService
             );
         }
 
-        $this->client = new GoogleClient();
+        $client = new GoogleClient();
 
-        $this->client->setClientId(
+        $client->setClientId(
             $clientId
         );
 
-        $this->client->setClientSecret(
+        $client->setClientSecret(
             $clientSecret
         );
 
-        $this->client->setRedirectUri(
+        $client->setRedirectUri(
             $redirectUri
         );
 
-        $this->client->setAccessType(
+        $client->setAccessType(
             'offline'
         );
 
-        $this->client->setPrompt(
+        $client->setPrompt(
             'select_account'
         );
 
-        $this->client->setScopes([
+        $client->setScopes([
             'openid',
             'email',
             'profile'
         ]);
+
+        return $this->client = $client;
     }
 
     /**
@@ -79,9 +87,10 @@ class GoogleAuthService
             );
         }
 
-        $this->client->setState($state);
+        $client = $this->client();
+        $client->setState($state);
 
-        return $this->client
+        return $client
             ->createAuthUrl();
     }
 
@@ -108,7 +117,8 @@ class GoogleAuthService
             );
         }
 
-        $token = $this->client
+        $client = $this->client();
+        $token = $client
             ->fetchAccessTokenWithAuthCode(
                 $code
             );
@@ -134,7 +144,7 @@ class GoogleAuthService
             );
         }
 
-        $this->client->setAccessToken(
+        $client->setAccessToken(
             $token
         );
 
@@ -153,7 +163,7 @@ class GoogleAuthService
             );
         }
 
-        $payload = $this->client
+        $payload = $client
             ->verifyIdToken($idToken);
 
         if (!is_array($payload)) {

@@ -51,6 +51,14 @@
                 </li>
 
                 <li class="nav-item">
+                    <a class="nav-link" href="<?= url('/medicines') ?>">Medicines</a>
+                </li>
+
+                <li class="nav-item">
+                    <a class="nav-link" href="<?= url('/search') ?>">Search</a>
+                </li>
+
+                <li class="nav-item">
 
                     <a
                         class="nav-link"
@@ -91,26 +99,6 @@
                     <a class="nav-link disabled">
 
                         Body Parts
-
-                    </a>
-
-                </li>
-
-                <li class="nav-item">
-
-                    <a class="nav-link disabled">
-
-                        Symptoms
-
-                    </a>
-
-                </li>
-
-                <li class="nav-item">
-
-                    <a class="nav-link disabled">
-
-                        Search
 
                     </a>
 

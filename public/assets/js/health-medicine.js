@@ -9,6 +9,10 @@ document.addEventListener('DOMContentLoaded', function () {
     const stoppedOn =
         document.getElementById('stopped_on');
 
+    if (!status || !stoppedOnWrapper || !stoppedOn) {
+        return;
+    }
+
     function updateStoppedDateVisibility()
     {
         if (status.value === 'current')
@@ -92,7 +96,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             button.textContent = item.canonical_name;
 
-            button.addEventListener('mousedown', (event) => {
+            button.addEventListener('click', (event) => {
                 event.preventDefault();
 
                 selectSubstance(item.canonical_name);

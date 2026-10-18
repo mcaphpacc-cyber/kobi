@@ -1,4 +1,5 @@
 <div class="container py-4">
+    <?php require __DIR__.'/medication-schedule-nav.php'; ?>
 
     <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4">
 
@@ -138,6 +139,10 @@
                                                     $medicine['brand_name']
                                                 ) ?>
                                             </h3>
+                                            <div class="mb-2 text-break">
+                                                <a href="<?= e(url($medicineBase.'/'.$medicine['id'].'/schedule')) ?>">Schedule</a>
+                                                · <?= (int)($scheduleCounts[$medicine['id']] ?? 0) > 0 ? (int)$scheduleCounts[$medicine['id']].' active daily time(s)' : 'No schedule' ?>
+                                            </div>
 
                                             <?php if (
                                                 !empty(
@@ -189,12 +194,10 @@
                                                         '/delete'
                                                     ) ?>"
                                                     class="d-inline"
-                                                    onsubmit="return confirm(
-                                                        'Are you sure you want to delete this medicine record?'
-                                                    );"
                                                 >
 
                                                     <?= csrfField() ?>
+                                                    <label class="form-check mb-2"><input class="form-check-input" type="checkbox" name="confirm_delete" value="1" required> <span class="form-check-label">Delete medicine, schedules and history</span></label>
 
                                                     <button
                                                         type="submit"
@@ -408,6 +411,10 @@
                                                     $medicine['brand_name']
                                                 ) ?>
                                             </h3>
+                                            <div class="mb-2 text-break">
+                                                <a href="<?= e(url($medicineBase.'/'.$medicine['id'].'/schedule')) ?>">Schedule</a>
+                                                · <?= (int)($scheduleCounts[$medicine['id']] ?? 0) > 0 ? (int)$scheduleCounts[$medicine['id']].' active daily time(s)' : 'No schedule' ?>
+                                            </div>
 
                                             <?php if (
                                                 !empty(
@@ -459,12 +466,10 @@
                                                         '/delete'
                                                     ) ?>"
                                                     class="d-inline"
-                                                    onsubmit="return confirm(
-                                                        'Are you sure you want to delete this medicine record?'
-                                                    );"
                                                 >
 
                                                     <?= csrfField() ?>
+                                                    <label class="form-check mb-2"><input class="form-check-input" type="checkbox" name="confirm_delete" value="1" required> <span class="form-check-label">Delete medicine, schedules and history</span></label>
 
                                                     <button
                                                         type="submit"
@@ -704,6 +709,10 @@
                                                     $medicine['brand_name']
                                                 ) ?>
                                             </h3>
+                                            <div class="mb-2 text-break">
+                                                <a href="<?= e(url($medicineBase.'/'.$medicine['id'].'/schedule')) ?>">Schedule</a>
+                                                · <?= (int)($scheduleCounts[$medicine['id']] ?? 0) > 0 ? (int)$scheduleCounts[$medicine['id']].' active daily time(s)' : 'No schedule' ?>
+                                            </div>
 
                                             <?php if (
                                                 !empty(
@@ -755,12 +764,10 @@
                                                         '/delete'
                                                     ) ?>"
                                                     class="d-inline"
-                                                    onsubmit="return confirm(
-                                                        'Are you sure you want to delete this medicine record?'
-                                                    );"
                                                 >
 
                                                     <?= csrfField() ?>
+                                                    <label class="form-check mb-2"><input class="form-check-input" type="checkbox" name="confirm_delete" value="1" required> <span class="form-check-label">Delete medicine, schedules and history</span></label>
 
                                                     <button
                                                         type="submit"

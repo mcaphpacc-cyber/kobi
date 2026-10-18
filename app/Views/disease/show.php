@@ -94,9 +94,23 @@ $severityLevel = $disease['severity_level'] ?? '';
 
 $severityClass = $severityColors[$severityLevel] ?? 'secondary';
 
+$hasText = static fn(string $field): bool => trim((string) ($content[$field] ?? '')) !== '';
+$sections = [
+    'overview' => ['Overview', $hasText('overview_en')],
+    'symptoms' => ['Symptoms', !empty($knowledge['symptoms'])],
+    'causes' => ['Causes', $hasText('causes_en') || !empty($knowledge['causes'])],
+    'risk-factors' => ['Risk Factors', $hasText('risk_factors_en')],
+    'diagnosis' => ['Diagnosis', $hasText('diagnosis_en')],
+    'prevention' => ['Prevention', $hasText('prevention_en')],
+    'treatment' => ['Treatment', !empty($knowledge['treatments'])],
+    'diet' => ['Diet & Nutrition', !empty($knowledge['diet']['recommended']) || !empty($knowledge['diet']['avoid'])],
+    'faqs' => ['Frequently Asked Questions', !empty($knowledge['faqs'])],
+    'related-diseases' => ['Related Diseases', !empty($relatedDiseases)]
+];
+
 ?>
 
-<div class="container py-4"> 
+<div class="container py-4 disease-detail">
   <a href="<?= url('/symptom-checker'); ?>"
     class="btn btn-outline-secondary btn-sm mb-4">
       <i class="bi bi-arrow-left-circle me-2"></i>
@@ -303,11 +317,20 @@ $severityClass = $severityColors[$severityLevel] ?? 'secondary';
       </div>
     </div>
   </div>
-  <div class="card mb-4 sticky-top disease-nav">
+  <?php if (array_filter($sections, static fn(array $section): bool => $section[1])) : ?>
+  <nav class="card mb-4 disease-detail-nav" aria-label="On this page">
     <div class="card-body">
-      <div class="d-flex flex-wrap gap-2"> <a href="#overview" class="btn btn-outline-primary btn-sm"> Overview </a> <a href="#symptoms" class="btn btn-outline-primary btn-sm"> Symptoms </a> <a href="#causes" class="btn btn-outline-primary btn-sm"> Causes </a> <a href="#diagnosis" class="btn btn-outline-primary btn-sm"> Diagnosis </a> <a href="#prevention" class="btn btn-outline-primary btn-sm"> Prevention </a> <a href="#treatment" class="btn btn-outline-primary btn-sm"> Treatment </a> <a href="#diet" class="btn btn-outline-primary btn-sm"> Diets </a> <a href="#faqs" class="btn btn-outline-primary btn-sm"> Faqs </a> </div>
+      <div class="fw-semibold mb-2">On this page</div>
+      <div class="d-flex flex-wrap gap-2">
+        <?php foreach ($sections as $id => [$label, $populated]) : ?>
+          <?php if ($populated) : ?>
+            <a href="#<?= e($id); ?>" class="btn btn-outline-primary btn-sm text-wrap"><?= e($label); ?></a>
+          <?php endif; ?>
+        <?php endforeach; ?>
+      </div>
     </div>
-  </div>
+  </nav>
+  <?php endif; ?>
   <?php
 
 function renderKnowledgeSection(
@@ -315,7 +338,8 @@ function renderKnowledgeSection(
     string $title,
     string $icon,
     string $content,
-    $count = ''
+    $count = '',
+    array $references = []
 ): void
 {
   if(empty($count)){
@@ -327,12 +351,29 @@ function renderKnowledgeSection(
   <section id="<?= $id; ?>" class="mb-4">
     <div class="card shadow-sm">
       <div class="card-header">
-        <h5 class="mb-0"> <i class="bi <?= $icon; ?> me-2"></i>
+        <h2 class="h5 mb-0"> <i class="bi <?= $icon; ?> me-2" aria-hidden="true"></i>
           <?= e($title); ?> <?= $countBadge; ?>
-        </h5>
+        </h2>
       </div>
-      <div class="card-body">
+      <div class="card-body knowledge-content">
         <?= $content; ?>
+        <?php if ($references !== []) : ?>
+        <aside class="border-top mt-3 pt-3 small text-break" aria-labelledby="<?= e($id); ?>-sources">
+          <h3 class="h6" id="<?= e($id); ?>-sources">Sources for this section</h3>
+          <p class="text-muted mb-2">Sources for the English section text; this is not a KOBI clinical review.</p>
+          <ul class="mb-0 ps-3">
+            <?php foreach ($references as $reference) : ?>
+            <li class="mb-2">
+              <?= e($reference['organization']); ?> —
+              <a href="<?= e($reference['url']); ?>" target="_blank" rel="noopener noreferrer"><span class="visually-hidden">View source: </span><?= e($reference['title']); ?><span class="visually-hidden"> (opens in a new tab)</span></a>
+              <?php if (isset($reference['date'], $reference['date_type'])) : ?>
+              <div class="text-muted"><?= e($reference['date_type']); ?>: <?= e($reference['date']); ?></div>
+              <?php endif; ?>
+            </li>
+            <?php endforeach; ?>
+          </ul>
+        </aside>
+        <?php endif; ?>
       </div>
     </div>
   </section>
@@ -341,6 +382,7 @@ function renderKnowledgeSection(
 ?>
   <?php
 
+if ($sections['overview'][1]) {
 renderKnowledgeSection(
 
     'overview',
@@ -355,15 +397,15 @@ renderKnowledgeSection(
 
             $content['overview_en']
 
-            ?: 'Overview will be available soon.'
-
         )
 
     ),
 
-    ''
+    '',
+    $knowledge['section_references']['overview'] ?? []
 
 );
+}
 
 ob_start();
 
@@ -374,7 +416,7 @@ if (!empty($knowledge['symptoms'])) {
     foreach ($knowledge['symptoms'] as $symptom) {
 
         ?>
-  <span class="badge rounded-pill bg-primary fs-6 px-3 py-2"> <i class="bi bi-check-circle-fill me-1"></i>
+  <span class="badge rounded-pill bg-primary fs-6 px-3 py-2 text-wrap text-break text-start"> <i class="bi bi-check-circle-fill me-1"></i>
   <?= e($symptom['symptom_en']); ?>
   </span>
   <?php
@@ -391,6 +433,7 @@ if (!empty($knowledge['symptoms'])) {
 
 $symptomsHtml = ob_get_clean();
 
+if ($sections['symptoms'][1]) {
 renderKnowledgeSection(
 
     'symptoms',
@@ -404,13 +447,14 @@ renderKnowledgeSection(
     $stats['symptoms']
 
 );
+}
 
 ob_start();
 
 ?>
-  <div class="row">
-    <div class="col-lg-5">
-      <h6 class="fw-semibold mb-3"> Primary Causes </h6>
+      <?php if ($hasText('causes_en')) : ?>
+      <div class="mb-3"><?= nl2br(e($content['causes_en'])); ?></div>
+      <?php endif; ?>
       <?php if (!empty($knowledge['causes'])) : ?>
       <div class="d-flex flex-column gap-2">
         <?php foreach ($knowledge['causes'] as $cause) : ?>
@@ -419,38 +463,31 @@ ob_start();
         </div>
         <?php endforeach; ?>
       </div>
-      <?php else : ?>
-      <div class="text-muted"> Cause information not available. </div>
       <?php endif; ?>
-    </div>
-    <div class="col-lg-7">
-      <h6 class="fw-semibold mb-3"> Risk Factors </h6>
-      <?php if (!empty($content['risk_factors_en'])) : ?>
-      <p class="mb-0">
-        <?= nl2br(e($content['risk_factors_en'])); ?>
-      </p>
-      <?php else : ?>
-      <div class="text-muted"> Risk factor information not available. </div>
-      <?php endif; ?>
-    </div>
-  </div>
   <?php
 
 $causesHtml = ob_get_clean();
 
+if ($sections['causes'][1]) {
 renderKnowledgeSection(
 
     'causes',
 
-    'Causes & Risk Factors',
+    'Causes',
 
     'bi-bug',
 
     $causesHtml,
 
-    $stats['causes']
+    $stats['causes'],
+    $knowledge['section_references']['causes'] ?? []
 
-); ?>
+);
+}
+if ($sections['risk-factors'][1]) {
+    renderKnowledgeSection('risk-factors', 'Risk Factors', 'bi-bug', nl2br(e($content['risk_factors_en'])), '', $knowledge['section_references']['risk_factors'] ?? []);
+}
+?>
   <?php
 
 ob_start();
@@ -470,7 +507,7 @@ ob_start();
 
 $diagnosisHtml = ob_get_clean();
 
-if (!empty($knowledge['diagnosis'])) {
+if ($sections['diagnosis'][1]) {
 
     renderKnowledgeSection(
 
@@ -482,7 +519,8 @@ if (!empty($knowledge['diagnosis'])) {
 
         $diagnosisHtml,
 
-        $stats['diagnosis']
+        $stats['diagnosis'],
+        $knowledge['section_references']['diagnosis'] ?? []
 
     );
 
@@ -531,13 +569,7 @@ $preventionTips = buildPreventionTips(
 
 $preventionHtml = ob_get_clean();
 
-if (
-    !empty(
-        trim(
-            $knowledge['content']['prevention_en'] ?? ''
-        )
-    )
-) {
+if ($sections['prevention'][1]) {
 
     renderKnowledgeSection(
 
@@ -549,7 +581,8 @@ if (
 
         $preventionHtml,
 
-        $stats['prevention']
+        $stats['prevention'],
+        $knowledge['section_references']['prevention'] ?? []
 
     );
 
@@ -611,39 +644,7 @@ $cardClass =
         $treatment['treatment_system_id']
     ] ?? '';
 
-$treatmentBadges = [
-
-    1 => [
-        'text'  => 'Evidence Based',
-        'class' => 'bg-primary'
-    ],
-
-    2 => [
-        'text'  => 'Traditional',
-        'class' => 'bg-success'
-    ],
-
-    3 => [
-        'text'  => 'Complementary',
-        'class' => 'bg-secondary'
-    ],
-
-    4 => [
-        'text'  => 'Supportive',
-        'class' => 'bg-warning text-dark'
-    ],
-
-    5 => [
-        'text'  => 'Wellness',
-        'class' => 'bg-info text-dark'
-    ]
-
-];
-
-$badge =
-    $treatmentBadges[
-        $treatment['treatment_system_id']
-    ] ?? null;
+$badge = ['text' => 'Legacy information', 'class' => 'bg-secondary'];
 
 ?>
 
@@ -840,9 +841,9 @@ if (!empty($knowledge['faqs'])) {?>
   <section  id="faqs">
   <div class="card shadow-sm border-0 mt-4">
     <div class="card-header bg-white">
-      <h3 class="h4 mb-0"> <i class="bi bi-patch-question me-2"></i> Frequently Asked Questions <span class="badge bg-primary ms-2">
+      <h2 class="h5 mb-0"> <i class="bi bi-patch-question me-2" aria-hidden="true"></i> Frequently Asked Questions <span class="badge bg-primary ms-2">
         <?= count($knowledge['faqs']); ?>
-        </span> </h3>
+        </span> </h2>
     </div>
     <div class="card-body">
       <?php if (!empty($knowledge['faqs'])) : ?>
@@ -851,7 +852,7 @@ if (!empty($knowledge['faqs'])) {?>
                 id="faqAccordion">
         <?php foreach ($knowledge['faqs'] as $index => $faq) : ?>
         <div class="accordion-item faq-item mb-3">
-          <h2
+          <h3
                             class="accordion-header"
                             id="faqHeading<?= $index; ?>">
             <button
@@ -861,7 +862,7 @@ if (!empty($knowledge['faqs'])) {?>
                                 data-bs-target="#faqCollapse<?= $index; ?>"> <i class="bi bi-patch-question-fill text-primary me-2"></i>
             <?= e($faq['question_en']); ?>
             </button>
-          </h2>
+          </h3>
           <div
                             id="faqCollapse<?= $index; ?>"
                             class="accordion-collapse collapse"
@@ -883,13 +884,13 @@ if (!empty($knowledge['faqs'])) {?>
         Consult your healthcare provider for advice tailored to your condition. </div>
     </div>
   </div>
-</div>
+</section>
 <?php } ?>
 <?php if (!empty($relatedDiseases)) : ?>
 <section id="related-diseases" class="mt-5">
   <div class="d-flex justify-content-between align-items-center mb-3">
     <div>
-      <h3 class="mb-1"> <i class="bi bi-diagram-3 me-2 text-primary"></i> Related Diseases </h3>
+      <h2 class="h5 mb-1"> <i class="bi bi-diagram-3 me-2 text-primary" aria-hidden="true"></i> Related Diseases </h2>
       <div class="text-muted"> Diseases with similar symptoms or affecting the same body system. </div>
     </div>
   </div>
@@ -899,9 +900,9 @@ if (!empty($knowledge['faqs'])) {?>
       <div class="card related-disease-card h-100 shadow-sm">
         <div class="card-body d-flex flex-column">
           <div class="d-flex justify-content-between align-items-start mb-3">
-            <h5 class="card-title mb-0">
+            <h3 class="h5 card-title mb-0">
               <?= e($related['disease_en']); ?>
-            </h5>
+            </h3>
             <?php
 
                                 $score = (int) $related['similarity_score'];
@@ -968,3 +969,4 @@ if (!empty($knowledge['faqs'])) {?>
   </div>
 </section>
 <?php endif; ?>
+</div>

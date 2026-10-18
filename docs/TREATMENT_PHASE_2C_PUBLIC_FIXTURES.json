@@ -1,0 +1,20 @@
+[
+    {
+        "id": 902,
+        "title_en": "Browser changes protocol",
+        "review_state": "draft",
+        "publication_status": "unpublished"
+    },
+    {
+        "id": 903,
+        "title_en": "Pending hold sentinel",
+        "review_state": "pending_review",
+        "publication_status": "unpublished"
+    },
+    {
+        "id": 904,
+        "title_en": "Approved hold sentinel",
+        "review_state": "approved",
+        "publication_status": "unpublished"
+    }
+]

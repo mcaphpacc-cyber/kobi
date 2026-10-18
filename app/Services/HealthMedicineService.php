@@ -352,7 +352,7 @@ class HealthMedicineService
 
         $date =
             \DateTime::createFromFormat(
-                'Y-m-d',
+                '!Y-m-d',
                 $value
             );
 

@@ -16,6 +16,13 @@
 
                     <div class="list-group">
 
+                        <a href="<?= e(url('/account/saved-symptom-checks')) ?>" class="list-group-item list-group-item-action">Saved Symptom Checks</a>
+
+                        <a href="<?= e(url('/account/health-dashboard')) ?>" class="list-group-item list-group-item-action">
+                            <i class="bi bi-grid me-2"></i>
+                            Personal Health Dashboard
+                        </a>
+
                         <a
                             href="<?= e(url('/account')) ?>"
                             class="list-group-item list-group-item-action active"
@@ -258,7 +265,7 @@
                                 id="name"
                                 name="name"
                                 value="<?= e(
-                                    $user['name'] ?? ''
+                                    $profileForm['name'] ?? $user['name'] ?? ''
                                 ) ?>"
                                 maxlength="100"
                                 required
@@ -282,7 +289,7 @@
                                 id="email"
                                 name="email"
                                 value="<?= e(
-                                    $user['email'] ?? ''
+                                    $profileForm['email'] ?? $user['email'] ?? ''
                                 ) ?>"
                                 maxlength="255"
                                 required
@@ -299,6 +306,8 @@
                         </button>
 
                     </form>
+
+                    <?php require __DIR__ . '/mobile-number.php'; ?>
 
                 </div>
 

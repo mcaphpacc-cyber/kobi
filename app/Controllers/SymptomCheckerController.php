@@ -9,7 +9,8 @@ use App\Services\SymptomCheckerService;
 class SymptomCheckerController extends Controller
 {
     public function __construct(
-        private readonly SymptomCheckerService $service
+        private readonly SymptomCheckerService $service,
+        private readonly \App\Services\SavedSymptomCheckService $savedChecks
     ) {
     }
 
@@ -74,6 +75,10 @@ class SymptomCheckerController extends Controller
         $this->service->recordSearch($symptomIds);
 
         $results = $this->service->match($symptomIds);
+
+        $results['save_context'] = $this->savedChecks->capture($results);
+
+        header('Cache-Control: private, no-store');
 
         header('Content-Type: application/json');
 

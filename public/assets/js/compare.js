@@ -255,7 +255,7 @@ compareButton.addEventListener(
 
         window.location =
             window.KOBI.baseUrl +
-            'compare/result?d1=' +
+            '/compare/result?d1=' +
             encodeURIComponent(leftSlug.value) +
             '&d2=' +
             encodeURIComponent(rightSlug.value);

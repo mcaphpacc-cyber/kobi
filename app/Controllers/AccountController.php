@@ -5,19 +5,23 @@ declare(strict_types=1);
 namespace App\Controllers;
 
 use App\Core\Session;
+use App\Core\Logger;
 use App\Services\AuthService;
 use RuntimeException;
+use Throwable;
 use App\Services\SavedDiseaseService;
 use App\Services\TreatmentPreferenceService;
 use App\Services\HealthProfileService;
 use App\Services\HealthConditionService;
 use App\Services\HealthMedicineService;
+use App\Services\MedicationScheduleService;
 use App\Services\HealthAllergyService;
 use App\Services\HealthProcedureService;
 use App\Services\HealthTimelineService;
 use App\Services\MedicalSummaryService;
 use App\Services\MedicalSummaryShareService;
 use App\Services\HealthDocumentService;
+use App\Services\HealthInsuranceService;
 use App\Services\HealthProfileInvitationService;
 use App\Services\SubstanceService;
 use App\Services\EmailVerificationService;
@@ -42,7 +46,9 @@ class AccountController extends Controller
         private HealthProfileInvitationService $healthProfileInvitationService,
         private UserAuthIdentityService $userAuthIdentityService,
         private EmailVerificationService $emailVerificationService,
-        private SubstanceService $substanceService
+        private SubstanceService $substanceService,
+        private MedicationScheduleService $medicationScheduleService,
+        private HealthInsuranceService $healthInsuranceService
     ) {
     }
 
@@ -53,29 +59,30 @@ class AccountController extends Controller
             redirect('/login');
         }
 
+        $error = $this->session->get('google_auth_error');
+        $this->session->remove('google_auth_error');
+
+        $this->view('account/index', $this->accountViewData(
+            is_string($error) ? ['error' => $error] : []
+        ));
+    }
+
+    private function accountViewData(array $messages = []): array
+    {
         $user = $this->authService->user();
 
-        $identities =
-            $this->userAuthIdentityService
-                ->getForUser(
-                    (int) $user['id']
-                );
+        if (!$user) {
+            redirect('/login');
+        }
 
-        $hasPassword =
-            $this->userAuthIdentityService
-                ->hasPassword(
-                    (int) $user['id']
-                );
+        $userId = (int) $user['id'];
 
-        $this->view(
-            'account/index',
-            [
-                'title' => 'My Account',
-                'user' => $user,
-                'identities' => $identities,
-                'hasPassword' => $hasPassword
-            ]
-        );
+        return array_merge([
+            'title' => 'My Account',
+            'user' => $user,
+            'identities' => $this->userAuthIdentityService->getForUser($userId),
+            'hasPassword' => $this->userAuthIdentityService->hasPassword($userId)
+        ], $messages);
     }
 
     public function savedDiseases(): void
@@ -463,7 +470,8 @@ class AccountController extends Controller
                     ' - Current Medicines',
 
                 'profile' => $profile,
-                'medicines' => $medicines
+                'medicines' => $medicines,
+                'scheduleCounts' => $this->medicationScheduleService->summary($profileId)
             ]
         );
     }
@@ -1814,7 +1822,9 @@ class AccountController extends Controller
         $this->view(
             'account/medical-summary',
             [
-                'summary' => $summary
+                'summary' => $summary,
+                'insurancePolicies' => $this->healthInsuranceService->getPolicies($profileId),
+                'medicalSummaryStyles' => true
             ]
         );
     }
@@ -1868,19 +1878,43 @@ class AccountController extends Controller
                 '/account?profile_updated=1'
             );
         }
-        catch (RuntimeException $exception)
+        catch (Throwable $exception)
         {
-            $user = $this->authService->user();
-
-            $this->view(
-                'account/index',
-                [
-                    'title' => 'My Account',
-                    'user'  => $user,
-                    'error' => $exception->getMessage()
-                ]
-            );
+            $this->renderAuthenticationError($exception, 'error', 'Unable to update your profile. Please try again.', [
+                'name' => is_string($_POST['name'] ?? null) ? $_POST['name'] : '',
+                'email' => is_string($_POST['email'] ?? null) ? $_POST['email'] : ''
+            ]);
         }
+    }
+
+    public function updateMobileNumber(): void
+    {
+        if (!$this->authService->check() || $this->authService->user() === null) {
+            redirect('/login');
+        }
+        try {
+            $token = $_POST['_csrf_token'] ?? null;
+            if (!is_string($token) || !$this->session->verifyCsrfToken($token)) {
+                throw new RuntimeException('Invalid security token. Please try again.');
+            }
+            $this->authService->updateMobileNumber($_POST['mobile_number'] ?? '');
+        } catch (Throwable $exception) {
+            $allowed = [
+                'Enter a mobile number of at most 64 characters.',
+                'Use digits and an international + prefix. Spaces, hyphens and parentheses are allowed.',
+                'Enter an international number beginning with + and containing 2 to 15 digits.',
+                'Invalid security token. Please try again.',
+            ];
+            $safe = get_class($exception) === RuntimeException::class && in_array($exception->getMessage(), $allowed, true);
+            if (!$safe) { Logger::error('Account mobile update failed (' . get_class($exception) . ').'); }
+            http_response_code($safe ? 400 : 500);
+            $this->view('account/index', $this->accountViewData([
+                'mobileError' => $safe ? $exception->getMessage() : 'Unable to update your mobile number. Please try again.',
+                'mobileForm' => is_string($_POST['mobile_number'] ?? null) ? mb_substr($_POST['mobile_number'], 0, 64) : '',
+            ]));
+            return;
+        }
+        redirect('/account?mobile_updated=1#profile');
     }
 
     private function verifyCsrf(): void
@@ -1939,18 +1973,9 @@ class AccountController extends Controller
             redirect('/account?password_updated=1');
 
         }
-        catch (RuntimeException $exception)
+        catch (Throwable $exception)
         {
-            $user = $this->authService->user();
-
-            $this->view(
-                'account/index',
-                [
-                    'title' => 'My Account',
-                    'user'  => $user,
-                    'passwordError' => $exception->getMessage()
-                ]
-            );
+            $this->renderAuthenticationError($exception, 'passwordError', 'Unable to update your password. Please try again.');
         }
     }
 
@@ -2100,7 +2125,15 @@ class AccountController extends Controller
                 'account/health-record-create',
                 [
                     'title' => 'Add Family Health Profile',
-                    'error' => $exception->getMessage()
+                    'error' => $this->healthProfileErrorMessage(
+                        $exception,
+                        'Unable to create the health profile. Please try again.'
+                    ),
+                    'old' => [
+                        'full_name' => is_string($_POST['full_name'] ?? null) ? $_POST['full_name'] : '',
+                        'date_of_birth' => is_string($_POST['date_of_birth'] ?? null) ? $_POST['date_of_birth'] : '',
+                        'gender' => is_string($_POST['gender'] ?? null) ? $_POST['gender'] : 'unspecified'
+                    ]
                 ]
             );
         }
@@ -2211,10 +2244,45 @@ class AccountController extends Controller
                     'profile' => $profile,
 
                     'error' =>
-                        $exception->getMessage()
+                        $this->healthProfileErrorMessage(
+                            $exception,
+                            'Unable to update the health profile. Please try again.'
+                        ),
+                    'old' => [
+                        'full_name' => is_string($_POST['full_name'] ?? null) ? $_POST['full_name'] : '',
+                        'date_of_birth' => is_string($_POST['date_of_birth'] ?? null) ? $_POST['date_of_birth'] : '',
+                        'gender' => is_string($_POST['gender'] ?? null) ? $_POST['gender'] : 'unspecified'
+                    ]
                 ]
             );
         }
+    }
+
+    private function healthProfileErrorMessage(Throwable $exception, string $fallback): string
+    {
+        $safeMessages = [
+            'Invalid security token. Please try again.',
+            'Name is required.',
+            'Full name is required.',
+            'Invalid gender.',
+            'Invalid date format.',
+            'Date of birth cannot be in the future.',
+            'Unable to update the health profile.'
+        ];
+
+        if (get_class($exception) === RuntimeException::class &&
+            in_array($exception->getMessage(), $safeMessages, true)) {
+            return $exception->getMessage();
+        }
+
+        Logger::error(sprintf(
+            'Health profile save failed: %s (code %s) at %s:%d',
+            get_class($exception),
+            (string) $exception->getCode(),
+            $exception->getFile(),
+            $exception->getLine()
+        ));
+        return $fallback;
     }
 
     public function createMedicalSummaryShare(
@@ -3010,40 +3078,72 @@ class AccountController extends Controller
                 '/account?google_unlinked=1'
             );
 
-        } catch (RuntimeException $exception) {
-
-            $user = $this->authService->user();
-
-            $identities =
-                $user
-                    ? $this->userAuthIdentityService
-                        ->getForUser(
-                            (int) $user['id']
-                        )
-                    : [];
-
-            $this->view(
-                'account/index',
-                [
-                    'title' => 'My Account',
-                    'user' => $user,
-                    'identities' => $identities,
-                    'error' => $exception->getMessage()
-                ]
-            );
+        } catch (Throwable $exception) {
+            $this->renderAuthenticationError($exception, 'error', 'Unable to disconnect Google. Please try again.');
         }
     }
 
-    public function hasPassword(
-        int $userId
-    ): bool {
-        if ($userId <= 0) {
-            return false;
+    private function renderAuthenticationError(Throwable $exception, string $field, string $fallback, ?array $profileForm = null): void
+    {
+        $safeMessages = [
+            'Invalid security token. Please try again.',
+            'Name is required.',
+            'Name must not exceed 100 characters.',
+            'Please provide a valid email address.',
+            'Email address is too long.',
+            'An account with this email address already exists.',
+            'You must be logged in to update your profile.',
+            'Unable to retrieve your current profile.',
+            'Unable to update your profile.',
+            'Unable to retrieve your updated profile.',
+            'Invalid user account.',
+            'The user account could not be found.',
+            'This account is currently inactive.',
+            'This email address is already verified.',
+            'Please wait before requesting another verification email.',
+            'Unable to create a secure authentication token.',
+            'You must be logged in to change your password.',
+            'Current password is required.',
+            'Current password is incorrect.',
+            'New password must be at least 8 characters long.',
+            'New passwords do not match.',
+            'Unable to secure the new password.',
+            'Unable to update your password.',
+            'Invalid authentication identity.',
+            'Authentication identity not found.',
+            'You cannot disconnect your only authentication method. Please set a KOBI password first.'
+        ];
+
+        $message = $fallback;
+
+        if (get_class($exception) === RuntimeException::class &&
+            in_array($exception->getMessage(), $safeMessages, true)) {
+            $message = $exception->getMessage();
+        } else {
+            $this->logAuthenticationFailure($exception);
         }
 
-        return $this->userRepository->hasPassword(
-            $userId
-        );
+        try {
+            $this->view('account/index', $this->accountViewData([
+                $field => $message,
+                'profileForm' => $profileForm
+            ]));
+        } catch (Throwable $renderFailure) {
+            $this->logAuthenticationFailure($renderFailure);
+            // If account data is unavailable, avoid a second exception reaching debug output.
+            abort(500, 'Unable to load your account. Please try again.');
+        }
+    }
+
+    private function logAuthenticationFailure(Throwable $exception): void
+    {
+        Logger::error(sprintf(
+            'Account authentication failed: %s (code %s) at %s:%d',
+            get_class($exception),
+            (string) $exception->getCode(),
+            $exception->getFile(),
+            $exception->getLine()
+        ));
     }
 
 }

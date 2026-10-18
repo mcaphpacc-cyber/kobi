@@ -6,8 +6,10 @@ namespace App\Controllers;
 
 use App\Core\Request;
 use App\Core\Session;
+use App\Core\Logger;
 use App\Services\AuthService;
 use RuntimeException;
+use Throwable;
 use App\Services\HealthProfileService;
 use App\Services\MailService;
 use App\Services\UserAuthTokenService;
@@ -78,13 +80,26 @@ class AuthController extends Controller
                 ]
             );
 
-        } catch (RuntimeException $exception) {
+        } catch (Throwable $exception) {
 
             $this->view(
                 'auth/register',
                 [
                     'title' => 'Create Account',
-                    'error' => $exception->getMessage(),
+                    'error' => $this->authenticationErrorMessage($exception, [
+                        'Name is required.',
+                        'Name must not exceed 100 characters.',
+                        'Please provide a valid email address.',
+                        'Email address is too long.',
+                        'Password must be at least 8 characters long.',
+                        'An account with this email address already exists.',
+                        'Unable to secure the password.',
+                        'Unable to retrieve the newly created account.',
+                        'Invalid user account.',
+                        'The user account could not be found.',
+                        'This account is currently inactive.',
+                        'This email address is already verified.'
+                    ], 'Unable to create your account. Please try again.'),
                     'old' => [
                         'name' => (string) $this->request->post(
                             'name',
@@ -135,9 +150,13 @@ class AuthController extends Controller
 
             $this->redirectAfterAuthentication();
 
-        } catch (RuntimeException $exception) {
+        } catch (Throwable $exception) {
 
-            $message = $exception->getMessage();
+            $message = $this->authenticationErrorMessage($exception, [
+                'Invalid email address or password.',
+                'This account is currently inactive.',
+                'Please verify your email address before logging in.'
+            ], 'Unable to log in. Please try again.');
 
             $this->view(
                 'auth/login',
@@ -527,13 +546,17 @@ class AuthController extends Controller
                 ]
             );
 
-        } catch (RuntimeException $exception) {
+        } catch (Throwable $exception) {
 
             $this->view(
                 'auth/forgot-password',
                 [
                     'title' => 'Forgot Password',
-                    'error' => $exception->getMessage(),
+                    'error' => $this->authenticationErrorMessage(
+                        $exception,
+                        [],
+                        'Unable to request a password reset. Please try again.'
+                    ),
                     'email' => (string) $this->request->post(
                         'email',
                         ''
@@ -657,13 +680,17 @@ class AuthController extends Controller
                 ]
             );
 
-        } catch (RuntimeException $exception) {
+        } catch (Throwable $exception) {
 
             $this->view(
                 'auth/verification-failed',
                 [
                     'title' => 'Password Reset',
-                    'error' => $exception->getMessage()
+                    'error' => $this->passwordResetErrorMessage($exception),
+                    'heading' => 'Password Reset Failed',
+                    'instructions' => 'This password-reset link is invalid or has expired. Please request a new password-reset link and try again.',
+                    'actionUrl' => url('/forgot-password'),
+                    'actionLabel' => 'Request a new password-reset link'
                 ]
             );
         }
@@ -698,8 +725,10 @@ class AuthController extends Controller
                 ''
             );
 
+            $this->authService->validateNewPassword($password, $confirmation);
+
             /*
-            * Consume only after the token has been validated.
+            * Consume only after the submitted password data is valid.
             */
             $record = $this->userAuthTokenService
                 ->consumePasswordResetToken($token);
@@ -712,13 +741,13 @@ class AuthController extends Controller
 
             redirect('/login');
 
-        } catch (RuntimeException $exception) {
+        } catch (Throwable $exception) {
 
             $this->view(
                 'auth/reset-password',
                 [
                     'title' => 'Reset Password',
-                    'error' => $exception->getMessage(),
+                    'error' => $this->passwordResetErrorMessage($exception),
                     'token' => (string) $this->request->post(
                         'token',
                         ''
@@ -728,5 +757,51 @@ class AuthController extends Controller
         }
     }
 
-    
+    private function authenticationErrorMessage(Throwable $exception, array $safeMessages, string $fallback): string
+    {
+        $safeMessages[] = 'Invalid security token. Please try again.';
+        if (get_class($exception) === RuntimeException::class &&
+            in_array($exception->getMessage(), $safeMessages, true)) {
+            return $exception->getMessage();
+        }
+
+        Logger::error(sprintf(
+            'Authentication request failed: %s (code %s) at %s:%d',
+            get_class($exception),
+            (string) $exception->getCode(),
+            $exception->getFile(),
+            $exception->getLine()
+        ));
+        return $fallback;
+    }
+
+    private function passwordResetErrorMessage(Throwable $exception): string
+    {
+        $safeMessages = [
+            'Invalid security token. Please try again.',
+            'New password must be at least 8 characters long.',
+            'New passwords do not match.',
+            'Invalid or expired token.',
+            'Invalid user account.',
+            'The user account could not be found.',
+            'This account is currently inactive.',
+            'Unable to secure the new password.',
+            'Unable to reset your password.'
+        ];
+
+        if (get_class($exception) === RuntimeException::class &&
+            in_array($exception->getMessage(), $safeMessages, true)) {
+            return $exception->getMessage();
+        }
+
+        Logger::error(sprintf(
+            'Password reset failed: %s (code %s) at %s:%d',
+            get_class($exception),
+            (string) $exception->getCode(),
+            $exception->getFile(),
+            $exception->getLine()
+        ));
+
+        return 'Unable to reset your password. Please try again.';
+    }
 }

@@ -9,6 +9,14 @@
 
 "use strict";
 
+function hideSavedCheckControl() {
+    document.getElementById("savedCheckControls")?.classList.add("d-none");
+    const button = document.getElementById("saveCheckButton");
+    if (button) button.disabled = true;
+    const key = document.getElementById("savedCheckKey");
+    if (key) key.value = "";
+}
+
 /******************************************************************
  * Configuration
  ******************************************************************/
@@ -36,6 +44,8 @@ const state = {
     timer: null,
 
     results: null,
+
+    matchLoading: false,
 
     highlightedIndex: -1,
 
@@ -427,6 +437,7 @@ function addSymptom(id, name)
 
 function renderSelected()
 {
+    hideSavedCheckControl();
     const count =
         state.selectedSymptoms.length;
 
@@ -444,7 +455,7 @@ function renderSelected()
     if (dom.button)
     {
         dom.button.disabled =
-            count === 0;
+            count === 0 || state.matchLoading;
     }
 
     renderTags();
@@ -500,6 +511,11 @@ function removeSymptom(id)
 
 function loadMatches()
 {
+    if (state.matchLoading)
+    {
+        return;
+    }
+
     document
     .getElementById("emptyState")
     .classList.add("d-none");
@@ -514,6 +530,10 @@ function loadMatches()
         return;
     }
 
+    state.results = null;
+    dom.matchResults.innerHTML = "";
+    hideSavedCheckControl();
+    state.matchLoading = true;
     showLoading();
 
     dom.button.disabled = true;
@@ -527,43 +547,56 @@ function loadMatches()
         .map(symptom => symptom.id)
         .join(",");
 
-    fetch("./api/symptom-checker?symptoms=" + ids)
+    return fetch("./api/symptom-checker?symptoms=" + ids)
 
-        .then(response => response.json())
+        .then(response => {
+            if (!response.ok)
+            {
+                throw new Error("Match request failed");
+            }
+
+            return response.json();
+        })
 
         .then(data => {
 
             hideLoading();
 
-            state.results = data;
-
-            if (data.length === 0)
+            if (ids !== state.selectedSymptoms.map(symptom => symptom.id).join(","))
             {
-                hideLoading();
-
                 showEmptyState(
-                    "No matching conditions found.",
-                    "Try adding more symptoms or removing one of your selected symptoms."
+                    "Your selected symptoms changed.",
+                    "Check matches again for your current selection."
                 );
-
                 return;
             }
+
+            if (!data || !Array.isArray(data.results))
+            {
+                throw new Error("Invalid match response");
+            }
+
+            state.results = data;
 
             renderMatches();
 
         })
 
-        .catch(error => {
+        .catch(() => {
 
-            hideLoading();
-
-            console.error(error);
+            state.results = null;
+            showEmptyState(
+                "Unable to find matches right now.",
+                "Please try again using Find Possible Conditions. Your selected symptoms have been kept."
+            );
 
         })
 
         .finally(() => {
 
-            dom.button.disabled = true;
+            hideLoading();
+            state.matchLoading = false;
+            dom.button.disabled = state.selectedSymptoms.length === 0;
 
             dom.button.innerHTML =
                 "Find Possible Conditions";
@@ -607,33 +640,37 @@ function renderMatches()
     const results =
         response.results;
     
-    //updateResultsSummary(results);
-
     dom.matchResults.innerHTML = "";
 
     if (results.length === 0) {
-
-        dom.matchResults.innerHTML = `
-
-            <div class="alert alert-info">
-
-                No matching conditions found.
-
-            </div>
-
-        `;
-
-        document
-            .getElementById("resultsSummary")
-            .classList.add("d-none");
-
-        return;
-
+        showEmptyState(
+            "No matching conditions found.",
+            "Try adding more symptoms or removing one of your selected symptoms."
+        );
+    }
+    else {
+        dom.matchResults.innerHTML = renderDiseaseCards(results);
     }
 
-    document.getElementById("resultsSummary").innerHTML = renderSummary(summary);
+    const summaryElement = document.getElementById("resultsSummary");
+    summaryElement.classList.toggle("d-none", !summary);
+    summaryElement.innerHTML = summary ? renderSummary(summary) : "";
 
-    dom.matchResults.innerHTML = renderDiseaseCards(results);
+    const controls = document.getElementById("savedCheckControls");
+    if (controls) {
+        controls.classList.remove("d-none");
+        const button = document.getElementById("saveCheckButton");
+        if (button) {
+            const key = response.save_context?.key;
+            const sameSelection = JSON.stringify(summary?.selectedSymptoms) === JSON.stringify(state.selectedSymptoms.map(s => s.id));
+            button.disabled = !key || !sameSelection;
+            document.getElementById("savedCheckKey").value = sameSelection && key ? key : "";
+            document.getElementById("saveCheckStatus").textContent = key && sameSelection
+                ? "Only your latest completed check in this session can be saved, for up to one hour."
+                : "Run a new check before saving. Saving this result is unavailable.";
+        }
+    }
+
 }
 
 /******************************************************************
@@ -755,7 +792,7 @@ function renderDiseaseCards(results)
 
 function renderDiseaseCard(item, rank)
 {
-    const badge = getMatchBadge(item.matchLevel);
+    const badge = getMatchBadge();
     const confidence = getConfidence(item.rankingScore);
     const severity = getSeverity(item.disease.severity_level);
 
@@ -938,8 +975,7 @@ function renderDiseaseCard(item, rank)
 
         <div class="small text-muted fst-italic mt-3">
 
-            Educational information only.
-            This is not a medical diagnosis.
+            Results are ranked by symptom overlap and are not a diagnosis.
 
         </div>
         <div class="text-end mt-4">
@@ -1077,41 +1113,12 @@ function renderProgress(title, value, color)
  * Match Badge
  ******************************************************************/
 
-function getMatchBadge(level)
+function getMatchBadge()
 {
-    switch(level){
-
-        case "strong":
-
-            return {
-
-                className: "bg-success",
-
-                text: "Strong Symptom Overlap"
-
-            };
-
-        case "moderate":
-
-            return {
-
-                className: "bg-warning text-dark",
-
-                text: "Moderate Symptom Overlap"
-
-            };
-
-        default:
-
-            return {
-
-                className: "bg-secondary",
-
-                text: "Limited Symptom Overlap"
-
-            };
-
-    }
+    return {
+        className: "bg-secondary",
+        text: "Symptom match"
+    };
 }
 
 function showLoading()
@@ -1358,7 +1365,7 @@ function renderConfidence(item)
 
                     <h6 class="mb-1">
 
-                        Clinical Confidence
+                        Symptom Match
 
                     </h6>
 
@@ -1383,7 +1390,7 @@ function renderConfidence(item)
 
                     <span class="badge bg-${confidence.color}">
 
-                        ${Math.round(score)}%
+                        ${Math.round(score)}% match
 
                     </span>
 
@@ -1401,7 +1408,7 @@ function renderConfidence(item)
 
             <h6 class="mb-3">
 
-                Confidence Reason
+                Symptom Match Reason
 
             </h6>
 
@@ -1818,6 +1825,14 @@ function bindRemoveTagButtons()
         .querySelectorAll(".remove-tag")
         .forEach(button => {
 
+            const symptom = state.selectedSymptoms.find(
+                item => Number(item.id) === Number(button.dataset.id)
+            );
+            if (symptom)
+            {
+                button.setAttribute("aria-label", "Remove " + symptom.name);
+            }
+
             button.addEventListener("click", () => {
 
                 removeSymptom(
@@ -1831,6 +1846,7 @@ function bindRemoveTagButtons()
 
 function clearSymptoms()
 {
+    hideSavedCheckControl();
     state.selectedSymptoms = [];
 
     state.results = null;
@@ -1841,6 +1857,9 @@ function clearSymptoms()
     dom.searchResults.classList.add("d-none");
 
     dom.matchResults.innerHTML = "";
+
+    document.getElementById("resultsSummary").classList.add("d-none");
+    document.getElementById("emptyState").classList.add("d-none");
 
     dom.searchBox.focus();
 }

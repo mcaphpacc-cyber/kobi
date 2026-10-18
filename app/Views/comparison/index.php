@@ -192,4 +192,4 @@ $selectedDisease = $leftDisease['disease'] ?? null;
 
 </div>
 <script src="<?= asset('js/kobi-config.js') ?>"></script>
-<script src="<?= asset('js/compare.js') ?>"></script>
+<script src="<?= asset('js/compare.js') ?>?v=<?= filemtime(dirname(__DIR__, 3) . '/public/assets/js/compare.js') ?>"></script>

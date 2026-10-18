@@ -309,4 +309,4 @@ href="<?= url('/disease/' . $disease['slug']) ?>">
 
 </div>
 
-<script src="<?= asset('js/home.js') ?>"></script>
+<script src="<?= asset('js/home.js') ?>?v=<?= filemtime(dirname(__DIR__, 3) . '/public/assets/js/home.js') ?>"></script>

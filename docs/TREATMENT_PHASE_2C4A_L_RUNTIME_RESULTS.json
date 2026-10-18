@@ -1,0 +1,805 @@
+{
+  "status": "PASS",
+  "environment": {
+    "version": "10.4.27-MariaDB",
+    "session_mode": "NO_ZERO_IN_DATE,NO_ZERO_DATE,NO_ENGINE_SUBSTITUTION",
+    "global_mode": "NO_ZERO_IN_DATE,NO_ZERO_DATE,NO_ENGINE_SUBSTITUTION",
+    "datadir": "D:\\xampp\\htdocs\\kobi\\.phase2c4al-validation\\data\\"
+  },
+  "tests": [
+    {
+      "name": "Actual policy remains HOLD",
+      "status": "PASS",
+      "detail": null
+    },
+    {
+      "name": "Positive persisted published fixture is CANDIDATE",
+      "status": "PASS",
+      "detail": null
+    },
+    {
+      "name": "HOLD projection remains null",
+      "status": "PASS",
+      "detail": null
+    },
+    {
+      "name": "HOLD public list empty",
+      "status": "PASS",
+      "detail": null
+    },
+    {
+      "name": "Real disease HOLD path empty",
+      "status": "PASS",
+      "detail": null
+    },
+    {
+      "name": "Real comparison HOLD paths empty",
+      "status": "PASS",
+      "detail": null
+    },
+    {
+      "name": "Protocol projection exact allowlist",
+      "status": "PASS",
+      "detail": null
+    },
+    {
+      "name": "Item projection exact allowlist",
+      "status": "PASS",
+      "detail": null
+    },
+    {
+      "name": "Citation projection exact allowlist",
+      "status": "PASS",
+      "detail": null
+    },
+    {
+      "name": "Projection includes only included items in deterministic order",
+      "status": "PASS",
+      "detail": null
+    },
+    {
+      "name": "Projection has no internal keys or sentinels",
+      "status": "PASS",
+      "detail": []
+    },
+    {
+      "name": "A wrong approval event type",
+      "status": "PASS",
+      "detail": null
+    },
+    {
+      "name": "A wrong approval event type read has no writes",
+      "status": "PASS",
+      "detail": null
+    },
+    {
+      "name": "A wrong approval event type restored candidate",
+      "status": "PASS",
+      "detail": null
+    },
+    {
+      "name": "B actual approval revision FK backstop",
+      "status": "PASS",
+      "detail": [
+        "23000",
+        1451,
+        "Cannot delete or update a parent row: a foreign key constraint fails (`kobi_phase2c4al_validation_20261008`.`treatment_protocols`, CONSTRAINT `fk_treatment_approved_revision` FOREIGN KEY (`id`, `content_revision`, `approved_review_id`) REFERENCES `treatment_prot)"
+      ]
+    },
+    {
+      "name": "B snapshot approval revision mismatch",
+      "status": "PASS",
+      "detail": null
+    },
+    {
+      "name": "B snapshot approval revision mismatch read has no writes",
+      "status": "PASS",
+      "detail": null
+    },
+    {
+      "name": "B snapshot approval revision mismatch restored candidate",
+      "status": "PASS",
+      "detail": null
+    },
+    {
+      "name": "C snapshot hash mismatch",
+      "status": "PASS",
+      "detail": null
+    },
+    {
+      "name": "C snapshot hash mismatch read has no writes",
+      "status": "PASS",
+      "detail": null
+    },
+    {
+      "name": "C snapshot hash mismatch restored candidate",
+      "status": "PASS",
+      "detail": null
+    },
+    {
+      "name": "D expired review",
+      "status": "PASS",
+      "detail": null
+    },
+    {
+      "name": "D expired review read has no writes",
+      "status": "PASS",
+      "detail": null
+    },
+    {
+      "name": "D expired review restored candidate",
+      "status": "PASS",
+      "detail": null
+    },
+    {
+      "name": "E unapproved unpublished Hindi DENY",
+      "status": "PASS",
+      "detail": null
+    },
+    {
+      "name": "F missing title_en",
+      "status": "PASS",
+      "detail": null
+    },
+    {
+      "name": "F missing title_en read has no writes",
+      "status": "PASS",
+      "detail": null
+    },
+    {
+      "name": "F missing title_en restored candidate",
+      "status": "PASS",
+      "detail": null
+    },
+    {
+      "name": "G missing overview_en",
+      "status": "PASS",
+      "detail": null
+    },
+    {
+      "name": "G missing overview_en read has no writes",
+      "status": "PASS",
+      "detail": null
+    },
+    {
+      "name": "G missing overview_en restored candidate",
+      "status": "PASS",
+      "detail": null
+    },
+    {
+      "name": "H missing applicability_en",
+      "status": "PASS",
+      "detail": null
+    },
+    {
+      "name": "H missing applicability_en read has no writes",
+      "status": "PASS",
+      "detail": null
+    },
+    {
+      "name": "H missing applicability_en restored candidate",
+      "status": "PASS",
+      "detail": null
+    },
+    {
+      "name": "I missing limitations_en",
+      "status": "PASS",
+      "detail": null
+    },
+    {
+      "name": "I missing limitations_en read has no writes",
+      "status": "PASS",
+      "detail": null
+    },
+    {
+      "name": "I missing limitations_en restored candidate",
+      "status": "PASS",
+      "detail": null
+    },
+    {
+      "name": "J unsupported evidence",
+      "status": "PASS",
+      "detail": null
+    },
+    {
+      "name": "J unsupported evidence read has no writes",
+      "status": "PASS",
+      "detail": null
+    },
+    {
+      "name": "J unsupported evidence restored candidate",
+      "status": "PASS",
+      "detail": null
+    },
+    {
+      "name": "K risk not_eligible",
+      "status": "PASS",
+      "detail": null
+    },
+    {
+      "name": "K risk not_eligible read has no writes",
+      "status": "PASS",
+      "detail": null
+    },
+    {
+      "name": "K risk not_eligible restored candidate",
+      "status": "PASS",
+      "detail": null
+    },
+    {
+      "name": "L risk not_assessed",
+      "status": "PASS",
+      "detail": null
+    },
+    {
+      "name": "L risk not_assessed read has no writes",
+      "status": "PASS",
+      "detail": null
+    },
+    {
+      "name": "L risk not_assessed restored candidate",
+      "status": "PASS",
+      "detail": null
+    },
+    {
+      "name": "M no included items",
+      "status": "PASS",
+      "detail": null
+    },
+    {
+      "name": "M no included items read has no writes",
+      "status": "PASS",
+      "detail": null
+    },
+    {
+      "name": "M no included items restored candidate",
+      "status": "PASS",
+      "detail": null
+    },
+    {
+      "name": "N one included item missing instructions",
+      "status": "PASS",
+      "detail": null
+    },
+    {
+      "name": "N one included item missing instructions read has no writes",
+      "status": "PASS",
+      "detail": null
+    },
+    {
+      "name": "N one included item missing instructions restored candidate",
+      "status": "PASS",
+      "detail": null
+    },
+    {
+      "name": "O one included item unsupported evidence",
+      "status": "PASS",
+      "detail": null
+    },
+    {
+      "name": "O one included item unsupported evidence read has no writes",
+      "status": "PASS",
+      "detail": null
+    },
+    {
+      "name": "O one included item unsupported evidence restored candidate",
+      "status": "PASS",
+      "detail": null
+    },
+    {
+      "name": "P protocol source withdrawn",
+      "status": "PASS",
+      "detail": null
+    },
+    {
+      "name": "P protocol source withdrawn read has no writes",
+      "status": "PASS",
+      "detail": null
+    },
+    {
+      "name": "P protocol source withdrawn restored candidate",
+      "status": "PASS",
+      "detail": null
+    },
+    {
+      "name": "Q protocol source unverified",
+      "status": "PASS",
+      "detail": null
+    },
+    {
+      "name": "Q protocol source unverified read has no writes",
+      "status": "PASS",
+      "detail": null
+    },
+    {
+      "name": "Q protocol source unverified restored candidate",
+      "status": "PASS",
+      "detail": null
+    },
+    {
+      "name": "R item source withdrawn",
+      "status": "PASS",
+      "detail": null
+    },
+    {
+      "name": "R item source withdrawn read has no writes",
+      "status": "PASS",
+      "detail": null
+    },
+    {
+      "name": "R item source withdrawn restored candidate",
+      "status": "PASS",
+      "detail": null
+    },
+    {
+      "name": "S item source unverified",
+      "status": "PASS",
+      "detail": null
+    },
+    {
+      "name": "S item source unverified read has no writes",
+      "status": "PASS",
+      "detail": null
+    },
+    {
+      "name": "S item source unverified restored candidate",
+      "status": "PASS",
+      "detail": null
+    },
+    {
+      "name": "T inactive system",
+      "status": "PASS",
+      "detail": null
+    },
+    {
+      "name": "T inactive system read has no writes",
+      "status": "PASS",
+      "detail": null
+    },
+    {
+      "name": "T inactive system restored candidate",
+      "status": "PASS",
+      "detail": null
+    },
+    {
+      "name": "U wrong requested disease DENY",
+      "status": "PASS",
+      "detail": null
+    },
+    {
+      "name": "U incoherent approved disease relationship",
+      "status": "PASS",
+      "detail": null
+    },
+    {
+      "name": "U incoherent approved disease relationship read has no writes",
+      "status": "PASS",
+      "detail": null
+    },
+    {
+      "name": "U incoherent approved disease relationship restored candidate",
+      "status": "PASS",
+      "detail": null
+    },
+    {
+      "name": "V unresolved invalidation DENY",
+      "status": "PASS",
+      "detail": null
+    },
+    {
+      "name": "V restored candidate",
+      "status": "PASS",
+      "detail": null
+    },
+    {
+      "name": "assessment no persisted writes",
+      "status": "PASS",
+      "detail": null
+    },
+    {
+      "name": "assessment SQL has no DML",
+      "status": "PASS",
+      "detail": null
+    },
+    {
+      "name": "projection no persisted writes",
+      "status": "PASS",
+      "detail": null
+    },
+    {
+      "name": "projection SQL has no DML",
+      "status": "PASS",
+      "detail": null
+    },
+    {
+      "name": "disease list no persisted writes",
+      "status": "PASS",
+      "detail": null
+    },
+    {
+      "name": "disease list SQL has no DML",
+      "status": "PASS",
+      "detail": null
+    },
+    {
+      "name": "DiseaseService no persisted writes",
+      "status": "PASS",
+      "detail": null
+    },
+    {
+      "name": "DiseaseService SQL has no DML",
+      "status": "PASS",
+      "detail": null
+    },
+    {
+      "name": "comparison no persisted writes",
+      "status": "PASS",
+      "detail": null
+    },
+    {
+      "name": "comparison SQL has no DML",
+      "status": "PASS",
+      "detail": null
+    },
+    {
+      "name": "Actual batch has ten published candidates and excludes draft",
+      "status": "PASS",
+      "detail": null
+    },
+    {
+      "name": "Actual one versus ten candidate query count constant",
+      "status": "PASS",
+      "detail": {
+        "one_candidate": 8,
+        "ten_candidates": 8
+      }
+    },
+    {
+      "name": "Batch protocol 1 is candidate",
+      "status": "PASS",
+      "detail": null
+    },
+    {
+      "name": "Batch protocol 2 is candidate",
+      "status": "PASS",
+      "detail": null
+    },
+    {
+      "name": "Batch protocol 3 is candidate",
+      "status": "PASS",
+      "detail": null
+    },
+    {
+      "name": "Batch protocol 4 is candidate",
+      "status": "PASS",
+      "detail": null
+    },
+    {
+      "name": "Batch protocol 5 is candidate",
+      "status": "PASS",
+      "detail": null
+    },
+    {
+      "name": "Batch protocol 6 is candidate",
+      "status": "PASS",
+      "detail": null
+    },
+    {
+      "name": "Batch protocol 7 is candidate",
+      "status": "PASS",
+      "detail": null
+    },
+    {
+      "name": "Batch protocol 8 is candidate",
+      "status": "PASS",
+      "detail": null
+    },
+    {
+      "name": "Batch protocol 9 is candidate",
+      "status": "PASS",
+      "detail": null
+    },
+    {
+      "name": "Batch protocol 10 is candidate",
+      "status": "PASS",
+      "detail": null
+    },
+    {
+      "name": "SQL modes unchanged",
+      "status": "PASS",
+      "detail": null
+    },
+    {
+      "name": "HTTP leaves content and governance rows unchanged",
+      "status": "PASS",
+      "detail": null
+    },
+    {
+      "name": "HTTP disease page succeeds with no public/internal treatment markers",
+      "status": "PASS",
+      "detail": null
+    },
+    {
+      "name": "Dedicated source withdrawal starts CANDIDATE",
+      "status": "PASS",
+      "detail": null
+    },
+    {
+      "name": "Dedicated read-time withdrawal DENY",
+      "status": "PASS",
+      "detail": null
+    },
+    {
+      "name": "Withdrawal did not alter protocol or approved snapshot hash",
+      "status": "PASS",
+      "detail": null
+    },
+    {
+      "name": "Dedicated withdrawal fixture restored",
+      "status": "PASS",
+      "detail": null
+    },
+    {
+      "name": "Final HOLD and SQL modes unchanged",
+      "status": "PASS",
+      "detail": null
+    },
+    {
+      "name": "Disposable database removed",
+      "status": "PASS",
+      "detail": null
+    }
+  ],
+  "database": "kobi_phase2c4al_validation_20261008",
+  "host": "127.0.0.1",
+  "port": 3317,
+  "php_version": "8.2.0",
+  "schema_sha256": "d3c73231d08047a413f19cf99b76ee769dfe4cbdd3f380bab8b85d8b8d3ded5b",
+  "omitted": [
+    {
+      "line": 9,
+      "sql": "/*!40101 SET SQL_MODE=''*/;"
+    },
+    {
+      "line": 13,
+      "sql": "/*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;"
+    },
+    {
+      "line": 1089,
+      "sql": "/*!40101 SET SQL_MODE=@OLD_SQL_MODE */;"
+    }
+  ],
+  "imported": 111,
+  "fixture": {
+    "protocol_id": 1,
+    "revision": 6,
+    "approval_id": 7,
+    "sequence": "SQL seeds blank structures/actors/grants; existing edit/createSource/verifySource/reference/recordRiskEligibility/submit/approve/publish commands; actual HOLD policy unchanged",
+    "sources": [
+      1,
+      2
+    ],
+    "included_items": [
+      1,
+      2
+    ],
+    "excluded_items": [
+      3
+    ]
+  },
+  "positive_assessment": {
+    "status": "CANDIDATE"
+  },
+  "public_projection": null,
+  "internal_projection": {
+    "protocol_id": 1,
+    "disease_id": 1,
+    "treatment_system_id": 1,
+    "treatment_system_name": "Synthetic system",
+    "treatment_system_slug": "synthetic-system",
+    "locale": "en",
+    "title": "PUBLIC_PROTOCOL_SENTINEL",
+    "overview": "Synthetic educational overview",
+    "content_purpose": "supportive_care",
+    "evidence_classification": "evidence_supported",
+    "evidence_summary": "Synthetic explicit classification",
+    "applicability": "Synthetic validation only",
+    "limitations": "Educational only; not clinical advice",
+    "included_items": [
+      {
+        "item_id": 2,
+        "item_type": "lifestyle",
+        "title": "PUBLIC_ITEM_TWO",
+        "instructions": "Synthetic instruction two",
+        "limitations": "Educational limitation",
+        "references": [
+          {
+            "reference_id": 2,
+            "source_id": 2,
+            "claim_scope": "Synthetic reviewer-governed claim scope",
+            "locator": "Page 1",
+            "source_type": "research_study",
+            "title": "Synthetic item citation",
+            "author_or_organization": null,
+            "publication": null,
+            "citation_text": "PUBLIC_ITEM_CITATION",
+            "url": "https://example.test/item",
+            "identifier": null,
+            "publication_date": null,
+            "edition_or_version": null,
+            "accessed_on": null
+          }
+        ]
+      },
+      {
+        "item_id": 1,
+        "item_type": "therapy",
+        "title": "PUBLIC_ITEM_ONE",
+        "instructions": "Synthetic instruction one",
+        "limitations": "Educational limitation",
+        "references": [
+          {
+            "reference_id": 1,
+            "source_id": 2,
+            "claim_scope": "Synthetic reviewer-governed claim scope",
+            "locator": "Page 1",
+            "source_type": "research_study",
+            "title": "Synthetic item citation",
+            "author_or_organization": null,
+            "publication": null,
+            "citation_text": "PUBLIC_ITEM_CITATION",
+            "url": "https://example.test/item",
+            "identifier": null,
+            "publication_date": null,
+            "edition_or_version": null,
+            "accessed_on": null
+          }
+        ]
+      }
+    ],
+    "references": [
+      {
+        "reference_id": 1,
+        "source_id": 1,
+        "claim_scope": "Synthetic reviewer-governed claim scope",
+        "locator": "Page 1",
+        "source_type": "guideline",
+        "title": "Synthetic protocol citation",
+        "author_or_organization": null,
+        "publication": null,
+        "citation_text": "PUBLIC_PROTOCOL_CITATION",
+        "url": "https://example.test/protocol",
+        "identifier": null,
+        "publication_date": null,
+        "edition_or_version": null,
+        "accessed_on": null
+      }
+    ]
+  },
+  "projection_method_note": "Existing private serializer invoked internally on actual eligible database aggregate; public API remains null under HOLD. No policy override or public projection delegate.",
+  "query_counts": {
+    "assessment": 8,
+    "projection": 0,
+    "disease list": 0,
+    "DiseaseService": 5,
+    "comparison": 10
+  },
+  "batch_query_counts": {
+    "one_candidate": 8,
+    "ten_candidates": 8
+  },
+  "batch_queries": [
+    "SELECT @@tx_isolation AS isolation_level",
+    "START TRANSACTION WITH CONSISTENT SNAPSHOT, READ ONLY",
+    "SELECT p.*, d.id AS existing_disease_id,\n                s.id AS existing_system_id, s.is_active AS system_active,\n                s.name_en AS system_name_en, s.name_hi AS system_name_hi, s.slug AS system_slug,\n                EXISTS (SELECT 1 FROM treatment_protocol_events e WHERE e.protocol_id=p.id\n                    AND e.id>p.approved_review_id AND e.event_type IN\n                    ('content_changed','submitted','changes_required','review_reset','withdrawn','source_invalidated','risk_assessed')) AS unresolved_invalidation\n                FROM treatment_protocols p LEFT JOIN diseases d ON d.id=p.disease_id\n                LEFT JOIN treatment_systems s ON s.id=p.treatment_system_id\n                WHERE p.disease_id=:disease_id AND p.review_state='approved' AND p.publication_status='published' ORDER BY p.treatment_system_id,p.id",
+    "SELECT * FROM treatment_protocol_items WHERE protocol_id IN (:id0,:id1,:id2,:id3,:id4,:id5,:id6,:id7,:id8,:id9) ORDER BY id",
+    "SELECT * FROM treatment_protocol_sources WHERE protocol_id IN (:id0,:id1,:id2,:id3,:id4,:id5,:id6,:id7,:id8,:id9) ORDER BY id",
+    "SELECT * FROM treatment_item_sources WHERE item_id IN (:id0,:id1,:id2,:id3,:id4,:id5,:id6,:id7,:id8,:id9,:id10,:id11) ORDER BY id",
+    "SELECT * FROM treatment_sources WHERE id IN (:id0,:id1) ORDER BY id",
+    "SELECT * FROM treatment_protocol_events WHERE id IN (:id0,:id1,:id2,:id3,:id4,:id5,:id6,:id7,:id8,:id9) ORDER BY id"
+  ],
+  "http_before_rows_hash": "95f8cfb5680240297f5a6cf32ca5c7c2bea0ba002b70c6e7b2a7fc93bc248e41",
+  "after": {
+    "session_mode": "NO_ZERO_IN_DATE,NO_ZERO_DATE,NO_ENGINE_SUBSTITUTION",
+    "global_mode": "NO_ZERO_IN_DATE,NO_ZERO_DATE,NO_ENGINE_SUBSTITUTION"
+  },
+  "http": {
+    "status_code": 200,
+    "disease_title_present": true,
+    "response_length": 10738,
+    "forbidden_markers_present": [],
+    "public_rendering_mode": "hold",
+    "positive_publication_rendering_exercised": false
+  },
+  "cleanup": {
+    "database_dropped": true,
+    "database_absence_verified": true,
+    "mariadb_server_stopped": true,
+    "http_server_stopped": true,
+    "temporary_directory_removed": true
+  },
+  "harness_notes": [
+    "Corrected initial fixture insertion order so synthetic authorizer exists before grants; no schema failure.",
+    "Normalized PDO native integer IDs in the batch assertion; no production change.",
+    "First sandbox HTTP request was denied; authorized loopback retry succeeded."
+  ],
+  "recorded_at": "2026-10-08T18:25:52Z",
+  "regression_results": [
+    {
+      "embedded_rerun": 105,
+      "script": "treatment-publication-correction",
+      "passed": 17,
+      "failed": 0,
+      "exit_code": 0
+    },
+    {
+      "script": "treatment-publication",
+      "passed": 105,
+      "failed": 0,
+      "exit_code": 0
+    },
+    {
+      "script": "treatment-governance",
+      "passed": 88,
+      "failed": 0,
+      "exit_code": 0
+    },
+    {
+      "embedded_rerun": 88,
+      "script": "treatment-editorial",
+      "passed": 73,
+      "failed": 0,
+      "exit_code": 0
+    },
+    {
+      "embedded_rerun": 161,
+      "script": "treatment-review",
+      "passed": 130,
+      "failed": 0,
+      "exit_code": 0
+    },
+    {
+      "lifecycle": 7,
+      "exit_code": 0,
+      "passed": 47,
+      "failed": 0,
+      "risk": 29,
+      "comparison": 11,
+      "script": "treatment-prerequisites"
+    },
+    {
+      "script": "auth-phase1",
+      "passed": 45,
+      "failed": 0,
+      "exit_code": 0
+    }
+  ],
+  "distinct_regression_passes": 505,
+  "live_check_count": 107,
+  "syntax": {
+    "temporary_validate_php": "PASS",
+    "temporary_router_php": "PASS",
+    "permanent_php_files_changed": 0,
+    "git_diff_check": "PASS"
+  },
+  "limitations": [
+    "HOLD prevents positive public projection API, disease/comparison exposure, live exposed-result preference ordering, and browser publication rendering.",
+    "Projection allowlist checked using the existing private serializer on actual eligible database data, internally only.",
+    "Direct approval-event revision mismatch is rejected by FK 1451; persistable snapshot revision mismatch returns DENY.",
+    "N+1 observation covers one and ten candidates, not production-scale benchmarking."
+  ],
+  "scope": {
+    "sql_mode_changed": false,
+    "tests_changed": false,
+    "git_history_mutated": false,
+    "existing_database_connected": false,
+    "schema_changed": false,
+    "application_changed": false,
+    "permanent_created_files": [],
+    "modified_files": [
+      "docs/TREATMENT_PHASE_2C4A_L_LIVE_VALIDATION.md",
+      "docs/TREATMENT_PHASE_2C4A_L_RUNTIME_RESULTS.json"
+    ],
+    "persistent_configuration_changed": false
+  }
+}

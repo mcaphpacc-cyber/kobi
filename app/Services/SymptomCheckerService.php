@@ -22,6 +22,11 @@ class SymptomCheckerService
         return $this->symptoms->getPopularSymptoms();
     }
 
+    public function getSymptomsByIds(array $ids): array
+    {
+        return $this->symptoms->findByIds($ids);
+    }
+
     public function checkSymptoms(array $symptomIds): array
     {
         if (empty($symptomIds)) {

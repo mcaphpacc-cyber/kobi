@@ -21,7 +21,8 @@ class MedicalSummaryService
         HealthMedicineRepository $medicineRepository,
         HealthAllergyRepository $allergyRepository,
         HealthProcedureRepository $procedureRepository,
-        HealthProfileService $healthProfileService
+        HealthProfileService $healthProfileService,
+        private ApiHealthProfileService $apiProfiles
     ) {
         $this->conditionRepository = $conditionRepository;
         $this->medicineRepository = $medicineRepository;
@@ -40,6 +41,19 @@ class MedicalSummaryService
             $this->healthProfileService
                 ->getProfile($profileId);
 
+        return $this->assemble($profileId, $profile);
+    }
+
+    /** Authorize the bearer actor before reading any summary records. */
+    public function getSummaryForPrincipal(ApiAuthPrincipal $principal, string $profileId): array
+    {
+        $profile = $this->apiProfiles->detail($principal, $profileId);
+        return $this->assemble((int) $profile['id'], $profile);
+    }
+
+    /** The single live assembler shared by browser and API readers. */
+    private function assemble(int $profileId, array $profile): array
+    {
         $conditions =
             $this->conditionRepository
                 ->findByProfile($profileId);

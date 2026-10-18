@@ -5,11 +5,13 @@ declare(strict_types=1);
 namespace App\Controllers;
 
 use App\Core\Session;
+use App\Core\Logger;
 use App\Services\AuthService;
 use App\Services\GoogleAuthService;
 use App\Services\GoogleOAuthStateService;
 use App\Services\UserAuthIdentityService;
 use RuntimeException;
+use Throwable;
 use App\Services\HealthProfileService;
 
 class GoogleAuthController extends Controller
@@ -42,15 +44,8 @@ class GoogleAuthController extends Controller
 
             exit;
 
-        } catch (RuntimeException $exception) {
-
-            $this->view(
-                'auth/login',
-                [
-                    'title' => 'Login',
-                    'error' => $exception->getMessage()
-                ]
-            );
+        } catch (Throwable $exception) {
+            $this->handleError($exception, 'login');
         }
     }
 
@@ -75,16 +70,8 @@ class GoogleAuthController extends Controller
 
             exit;
 
-        } catch (RuntimeException $exception) {
-
-            $this->view(
-                'account/index',
-                [
-                    'title' => 'My Account',
-                    'user' => $this->authService->user(),
-                    'error' => $exception->getMessage()
-                ]
-            );
+        } catch (Throwable $exception) {
+            $this->handleError($exception, 'link');
         }
     }
 
@@ -93,7 +80,15 @@ class GoogleAuthController extends Controller
      */
     public function callback(): void
     {
+        $intent = $this->stateService->intent();
+
         try {
+            // Validate and consume state even when Google returns an OAuth error.
+            $state = $_GET['state'] ?? null;
+            $intent = $this->stateService->validate(
+                is_string($state) ? $state : null
+            );
+
             /*
              * Google may return an OAuth error instead
              * of an authorization code.
@@ -108,18 +103,6 @@ class GoogleAuthController extends Controller
                     'Google sign-in was cancelled or could not be completed.'
                 );
             }
-
-            /*
-             * Validate the OAuth state before doing
-             * anything with the authorization code.
-             */
-            $state = $_GET['state'] ?? null;
-
-            $intent = $this->stateService->validate(
-                is_string($state)
-                    ? $state
-                    : null
-            );
 
             $code = $_GET['code'] ?? '';
 
@@ -181,16 +164,58 @@ class GoogleAuthController extends Controller
                 $googleUser
             );
 
-        } catch (RuntimeException $exception) {
-
-            $this->view(
-                'auth/login',
-                [
-                    'title' => 'Login',
-                    'error' => $exception->getMessage()
-                ]
-            );
+        } catch (Throwable $exception) {
+            $this->handleError($exception, $intent);
         }
+    }
+
+    private function handleError(Throwable $exception, string $intent): void
+    {
+        $this->stateService->clear();
+
+        // Record diagnostic location without logging OAuth tokens, secrets or arguments.
+        Logger::error(sprintf(
+            'Google OAuth %s failed: %s (code %s) at %s:%d',
+            $intent,
+            get_class($exception),
+            (string) $exception->getCode(),
+            $exception->getFile(),
+            $exception->getLine()
+        ));
+
+        $safeMessages = [
+            'Google sign-in was cancelled or could not be completed.',
+            'Invalid Google authentication request.',
+            'Google authentication code is missing.',
+            'Your Google email address must be verified before you can use Google sign-in.',
+            'A KOBI account already exists with this Google email address. Please sign in to your KOBI account first. Google linking will be available from your account settings.',
+            'This Google account is already linked to another KOBI account.',
+            'This authentication account is already linked to another KOBI account.',
+            'Your KOBI session has expired. Please sign in again.',
+            'This account is currently inactive.',
+            'Please verify your email address before continuing.'
+        ];
+
+        $message = $intent === 'link'
+            ? 'Unable to connect Google. Please try again.'
+            : 'Unable to sign in with Google. Please try again.';
+
+        if (
+            get_class($exception) === RuntimeException::class &&
+            in_array($exception->getMessage(), $safeMessages, true)
+        ) {
+            $message = $exception->getMessage();
+        }
+
+        if ($intent === 'link' && $this->authService->check()) {
+            $this->session->put('google_auth_error', $message);
+            redirect('/account');
+        }
+
+        $this->view('auth/login', [
+            'title' => 'Login',
+            'error' => $message
+        ]);
     }
 
     /**

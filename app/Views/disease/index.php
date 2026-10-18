@@ -53,25 +53,21 @@
 <div class="row g-3 mb-5">
 
     <div class="col-md-3">
-        ...
         🩺 Diseases
         <?= number_format($statistics['diseases']) ?>
     </div>
 
     <div class="col-md-3">
-        ...
         ❤️ Body Systems
         <?= number_format($statistics['bodySystems']) ?>
     </div>
 
     <div class="col-md-3">
-        ...
         🩹 Symptoms
         <?= number_format($statistics['symptoms']) ?>
     </div>
 
     <div class="col-md-3">
-        ...
         🧬 Causes
         <?= number_format($statistics['causes']) ?>
     </div>
@@ -121,6 +117,7 @@ if (!empty($_GET['featured'])) {
         <input
             type="text"
             id="diseaseSearch"
+            aria-label="Search diseases"
             class="form-control"
             placeholder="Search diseases, symptoms, body systems..."
         >
@@ -129,6 +126,7 @@ if (!empty($_GET['featured'])) {
     <div class="col-md-4">
         <select
             id="sortDiseases"
+            aria-label="Sort diseases"
             class="form-select"
         >
             <option value="az">Sort: A → Z</option>
@@ -139,6 +137,7 @@ if (!empty($_GET['featured'])) {
     </div>
     <select
         id="genderFilter"
+        aria-label="Filter diseases by gender"
         class="form-select"
     >
         <option value="all">All Genders</option>
@@ -542,10 +541,14 @@ if (!empty($_GET['featured'])) {
     </div>
 
 </div>
+<div id="noDiseaseResults" class="alert alert-info d-none" role="status">
+    No diseases match your search or filters. Try a different search or adjust the filters.
+</div>
+
 <nav class="mt-4">
     <ul
         id="catalogPagination"
-        class="pagination justify-content-center">
+        class="pagination justify-content-center flex-wrap row-gap-2">
     </ul>
 </nav>
 <hr class="my-5">

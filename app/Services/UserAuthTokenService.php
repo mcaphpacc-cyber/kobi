@@ -103,6 +103,22 @@ class UserAuthTokenService
     }
 
     /**
+     * Invalidate outstanding reset links after a successful password update.
+     * Having no unused tokens is a successful no-op.
+     */
+    public function invalidateUnusedPasswordResetTokens(int $userId): void
+    {
+        if ($userId <= 0) {
+            throw new RuntimeException('Invalid user account.');
+        }
+
+        $this->repository->invalidateUnusedTokens(
+            $userId,
+            self::TYPE_PASSWORD_RESET
+        );
+    }
+
+    /**
      * Validate a password reset token.
      *
      * Returns the token record when valid.

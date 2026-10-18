@@ -67,13 +67,7 @@ class GoogleOAuthStateService
             self::SESSION_INTENT_KEY
         );
 
-        $this->session->remove(
-            self::SESSION_KEY
-        );
-
-        $this->session->remove(
-            self::SESSION_INTENT_KEY
-        );
+        $this->clear();
 
         if (
             !is_string($storedState) ||
@@ -105,5 +99,22 @@ class GoogleOAuthStateService
         }
 
         return $intent;
+    }
+
+    /**
+     * Read the stored intent only to choose the error context.
+     * Successful authentication still requires validate().
+     */
+    public function intent(): string
+    {
+        return $this->session->get(self::SESSION_INTENT_KEY) === 'link'
+            ? 'link'
+            : 'login';
+    }
+
+    public function clear(): void
+    {
+        $this->session->remove(self::SESSION_KEY);
+        $this->session->remove(self::SESSION_INTENT_KEY);
     }
 }

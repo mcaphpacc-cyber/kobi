@@ -2,6 +2,16 @@ html{
     scroll-behavior:smooth;
 }
 
+/* Disease Detail: wrap long content without clipping it or covering anchor headings. */
+.disease-detail {
+    overflow-wrap: anywhere;
+}
+
+.disease-detail-nav .btn:focus-visible {
+    outline: 3px solid var(--bs-primary);
+    outline-offset: 2px;
+}
+
 section{
     scroll-margin-top:80px;
 }

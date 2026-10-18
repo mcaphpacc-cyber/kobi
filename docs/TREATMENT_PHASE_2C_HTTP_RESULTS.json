@@ -1,0 +1,232 @@
+[
+    {
+        "role": "editor",
+        "test": "CSRF missing save",
+        "method": "POST",
+        "path": "/admin/treatments/901/save",
+        "expected": 403,
+        "actual": 403,
+        "database_unchanged": true,
+        "status": "PASS"
+    },
+    {
+        "role": "editor",
+        "test": "CSRF invalid save",
+        "method": "POST",
+        "path": "/admin/treatments/901/save",
+        "expected": 403,
+        "actual": 403,
+        "database_unchanged": true,
+        "status": "PASS"
+    },
+    {
+        "role": "editor",
+        "test": "GET mutation save",
+        "method": "GET",
+        "path": "/admin/treatments/901/save",
+        "expected": 404,
+        "actual": 404,
+        "database_unchanged": true,
+        "status": "PASS"
+    },
+    {
+        "role": "editor",
+        "test": "CSRF missing approve",
+        "method": "POST",
+        "path": "/admin/treatments/901/approve",
+        "expected": 403,
+        "actual": 403,
+        "database_unchanged": true,
+        "status": "PASS"
+    },
+    {
+        "role": "editor",
+        "test": "CSRF invalid approve",
+        "method": "POST",
+        "path": "/admin/treatments/901/approve",
+        "expected": 403,
+        "actual": 403,
+        "database_unchanged": true,
+        "status": "PASS"
+    },
+    {
+        "role": "editor",
+        "test": "GET mutation approve",
+        "method": "GET",
+        "path": "/admin/treatments/901/approve",
+        "expected": 404,
+        "actual": 404,
+        "database_unchanged": true,
+        "status": "PASS"
+    },
+    {
+        "role": "editor",
+        "test": "CSRF missing changes-required",
+        "method": "POST",
+        "path": "/admin/treatments/901/changes-required",
+        "expected": 403,
+        "actual": 403,
+        "database_unchanged": true,
+        "status": "PASS"
+    },
+    {
+        "role": "editor",
+        "test": "CSRF invalid changes-required",
+        "method": "POST",
+        "path": "/admin/treatments/901/changes-required",
+        "expected": 403,
+        "actual": 403,
+        "database_unchanged": true,
+        "status": "PASS"
+    },
+    {
+        "role": "editor",
+        "test": "GET mutation changes-required",
+        "method": "GET",
+        "path": "/admin/treatments/901/changes-required",
+        "expected": 404,
+        "actual": 404,
+        "database_unchanged": true,
+        "status": "PASS"
+    },
+    {
+        "role": "editor",
+        "test": "Stale editorial HTTP save",
+        "method": "POST",
+        "path": "/admin/treatments/902/save",
+        "expected": 409,
+        "actual": 409,
+        "database_unchanged": true,
+        "status": "PASS"
+    },
+    {
+        "role": "reviewer",
+        "test": "CSRF missing save",
+        "method": "POST",
+        "path": "/admin/treatments/901/save",
+        "expected": 403,
+        "actual": 403,
+        "database_unchanged": true,
+        "status": "PASS"
+    },
+    {
+        "role": "reviewer",
+        "test": "CSRF invalid save",
+        "method": "POST",
+        "path": "/admin/treatments/901/save",
+        "expected": 403,
+        "actual": 403,
+        "database_unchanged": true,
+        "status": "PASS"
+    },
+    {
+        "role": "reviewer",
+        "test": "GET mutation save",
+        "method": "GET",
+        "path": "/admin/treatments/901/save",
+        "expected": 404,
+        "actual": 404,
+        "database_unchanged": true,
+        "status": "PASS"
+    },
+    {
+        "role": "reviewer",
+        "test": "CSRF missing approve",
+        "method": "POST",
+        "path": "/admin/treatments/901/approve",
+        "expected": 403,
+        "actual": 403,
+        "database_unchanged": true,
+        "status": "PASS"
+    },
+    {
+        "role": "reviewer",
+        "test": "CSRF invalid approve",
+        "method": "POST",
+        "path": "/admin/treatments/901/approve",
+        "expected": 403,
+        "actual": 403,
+        "database_unchanged": true,
+        "status": "PASS"
+    },
+    {
+        "role": "reviewer",
+        "test": "GET mutation approve",
+        "method": "GET",
+        "path": "/admin/treatments/901/approve",
+        "expected": 404,
+        "actual": 404,
+        "database_unchanged": true,
+        "status": "PASS"
+    },
+    {
+        "role": "reviewer",
+        "test": "CSRF missing changes-required",
+        "method": "POST",
+        "path": "/admin/treatments/901/changes-required",
+        "expected": 403,
+        "actual": 403,
+        "database_unchanged": true,
+        "status": "PASS"
+    },
+    {
+        "role": "reviewer",
+        "test": "CSRF invalid changes-required",
+        "method": "POST",
+        "path": "/admin/treatments/901/changes-required",
+        "expected": 403,
+        "actual": 403,
+        "database_unchanged": true,
+        "status": "PASS"
+    },
+    {
+        "role": "reviewer",
+        "test": "GET mutation changes-required",
+        "method": "GET",
+        "path": "/admin/treatments/901/changes-required",
+        "expected": 404,
+        "actual": 404,
+        "database_unchanged": true,
+        "status": "PASS"
+    },
+    {
+        "role": "reviewer",
+        "test": "Stale duplicate HTTP approval",
+        "method": "POST",
+        "path": "/admin/treatments/901/approve",
+        "expected": 409,
+        "actual": 409,
+        "database_unchanged": true,
+        "status": "PASS"
+    },
+    {
+        "role": "wrong",
+        "test": "Wrong-system detail",
+        "method": "GET",
+        "path": "/admin/treatments/902/review",
+        "expected": 403,
+        "actual": 403,
+        "database_unchanged": true,
+        "status": "PASS"
+    },
+    {
+        "role": "wrong",
+        "test": "Wrong-system approval with valid CSRF",
+        "method": "POST",
+        "path": "/admin/treatments/902/approve",
+        "expected": 403,
+        "actual": 403,
+        "database_unchanged": true,
+        "status": "PASS"
+    },
+    {
+        "role": "wrong",
+        "test": "Wrong-system changes with valid CSRF",
+        "method": "POST",
+        "path": "/admin/treatments/902/changes-required",
+        "expected": 403,
+        "actual": 403,
+        "database_unchanged": true,
+        "status": "PASS"
+    }
+]

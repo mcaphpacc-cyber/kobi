@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 use App\Core\App;
 use App\Core\Logger;
+use App\Core\Request;
+use App\Core\PublicApiResponse;
 
 /*
 |--------------------------------------------------------------------------
@@ -15,6 +17,9 @@ $config = require dirname(__DIR__) . '/app/Config/Config.php';
 
 date_default_timezone_set($config['timezone']);
 
+$publicApi = Request::isPublicApiUri($_SERVER['REQUEST_URI'] ?? '/');
+if ($publicApi) { PublicApiResponse::begin(); }
+
 /*
 |--------------------------------------------------------------------------
 | PHP Error Reporting
@@ -23,7 +28,7 @@ date_default_timezone_set($config['timezone']);
 
 error_reporting(E_ALL);
 
-if ($config['debug']) {
+if ($config['debug'] && !$publicApi) {
     ini_set('display_errors', '1');
     ini_set('display_startup_errors', '1');
 } else {
@@ -37,25 +42,27 @@ if ($config['debug']) {
 |--------------------------------------------------------------------------
 */
 
-$isHttps =
-    (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off')
-    || (
-        isset($_SERVER['SERVER_PORT'])
-        && (int) $_SERVER['SERVER_PORT'] === 443
-    );
+if (!$publicApi) {
+    $isHttps =
+        (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off')
+        || (
+            isset($_SERVER['SERVER_PORT'])
+            && (int) $_SERVER['SERVER_PORT'] === 443
+        );
 
-ini_set('session.use_strict_mode', '1');
-ini_set('session.use_only_cookies', '1');
+    ini_set('session.use_strict_mode', '1');
+    ini_set('session.use_only_cookies', '1');
 
-session_set_cookie_params([
-    'lifetime' => 0,
-    'path'     => '/',
-    'secure'   => $isHttps,
-    'httponly' => true,
-    'samesite' => 'Lax',
-]);
+    session_set_cookie_params([
+        'lifetime' => 0,
+        'path'     => '/',
+        'secure'   => $isHttps,
+        'httponly' => true,
+        'samesite' => 'Lax',
+    ]);
 
-session_start();
+    session_start();
+}
 
 /*
 |--------------------------------------------------------------------------
@@ -63,7 +70,7 @@ session_start();
 |--------------------------------------------------------------------------
 */
 
-header('Content-Type: text/html; charset=UTF-8');
+header('Content-Type: ' . ($publicApi ? 'application/json; charset=UTF-8' : 'text/html; charset=UTF-8'));
 
 header(
     "Content-Security-Policy: "
@@ -98,7 +105,12 @@ header(
 */
 
 set_exception_handler(
-    static function (Throwable $exception) use ($config): void {
+    static function (Throwable $exception) use ($config, $publicApi): void {
+        if ($publicApi) {
+            Logger::error('Public API failed: ' . get_class($exception));
+            PublicApiResponse::error(500, 'INTERNAL_ERROR', 'Unable to complete the request.');
+            return;
+        }
         Logger::exception($exception);
 
         http_response_code(500);
@@ -130,10 +142,12 @@ set_error_handler(
         string $message,
         string $file,
         int $line
-    ) use ($config): bool {
+    ) use ($config, $publicApi): bool {
         if (!(error_reporting() & $severity)) {
             return false;
         }
+
+        if ($publicApi) { throw new ErrorException('Public API runtime failure', 0, $severity); }
 
         $errorMessage = sprintf(
             '%s in %s:%d',
@@ -159,7 +173,7 @@ set_error_handler(
 */
 
 register_shutdown_function(
-    static function () use ($config): void {
+    static function () use ($config, $publicApi): void {
         $error = error_get_last();
 
         if ($error === null) {
@@ -174,6 +188,12 @@ register_shutdown_function(
         ];
 
         if (!in_array($error['type'], $fatalTypes, true)) {
+            return;
+        }
+
+        if ($publicApi) {
+            Logger::error('Public API fatal failure');
+            if (!headers_sent()) { PublicApiResponse::error(500, 'INTERNAL_ERROR', 'Unable to complete the request.'); }
             return;
         }
 

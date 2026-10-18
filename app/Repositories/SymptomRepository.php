@@ -48,7 +48,9 @@ class SymptomRepository extends BaseRepository
 
     public function findByIds(array $ids): array
     {
-        return [];
+        if ($ids === []) { return []; }
+        $placeholders = implode(',', array_fill(0, count($ids), '?'));
+        return $this->fetchAll("SELECT id,symptom_en,symptom_hi,slug FROM symptoms WHERE id IN ($placeholders)", $ids);
     }
 
     public function findBySlug(string $slug): ?array

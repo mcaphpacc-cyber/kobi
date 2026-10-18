@@ -54,6 +54,20 @@ class Router
             return;
         }
 
+        if (Request::isPublicApiUri($uri)) {
+            foreach ($this->routes as $allowedMethod => $routes) {
+              foreach ($routes as $route) {
+                $pattern = '#^' . preg_replace('/\{([a-zA-Z0-9_]+)\}/', '([^/]+)', $route['uri']) . '$#';
+                if (preg_match($pattern, $uri)) {
+                    PublicApiResponse::error(405, 'METHOD_NOT_ALLOWED', 'Use '.$allowedMethod.' for this endpoint.', [], $allowedMethod);
+                    return;
+                }
+              }
+            }
+            PublicApiResponse::error(404, 'NOT_FOUND', 'Public resource not found.');
+            return;
+        }
+
         http_response_code(404);
 
         echo "<h1>404 - Page Not Found</h1>";

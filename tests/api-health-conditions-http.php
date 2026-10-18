@@ -1,0 +1,75 @@
+<?php
+declare(strict_types=1);
+if(PHP_SAPI!=='cli'){http_response_code(404);exit;}
+define('API_IDENTITY_HTTP_LIBRARY',true);require __DIR__.'/api-identity-http.php';
+function medicationExpected(int $id,string $status='current'):array{return ['id'=>(string)$id,'brand_name'=>'Recorded '.$id,'generic_name'=>null,'strength'=>'10 mg','dose'=>'recorded dose','frequency'=>'recorded frequency','route'=>'recorded route','status'=>$status,'started_on'=>'2026-01-01','stopped_on'=>$status==='stopped'?'2026-02-01':null];}
+function conditionExpected(int $id,string $status='active',?string $date='2026-01-02'):array{return ['id'=>(string)$id,'condition_name'=>'Recorded नाम '.$id.' <label>','status'=>$status,'diagnosed_on'=>$date,'resolved_on'=>$status==='resolved'?'2026-02-01':null];}
+function conditionPage(string $path,string $token,int $page,int $size,int $total,?array $body=null,array $extra=[]):array {
+    global $pem;
+    $c=curl_init('https://localhost:18866/api/v1/'.$path);$headers=array_merge(['Connection: close','Authorization: Bearer '.$token],$extra);
+    $options=[CURLOPT_RETURNTRANSFER=>true,CURLOPT_HEADER=>true,CURLOPT_CUSTOMREQUEST=>'GET',CURLOPT_HTTPHEADER=>$headers,CURLOPT_SSL_VERIFYPEER=>true,CURLOPT_SSL_VERIFYHOST=>2,CURLOPT_CAINFO=>$pem,CURLOPT_FOLLOWLOCATION=>false,CURLOPT_TIMEOUT=>10];if($body!==null)$options[CURLOPT_POSTFIELDS]=json_encode($body);curl_setopt_array($c,$options);
+    $raw=curl_exec($c);ih(is_string($raw)&&curl_errno($c)===0&&curl_getinfo($c,CURLINFO_SSL_VERIFYRESULT)===0,'Collection verified HTTPS');ih(curl_getinfo($c,CURLINFO_HTTP_CODE)===200,'Collection HTTP 200');$n=curl_getinfo($c,CURLINFO_HEADER_SIZE);curl_close($c);$head=substr($raw,0,$n);$text=substr($raw,$n);
+    ih(preg_match('/^Content-Type: application\/json; charset=UTF-8\s*$/im',$head)===1,'Collection JSON UTF8');ih(preg_match('/^Cache-Control: no-store\s*$/im',$head)===1,'Collection no-store');ih(preg_match('/^X-Content-Type-Options: nosniff\s*$/im',$head)===1,'Collection nosniff');ih(!preg_match('/^(?:Set-Cookie|Access-Control-Allow-Origin|Access-Control-Allow-Credentials):/im',$head),'Collection no cookies/CORS');
+    $json=json_decode($text,true,16,JSON_THROW_ON_ERROR);ih(array_keys($json)===['success','data','meta']&&$json['success']===true,'Exact collection envelope');ih($json['meta']===['api_version'=>'v1','page'=>$page,'page_size'=>$size,'total'=>$total,'has_more'=>$page*$size<$total],'Exact integer/boolean pagination metadata');
+    ih(!str_contains($text,'PRIVATE')&&!str_contains($text,'SQLSTATE')&&!str_contains($text,'Stack trace'),'Collection private data/errors absent');
+    foreach($json['data'] as $r)ih(array_keys($r)===['id','condition_name','status','diagnosed_on','resolved_on']&&is_string($r['id'])&&preg_match('/^[1-9][0-9]*$/D',$r['id'])===1,'Each row exact five fields and string ID');
+    return $json['data'];
+}
+$source=apiFixtureSource();apiFixtureCreate($source);$db=apiFixtureConnect();$p=$db->connection();$storage=dirname(__DIR__).'/storage/cache/api-health-conditions-http-'.bin2hex(random_bytes(8));mkdir($storage,0700);$pem=$storage.'/tls.pem';$processes=[];
+try {
+    $schema=file_get_contents(dirname(__DIR__).'/database/structure.sql');foreach(['health_profiles','health_profile_members','health_medicines','health_conditions','health_allergies','health_procedures','medical_summary_shares','medical_summary_share_access_logs'] as $table){if(!preg_match('/CREATE TABLE `'.$table.'` \([\s\S]*?ENGINE=InnoDB[^;]*;/',$schema,$match))throw new LogicException('Fixture schema missing');$p->exec($match[0]);}
+    $password=bin2hex(random_bytes(18));foreach([100001,100002] as $id)apiFixtureUser($p,$password,$id);
+    $insert=$p->prepare('INSERT INTO health_profiles(id,full_name,profile_type,created_by,status) VALUES (?,?,?,?,?)');foreach([[1,'Owner A','self',100001,'active'],[2,'Owner B','self',100002,'active'],[3,'Shared','family',100002,'active'],[4,'Archived','self',100001,'archived'],[5,'Revoked','family',100001,'active'],[6,'Empty','family',100001,'active'],[7,'Single','dependent',100002,'active']] as $r)$insert->execute($r);
+    $insert=$p->prepare('INSERT INTO health_profile_members(health_profile_id,user_id,role,status) VALUES (?,?,?,?)');foreach([[1,100001,'owner','active'],[2,100002,'owner','active'],[3,100001,'viewer','active'],[3,100002,'owner','active'],[4,100001,'owner','active'],[5,100001,'editor','revoked'],[6,100001,'owner','active'],[7,100001,'editor','active']] as $r)$insert->execute($r);
+    $insert=$p->prepare('INSERT INTO health_medicines(id,health_profile_id,brand_name,generic_name,strength,dose,frequency,route,status,started_on,stopped_on,prescribed_by,notes) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)');
+    foreach([[1,1,'current'],[2,1,'current'],[3,1,'stopped'],[4,1,'historical'],[5,2,'current'],[6,3,'current'],[7,7,'current']] as [$id,$profile,$status]){$dto=medicationExpected($id,$status);$insert->execute([$id,$profile,$dto['brand_name'],$dto['generic_name'],$dto['strength'],$dto['dose'],$dto['frequency'],$dto['route'],$status,$dto['started_on'],$dto['stopped_on'],'PRIVATE PRESCRIBER','PRIVATE NOTES']);}
+    $ssl='D:/xampp/apache/conf/openssl.cnf';$key=openssl_pkey_new(['private_key_bits'=>2048,'config'=>$ssl]);$csr=openssl_csr_new(['commonName'=>'localhost'],$key,['config'=>$ssl]);$cert=openssl_csr_sign($csr,null,$key,1,['config'=>$ssl]);openssl_x509_export($cert,$public);openssl_pkey_export($key,$private,null,['config'=>$ssl]);file_put_contents($pem,$public.$private);unset($private,$key);
+    $rateKey=bin2hex(random_bytes(32));$environment=getenv();$environment['KOBI_API_TEST_RATE_KEY']=$rateKey;$environment['KOBI_API_TEST_STORAGE']=$storage;
+    $server=proc_open([PHP_BINARY,'-S','127.0.0.1:18865',__DIR__.'/api-identity-http-router.php'],[0=>['pipe','r'],1=>['file','NUL','w'],2=>['file','NUL','w']],$pipes,dirname(__DIR__),$environment);$processes[]=[$server,$pipes];fclose($pipes[0]);
+    $proxy=proc_open([PHP_BINARY,__DIR__.'/api-auth-http.php','--tls-proxy'],[0=>['pipe','r'],1=>['file','NUL','w'],2=>['file','NUL','w']],$pipes);$processes[]=[$proxy,$pipes];fwrite($pipes[0],json_encode(['pem'=>$pem]));fclose($pipes[0]);
+    $ready=false;for($i=0;$i<30;$i++){usleep(100000);$s=@stream_socket_client('tcp://127.0.0.1:18865',$errno,$error,0.1);if($s){fclose($s);$ready=true;break;}}ih($ready,'Fixture upstream ready');usleep(300000);
+    $families=[];foreach([100001,100001,100002] as $id)$families[]=identityHttp('auth/login',null,200,'POST',['email'=>'fixture'.$id.'@example.invalid','password'=>$password]);[$a,$device,$b]=$families;
+    $insert=$p->prepare('INSERT INTO health_conditions(id,health_profile_id,condition_name,status,diagnosed_on,resolved_on,doctor_hospital,notes) VALUES (?,?,?,?,?,?,?,?)');
+    $expected=[];foreach(range(1,60) as $id){$profile=$id<=55?1:[56=>2,57=>3,58=>7,59=>4,60=>5][$id];$status=$id<=3?'active':($id===4||$id===58?'chronic':($id===6?'resolved':($id<=55?'historical':'active')));$date=$id===3?null:($id===4?'2026-01-03':($id===5?'2026-01-04':($id===6?'2026-01-05':($id>=7&&$id<=55?'2025-01-01':'2026-01-02'))));$r=conditionExpected($id,$status,$date);$expected[$id]=$r;$insert->execute([$id,$profile,$r['condition_name'],$status,$date,$r['resolved_on'],'PRIVATE PROVIDER','PRIVATE NOTES']);}
+    $order=array_merge([2,1,3,4,5],range(55,7),[6]);$ordered=array_map(fn($id)=>$expected[$id],$order);$route='health-profiles/1/conditions';
+    $snapshot=[];foreach(['users','health_profiles','health_profile_members','health_conditions','health_medicines','health_allergies','health_procedures','medical_summary_shares','medical_summary_share_access_logs','user_api_sessions','user_api_refresh_tokens'] as $table)$snapshot[$table]=$p->query('SELECT * FROM '.$table.' ORDER BY id')->fetchAll();
+    ih(conditionPage($route,$a['access_token'],1,20,55)===array_slice($ordered,0,20),'Default twenty and canonical ordering including ties/nulls');
+    ih(conditionPage($route.'?page=2',$a['access_token'],2,20,55)===array_slice($ordered,20,20),'Second default page');
+    ih(conditionPage($route.'?page=3',$a['access_token'],3,20,55)===array_slice($ordered,40,20),'Last partial page');
+    ih(conditionPage($route.'?page_size=50',$a['access_token'],1,50,55)===array_slice($ordered,0,50),'Maximum fifty');
+    ih(conditionPage($route.'?page_size=50&page=2',$a['access_token'],2,50,55)===array_slice($ordered,50),'No omissions/duplicates across pages');
+    ih(conditionPage($route.'?page=10000',$a['access_token'],10000,20,55)===[],'Beyond final page empty');
+    ih(conditionPage($route,$device['access_token'],1,20,55)===array_slice($ordered,0,20),'Deterministic independent device');
+    ih(conditionPage($route,$a['access_token'],1,20,55,['user_id'=>'100002','profile_id'=>'2'],['Cookie: PHPSESSID=not-api-identity','X-User-ID: 100002'])===array_slice($ordered,0,20),'Body/cookie/header cannot override actor');
+    ih(conditionPage('health-profiles/6/conditions',$a['access_token'],1,20,0)===[],'Empty authorized profile');
+    ih(conditionPage('health-profiles/7/conditions',$a['access_token'],1,20,1)===[$expected[58]],'Single condition editor');
+    ih(conditionPage('health-profiles/3/conditions',$a['access_token'],1,20,1)===[$expected[57]],'Viewer read');
+    ih(conditionPage('health-profiles/2/conditions',$b['access_token'],1,20,1)===[$expected[56]],'Other account own profile');
+    foreach([1,3,4,5,6] as $id)ih(identityHttp($route.'/'.$id,$a['access_token'])===$expected[$id],'Detail exact fields all statuses dates/null');
+    $notFound=identityHttp($route.'/9999',$a['access_token'],404);foreach([$route.'/56',$route.'/57','health-profiles/3/conditions/1','health-profiles/6/conditions/1'] as $path)ih(identityHttp($path,$a['access_token'],404)===$notFound,'Child profile SQL binding even when actor can access both profiles');
+    $missingProfile=null;foreach(['2','4','5','999999'] as $id){$e=identityHttp('health-profiles/'.$id.'/conditions',$a['access_token'],404);$missingProfile??=$e;ih($e===$missingProfile,'Other archived revoked missing profile parity');identityHttp('health-profiles/'.$id.'/conditions/1',$a['access_token'],404);}
+    identityHttp($route,$b['access_token'],404);
+    foreach([$route,$route.'/1'] as $path){foreach([null,'malformed','ka1_'.rtrim(strtr(base64_encode(random_bytes(32)),'+/','-_'),'=')] as $token)identityHttp($path,$token,401);identityHttp($path,$a['refresh_token'],401);foreach(['POST','PUT','PATCH','DELETE','OPTIONS','HEAD'] as $method)identityHttp($path,null,405,$method);}
+    foreach(['page=0','page=01','page=-1','page=1.0','page=10001','page_size=51','page_size=999999','page_size=0','page_size=01','limit=1','user_id=100002','status=active'] as $query)identityHttp($route.'?'.$query,$a['access_token'],422);
+    identityHttp($route.'?page[]=1',$a['access_token'],400);identityHttp($route.'?page=%FF',$a['access_token'],400);identityHttp($route.'?page=0',null,401);identityHttp($route.'/1?page=1',$a['access_token'],400);
+    foreach(['0','01','-1','abc','2147483648'] as $id){identityHttp($route.'/'.$id,$a['access_token'],422);identityHttp('health-profiles/'.$id.'/conditions',$a['access_token'],422);}
+    foreach(['health-profiles/1/health-records','health-profiles/1/condition','health-profiles/1/conditions/1/notes','health-profiles/1/allergies','health-profiles/1/procedures'] as $path)identityHttp($path,$a['access_token'],404);
+    // Every compared row is synthetic and confined to the guarded disposable database.
+    foreach($snapshot as $table=>$rows)ih($p->query('SELECT * FROM '.$table.' ORDER BY id')->fetchAll()===$rows,'GET does not mutate synthetic table '.$table);
+    identityExpected(identityHttp('me',$a['access_token']),100001);identityHttp('health-profiles',$a['access_token']);ih(identityHttp('health-profiles/1',$a['access_token'])===['id'=>'1','full_name'=>'Owner A','profile_type'=>'self'],'Existing profile detail');ih(identityHttp('health-profiles/1/medications/1',$a['access_token'])===medicationExpected(1),'Existing medication detail');identityHttp('health-profiles/1/medications',$a['access_token']);
+    ih(identityHttp('health-profiles/1/medical-summary',$a['access_token'])===['profile'=>['id'=>'1','full_name'=>'Owner A','profile_type'=>'self'],'counts'=>['conditions'=>4,'historical_conditions'=>51,'current_medications'=>2,'allergies'=>0,'procedures'=>0]],'Medical Summary count definitions unchanged');
+    $sid=$p->prepare('SELECT id FROM user_api_sessions WHERE public_id=?');$sid->execute([$a['session_id']]);$bucket=hash_hmac('sha256',"access_family\0".$sid->fetchColumn(),$rateKey);$file=$storage.'/cache/api-auth/counters.json';$counters=json_decode(file_get_contents($file),true);$count=$counters[$bucket]['count'];conditionPage($route,$a['access_token'],1,20,55);$counters=json_decode(file_get_contents($file),true);ih($counters[$bucket]['count']===$count+1,'One existing family admission');$counters[$bucket]['count']=120;file_put_contents($file,json_encode($counters));identityHttp($route,$a['access_token'],429);$counters[$bucket]['count']=0;file_put_contents($file,json_encode($counters));
+    // Canonical ELSE ordering moves the corrupt row to the last page.
+    $p->exec("UPDATE health_conditions SET status='' WHERE id=1");identityHttp($route.'/1',$a['access_token'],500);identityHttp($route.'?page=3',$a['access_token'],500);$p->exec("UPDATE health_conditions SET status='active' WHERE id=1");
+    $p->exec("UPDATE health_profile_members SET status='revoked' WHERE health_profile_id=3 AND user_id=100001");identityHttp('health-profiles/3/conditions/57',$a['access_token'],404);
+    $s=$p->prepare('UPDATE user_api_sessions SET created_at=DATE_SUB(UTC_TIMESTAMP(),INTERVAL 1200 SECOND),last_refreshed_at=DATE_SUB(UTC_TIMESTAMP(),INTERVAL 1200 SECOND),access_expires_at=DATE_SUB(UTC_TIMESTAMP(),INTERVAL 600 SECOND) WHERE public_id=?');$s->execute([$a['session_id']]);identityHttp($route,$a['access_token'],401);identityHttp($route.'/1',$a['access_token'],401);
+    identityHttp('auth/logout',$device['access_token'],200,'POST',[]);identityHttp($route,$device['access_token'],401);identityHttp($route.'/1',$device['access_token'],401);
+    foreach([$a,$b] as $issued){$next=identityHttp('auth/refresh',null,200,'POST',['refresh_token'=>$issued['refresh_token']]);identityHttp('auth/logout',$next['access_token'],200,'POST',[]);}
+    ih((int)$p->query('SELECT COUNT(*) FROM user_api_sessions WHERE revoked_at IS NULL')->fetchColumn()===0,'No active synthetic families');
+} finally {
+    foreach(array_reverse($processes) as [$process,$pipes]){if(is_resource($process)){proc_terminate($process);foreach($pipes as $pipe){if(is_resource($pipe))fclose($pipe);}proc_close($process);}}
+    apiFixtureDrop($source);
+    if(is_file($storage.'/cache/api-auth/counters.json')){unlink($storage.'/cache/api-auth/counters.json');rmdir($storage.'/cache/api-auth');rmdir($storage.'/cache');}
+    if(is_file($pem))unlink($pem);rmdir($storage);
+}
+echo "Medical Conditions API verified PHP/cURL HTTPS: $checks checks passed; disposable database/server/files removed.\n";

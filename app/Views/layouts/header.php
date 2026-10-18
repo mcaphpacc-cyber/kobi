@@ -53,6 +53,10 @@ href="<?= asset('css/symptom-checker.css') ?>">
 
 <script src="<?= asset('js/kobi-config.js') ?>"></script>
 
+<?php if (!empty($medicalSummaryStyles)): ?>
+<link rel="stylesheet" href="<?= asset('css/medical-summary.css') ?>?v=<?= filemtime(dirname(__DIR__, 3) . '/public/assets/css/medical-summary.css') ?>">
+<?php endif; ?>
+
 </head>
 
 <body>

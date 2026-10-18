@@ -11,7 +11,7 @@ declare(strict_types=1);
                 <div class="card-body p-4 text-center">
 
                     <h1 class="h4 mb-3">
-                        Email Verification Failed
+                        <?= e($heading ?? 'Email Verification Failed') ?>
                     </h1>
 
                     <div class="alert alert-danger">
@@ -19,15 +19,14 @@ declare(strict_types=1);
                     </div>
 
                     <p class="text-muted">
-                        Please request a new verification email
-                        and try again.
+                        <?= e($instructions ?? 'Please request a new verification email and try again.') ?>
                     </p>
 
                     <a
-                        href="<?= e(url('/login')) ?>"
+                        href="<?= e($actionUrl ?? url('/login')) ?>"
                         class="btn btn-primary"
                     >
-                        Go to Login
+                        <?= e($actionLabel ?? 'Go to Login') ?>
                     </a>
 
                 </div>

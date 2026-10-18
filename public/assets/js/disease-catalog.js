@@ -793,51 +793,7 @@ document.addEventListener("DOMContentLoaded", () => {
             return false;
         }
 
-        /*
-        |--------------------------------------------------------------------------
-        | Phrase Search
-        |--------------------------------------------------------------------------
-        |
-        | If the user searches multiple words like:
-        | "ear pain"
-        | "chest pain"
-        | "high blood pressure"
-        |
-        | search for the complete phrase.
-        |
-        */
-
-        if (keyword.includes(" ")) {
-            return text.includes(keyword);
-        }
-
-        /*
-        |--------------------------------------------------------------------------
-        | Single Word Search
-        |--------------------------------------------------------------------------
-        */
-
-        const words = text
-            .split(/[\s,()/-]+/)
-            .filter(Boolean);
-
-        return words.some(word => {
-
-            if (word === keyword)
-                return true;
-
-            // Singular / plural matching
-            if (
-                word.endsWith("s") &&
-                word.slice(0, -1) === keyword
-            ) {
-                return true;
-            }
-
-            return false;
-
-        });
-
+        return text.includes(keyword);
     }
 
     /*
@@ -1036,7 +992,7 @@ document.addEventListener("DOMContentLoaded", () => {
             const d2 = state.compare[1].slug;
 
             window.location.href =
-                `${window.KOBI.baseUrl}compare/result?d1=${encodeURIComponent(d1)}&d2=${encodeURIComponent(d2)}`;
+                `${window.KOBI.baseUrl}/compare/result?d1=${encodeURIComponent(d1)}&d2=${encodeURIComponent(d2)}`;
                     });
     }
 
@@ -1118,6 +1074,14 @@ document.addEventListener("DOMContentLoaded", () => {
         const params =
             new URLSearchParams();
 
+        // Keep the server-selected catalog subset when local controls change.
+        const currentParams = new URLSearchParams(window.location.search);
+        for (const key of ["body", "featured", "recent"]) {
+            if (currentParams.has(key)) {
+                params.set(key, currentParams.get(key));
+            }
+        }
+
         if (state.keyword)
         {
             params.set(
@@ -1149,6 +1113,20 @@ document.addEventListener("DOMContentLoaded", () => {
                 state.currentPage
             );
         }
+
+        // Body-system/Featured/Recent links must intersect with local search/filters.
+        document.querySelectorAll(".body-filter-bar a[href]").forEach(link => {
+            const target = new URL(link.href);
+            for (const key of ["search", "gender", "sort"]) {
+                if (params.has(key)) {
+                    target.searchParams.set(key, params.get(key));
+                } else {
+                    target.searchParams.delete(key);
+                }
+            }
+            target.searchParams.delete("page");
+            link.href = target.href;
+        });
 
         const url =
             window.location.pathname +

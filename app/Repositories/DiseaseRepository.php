@@ -7,6 +7,42 @@ use App\Services\Disease\QuickFactsBuilder;
 
 class DiseaseRepository extends BaseRepository
 {
+    public function countPublicApiDiseases(): int
+    {
+        return (int)$this->db->query("SELECT COUNT(*) FROM diseases WHERE slug IS NOT NULL AND slug <> ''")->fetchColumn();
+    }
+
+    public function listPublicApiDiseases(int $limit, int $offset): array
+    {
+        $limit = max(1, min(50, $limit));
+        $offset = max(0, min(499950, $offset));
+        return $this->fetchAll(
+            "SELECT d.id, d.slug, d.disease_en, d.disease_hi, d.gender, bp.name_en AS body_name
+             FROM diseases d LEFT JOIN body_parts bp ON bp.id = d.body_part_id
+             WHERE d.slug IS NOT NULL AND d.slug <> ''
+             ORDER BY d.disease_en ASC, d.id ASC LIMIT {$limit} OFFSET {$offset}"
+        );
+    }
+
+    public function findPublicApiDisease(string $slug): ?array
+    {
+        return $this->fetch(
+            "SELECT d.id, d.slug, d.disease_en, d.disease_hi, d.gender, bp.name_en AS body_name,
+                    dc.overview_en, dc.causes_en, dc.risk_factors_en, dc.diagnosis_en,
+                    dc.prevention_en, dc.urgency_note_en
+             FROM diseases d LEFT JOIN body_parts bp ON bp.id = d.body_part_id
+             LEFT JOIN disease_content dc ON dc.disease_id = d.id
+             WHERE d.slug = :slug AND d.slug <> '' LIMIT 1", ['slug' => $slug]
+        );
+    }
+
+    public function publicApiCauseNames(int $diseaseId): array
+    {
+        $rows = $this->getCausesForDisease($diseaseId, 101);
+        if (count($rows) > 100) { throw new \LengthException('Public cause list exceeds response limit'); }
+        return array_column($rows, 'cause_en');
+    }
+
     /**
      * Get all diseases ordered alphabetically.
      */
@@ -88,7 +124,8 @@ class DiseaseRepository extends BaseRepository
     }
 
     private function getCausesForDisease(
-        int $diseaseId
+        int $diseaseId,
+        ?int $limit = null
     ): array
     {
         $sql = "
@@ -113,6 +150,8 @@ class DiseaseRepository extends BaseRepository
 
         ";
 
+        if ($limit !== null) { $sql .= ' LIMIT ' . max(1, min(101, $limit)); }
+
         return $this->fetchAll($sql, [
 
             'id' => $diseaseId
@@ -120,37 +159,16 @@ class DiseaseRepository extends BaseRepository
         ]);
     }
 
-    private function getTreatmentsForDisease(
-        int $diseaseId
-    ): array
+    /** Existing educational content for Disease Detail only; not a governed publication. */
+    public function findLegacyTreatmentsForDiseaseDetail(int $diseaseId): array
     {
-        $sql = "
-            SELECT
-
-                tp.id,
-
-                tp.treatment_system_id,
-
-                tp.title_en,
-
-                tp.title_hi,
-
-                tp.overview_en,
-
-                tp.overview_hi
-
-            FROM treatment_protocols tp
-
-            WHERE tp.disease_id = :id
-
-            ORDER BY tp.treatment_system_id
-        ";
-
         return $this->fetchAll(
-            $sql,
-            [
-                'id' => $diseaseId
-            ]
+            'SELECT tp.id, tp.treatment_system_id, tp.title_en, tp.title_hi,
+                    tp.overview_en, tp.overview_hi
+             FROM treatment_protocols tp
+             WHERE tp.disease_id = :id
+             ORDER BY tp.treatment_system_id',
+            ['id' => $diseaseId]
         );
     }
 
@@ -278,7 +296,8 @@ class DiseaseRepository extends BaseRepository
 
             'causes' => $this->getCausesForDisease($id),
 
-            'treatments' => $this->getTreatmentsForDisease($id),
+            // Services select the presentation-specific treatment reader.
+            'treatments' => [],
 
             'faqs' => $this->getFaqsForDisease($id),
 
@@ -290,6 +309,23 @@ class DiseaseRepository extends BaseRepository
     /**
      * Search diseases.
      */
+    /** Ranked public names only; no knowledge, preference or private-data reads. */
+    public function searchPublicNames(string $query, string $pattern): array
+    {
+        return $this->fetchAll(
+            "SELECT d.id, d.slug, d.disease_en, d.disease_hi, d.gender, bp.name_en AS body_name
+             FROM diseases d LEFT JOIN body_parts bp ON bp.id = d.body_part_id
+             WHERE d.slug IS NOT NULL AND d.slug <> ''
+               AND (d.disease_en LIKE :contains_en ESCAPE '=' OR d.disease_hi LIKE :contains_hi ESCAPE '=')
+             ORDER BY CASE
+               WHEN d.disease_en = :exact_en OR d.disease_hi = :exact_hi THEN 0
+               WHEN d.disease_en LIKE :prefix_en ESCAPE '=' OR d.disease_hi LIKE :prefix_hi ESCAPE '=' THEN 1
+               ELSE 2 END, d.disease_en ASC, d.id ASC LIMIT 11",
+            ['contains_en' => '%' . $pattern . '%', 'contains_hi' => '%' . $pattern . '%',
+             'exact_en' => $query, 'exact_hi' => $query, 'prefix_en' => $pattern . '%', 'prefix_hi' => $pattern . '%']
+        );
+    }
+
     public function search(string $keyword): array
     {
         $sql = "

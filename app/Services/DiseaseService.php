@@ -18,7 +18,9 @@ class DiseaseService
     private DiseaseComparisonBuilder $comparisonBuilder,
     private BodyPartRepository $bodyPartRepository,
     private Session $session,
-    private TreatmentPreferenceService $treatmentPreferenceService
+    private TreatmentPreferenceService $treatmentPreferenceService,
+    private TreatmentPublicationService $treatmentPublicationService,
+    private DiseaseReferenceService $diseaseReferenceService
 ) {
 }
 
@@ -141,10 +143,20 @@ class DiseaseService
             return null;
         }
 
-        $knowledge['treatments'] =
-            $this->applyTreatmentPreference(
-                $knowledge['treatments'] ?? []
-            );
+        // Disease Detail restores legacy educational display independently of publication policy.
+        $knowledge['treatments'] = $this->applyTreatmentPreference(
+            $this->repository->findLegacyTreatmentsForDiseaseDetail(
+                (int) ($knowledge['disease']['disease_id'] ?? $knowledge['disease']['id'] ?? 0)
+            )
+        );
+
+        $knowledge['section_references'] = [];
+        if ($language === 'en') {
+            $diseaseId = (int) ($knowledge['disease']['disease_id'] ?? $knowledge['disease']['id'] ?? 0);
+            foreach (DiseaseReferenceService::SECTIONS as $section) {
+                $knowledge['section_references'][$section] = $this->diseaseReferenceService->getForSection($diseaseId, $section);
+            }
+        }
 
         return $knowledge;
     }
@@ -311,6 +323,9 @@ class DiseaseService
         if (!$right) {
             return null;
         }
+
+        $left = $this->withPublicTreatments($left, $language);
+        $right = $this->withPublicTreatments($right, $language);
 
         return $this->comparisonBuilder
             ->build(
@@ -493,6 +508,17 @@ class DiseaseService
             $rows,
             $language
         );
+    }
+
+    /** Comparison retains the canonical governed public projection. */
+    private function withPublicTreatments(array $knowledge, string $language): array
+    {
+        $knowledge['treatments']=$this->applyTreatmentPreference(
+            $this->treatmentPublicationService->getPublicTreatmentsForDisease(
+                (int)($knowledge['disease']['disease_id'] ?? $knowledge['disease']['id'] ?? 0), $language
+            )
+        );
+        return $knowledge;
     }
 
     private function applyTreatmentPreference(

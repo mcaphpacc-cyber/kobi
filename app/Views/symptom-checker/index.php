@@ -59,6 +59,7 @@
                                 class="tag-list">
                             </div>
 
+                            <label for="symptomSearch" class="visually-hidden">Search symptoms</label>
                             <input
                                 id="symptomSearch"
                                 type="text"
@@ -221,6 +222,20 @@
             </div>
             <!-- Disease Results -->
             <div id="matchResults"></div>
+
+            <div id="savedCheckControls" class="mt-3 d-none">
+                <?php if ($auth !== null && $auth->check()): ?>
+                    <form id="savedCheckForm" method="POST" action="<?= e(url('/account/saved-symptom-checks')) ?>">
+                        <?= csrfField() ?>
+                        <input type="hidden" name="check_key" id="savedCheckKey" value="">
+                        <button type="submit" id="saveCheckButton" class="btn btn-outline-primary" disabled>Save this check</button>
+                        <p class="small text-muted mt-2" id="saveCheckStatus" role="status">Only your latest completed check in this session can be saved, for up to one hour.</p>
+                    </form>
+                <?php else: ?>
+                    <a class="btn btn-outline-primary" href="<?= e(url('/login')) ?>">Sign in to save checks</a>
+                    <p class="small text-muted mt-2">Sign in, then complete a new check to save it to your account.</p>
+                <?php endif; ?>
+            </div>
 
         </div>
 

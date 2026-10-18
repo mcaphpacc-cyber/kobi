@@ -4,6 +4,22 @@ namespace App\Repositories;
 
 class HealthMedicineRepository extends BaseRepository
 {
+    /** Explicit API columns; the caller must first authorize the profile. */
+    public function findApiByProfile(int $profileId): array
+    {
+        return $this->fetchAll('SELECT id,brand_name,generic_name,strength,dose,frequency,route,status,started_on,stopped_on
+            FROM health_medicines WHERE health_profile_id=:profile
+            ORDER BY CASE status WHEN \'current\' THEN 1 WHEN \'stopped\' THEN 2 WHEN \'historical\' THEN 3 END,
+                started_on DESC,id DESC', ['profile'=>$profileId]);
+    }
+
+    public function findApiByIdInProfile(int $medicationId,int $profileId): ?array
+    {
+        return $this->fetch('SELECT id,brand_name,generic_name,strength,dose,frequency,route,status,started_on,stopped_on
+            FROM health_medicines WHERE id=:id AND health_profile_id=:profile LIMIT 1',
+            ['id'=>$medicationId,'profile'=>$profileId]);
+    }
+
     /**
      * Get all medicines for a health profile.
      */
@@ -133,7 +149,11 @@ class HealthMedicineRepository extends BaseRepository
             WHERE id = :id
         ";
 
-        return $this->execute(
+        $this->beginTransaction();
+        try {
+            // Serialize status transitions with schedule/checkoff mutations.
+            $this->fetch('SELECT id FROM health_medicines WHERE id=:id FOR UPDATE', ['id'=>$id]);
+            $updated = $this->execute(
             $sql,
             [
                 'id'               => $id,
@@ -149,7 +169,14 @@ class HealthMedicineRepository extends BaseRepository
                 'prescribed_by'   => $data['prescribed_by'] ?? null,
                 'notes'           => $data['notes'] ?? null
             ]
-        );
+            );
+            if (($data['status'] ?? 'current') !== 'current') {
+                $this->execute('UPDATE health_medicine_schedule_slots SET is_active=0, updated_at=:now
+                    WHERE health_medicine_id=:id AND is_active=1', ['now'=>gmdate('Y-m-d H:i:s'),'id'=>$id]);
+            }
+            $this->commit();
+            return $updated;
+        } catch (\Throwable $exception) { $this->rollback(); throw $exception; }
     }
 
 

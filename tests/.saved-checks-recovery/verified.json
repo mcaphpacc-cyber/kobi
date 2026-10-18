@@ -1,0 +1,16 @@
+{
+    "status": "RECOVERY_VERIFIED",
+    "backup_sha256": "a533ab2b31b438f0c9215a1069c3b1a2ba4c952cdeee5ba11dd2000e52e26050",
+    "backup_bytes": 11295336,
+    "normal_fingerprint": "482092219f39a87aaa0a632f2a1a2d4b07c641f3d495da98c6f1260d31e4709c",
+    "database": "medical1",
+    "recovery_database": "kobi_saved_checks_recovery_20261013",
+    "tables": 57,
+    "views": 1,
+    "triggers": 15,
+    "sql_mode": {
+        "session_mode": "NO_ZERO_IN_DATE,NO_ZERO_DATE,NO_ENGINE_SUBSTITUTION",
+        "global_mode": "NO_ZERO_IN_DATE,NO_ZERO_DATE,NO_ENGINE_SUBSTITUTION"
+    },
+    "artifact_sha256": "63f69b757910d0018642acfb8efb2f2d7734e16b84e20c975ad39650b43a6095"
+}

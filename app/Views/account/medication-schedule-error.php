@@ -1,0 +1,1 @@
+<div class="container py-4"><h1 class="h3">Medication Schedule</h1><div class="alert alert-danger text-break" role="alert"><?= e($message) ?></div><a class="btn btn-outline-secondary" href="<?= e(url('/account/health-records')) ?>">Health Records</a></div>

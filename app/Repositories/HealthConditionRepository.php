@@ -4,6 +4,32 @@ namespace App\Repositories;
 
 class HealthConditionRepository extends BaseRepository
 {
+    /** The caller must authorize the profile before these API reads. */
+    public function countApiByProfile(int $profileId): int
+    {
+        $row = $this->fetch('SELECT COUNT(*) AS total FROM health_conditions WHERE health_profile_id = :profile', ['profile' => $profileId]);
+        return (int) ($row['total'] ?? 0);
+    }
+
+    public function listApiByProfile(int $profileId, int $limit, int $offset): array
+    {
+        // Match the existing public API's bounded integer LIMIT/OFFSET convention.
+        $limit = max(1, min(50, $limit));
+        $offset = max(0, min(499950, $offset));
+        return $this->fetchAll("SELECT id, condition_name, status, diagnosed_on, resolved_on
+            FROM health_conditions WHERE health_profile_id = :profile
+            ORDER BY CASE status WHEN 'active' THEN 1 WHEN 'chronic' THEN 2
+                WHEN 'historical' THEN 3 WHEN 'resolved' THEN 4 ELSE 5 END,
+                diagnosed_on DESC, id DESC LIMIT {$limit} OFFSET {$offset}", ['profile' => $profileId]);
+    }
+
+    public function findApiByIdInProfile(int $conditionId, int $profileId): ?array
+    {
+        return $this->fetch('SELECT id, condition_name, status, diagnosed_on, resolved_on
+            FROM health_conditions WHERE id = :id AND health_profile_id = :profile LIMIT 1',
+            ['id' => $conditionId, 'profile' => $profileId]);
+    }
+
     /**
      * Get all medical conditions for a health profile.
      */

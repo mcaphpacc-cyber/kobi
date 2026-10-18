@@ -274,7 +274,7 @@ $pageTitle = 'Knowledge Discovery';
                 </a>
 
                 <a
-                    href="javascript:void(0)"
+                    href="<?= url('/diseases') ?>"
                     class="btn btn-outline-secondary">
 
                     Browse Body Systems

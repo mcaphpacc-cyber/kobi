@@ -7,6 +7,10 @@
     # Protect hidden files such as .env, .git, etc.
     RewriteRule (^|/)\. - [F,L]
 
+    # Forward Bearer headers only for the explicit authenticated API paths below.
+    RewriteCond %{HTTP:Authorization} .
+    RewriteRule ^api/v1/(?:auth/|me$|saved-symptom-checks(?:/[^/]+)?$|health-profiles(?:/[^/]+(?:/(?:medications|conditions)(?:/[^/]+)?|/medical-summary|/medication-schedules(?:/due-today|/[^/]+/checkoff)?)?)?$) - [E=HTTP_AUTHORIZATION:%{HTTP:Authorization}]
+
     # Front controller
     RewriteCond %{REQUEST_FILENAME} !-f
     RewriteCond %{REQUEST_FILENAME} !-d

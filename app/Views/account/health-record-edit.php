@@ -72,7 +72,7 @@
                         class="form-control"
                         maxlength="150"
                         value="<?= e(
-                            $profile['full_name'] ?? ''
+                            $old['full_name'] ?? $profile['full_name'] ?? ''
                         ) ?>"
                         required
                     >
@@ -95,7 +95,7 @@
                         name="date_of_birth"
                         class="form-control"
                         value="<?= e(
-                            $profile['date_of_birth'] ?? ''
+                            $old['date_of_birth'] ?? $profile['date_of_birth'] ?? ''
                         ) ?>"
                     >
 
@@ -113,7 +113,7 @@
 
                     <?php
                     $gender =
-                        $profile['gender']
+                        $old['gender'] ?? $profile['gender']
                         ?? 'unspecified';
                     ?>
 

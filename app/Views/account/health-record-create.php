@@ -20,6 +20,12 @@
     </div>
 
 
+    <?php if (!empty($error)): ?>
+        <div class="alert alert-danger" role="alert">
+            <?= e($error) ?>
+        </div>
+    <?php endif; ?>
+
     <div class="card shadow-sm">
 
         <div class="card-header bg-white">
@@ -52,6 +58,7 @@
                         name="full_name"
                         class="form-control"
                         maxlength="150"
+                        value="<?= e($old['full_name'] ?? '') ?>"
                         required
                     >
 
@@ -72,6 +79,7 @@
                         id="date_of_birth"
                         name="date_of_birth"
                         class="form-control"
+                        value="<?= e($old['date_of_birth'] ?? '') ?>"
                     >
 
                 </div>
@@ -91,19 +99,19 @@
                         name="gender"
                         class="form-select"
                     >
-                        <option value="unspecified">
+                        <option value="unspecified" <?= ($old['gender'] ?? 'unspecified') === 'unspecified' ? 'selected' : '' ?>>
                             Prefer not to specify
                         </option>
 
-                        <option value="male">
+                        <option value="male" <?= ($old['gender'] ?? '') === 'male' ? 'selected' : '' ?>>
                             Male
                         </option>
 
-                        <option value="female">
+                        <option value="female" <?= ($old['gender'] ?? '') === 'female' ? 'selected' : '' ?>>
                             Female
                         </option>
 
-                        <option value="other">
+                        <option value="other" <?= ($old['gender'] ?? '') === 'other' ? 'selected' : '' ?>>
                             Other
                         </option>
                     </select>

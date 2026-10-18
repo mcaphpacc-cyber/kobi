@@ -125,143 +125,43 @@ $formatLabel =
 
 ?>
 
-<div class="container py-4">
+<div class="medical-summary-page">
 
-    <!-- Actions -->
-    <!-- Actions -->
-<div
-    class="d-flex
-           justify-content-between
-           align-items-center
-           flex-wrap
-           gap-2
-           mb-3"
->
-
-    <a
-        href="<?= url(
-            '/account/health-records/' .
-            $profileId
-        ) ?>"
-        class="text-decoration-none"
-    >
-        <i class="bi bi-arrow-left"></i>
-        Back to Health Record
+    <a class="d-inline-flex align-items-center gap-2 text-decoration-none mb-3"
+       href="<?= e(url('/account/health-records/' . $profileId)) ?>">
+        <i class="bi bi-arrow-left" aria-hidden="true"></i> Back to Health Record
     </a>
 
-
-    <div
-        class="d-flex
-               align-items-center
-               flex-wrap
-               gap-2"
-    >
-
-            <a
-                href="<?= url(
-                    '/account/health-records/' .
-                    $profileId .
-                    '/timeline'
-                ) ?>"
-                class="btn btn-outline-secondary btn-sm"
-            >
-                <i class="bi bi-clock-history"></i>
-                Medical Timeline
-            </a>
-
-
-            <?php if (
-                ($profile['role'] ?? null)
-                === 'owner'
-            ): ?>
-
-                <a
-                    href="<?= url(
-                        '/account/health-records/' .
-                        $profileId .
-                        '/medical-summary/share'
-                    ) ?>"
-                    class="btn btn-primary btn-sm"
-                >
-                    <i class="bi bi-share"></i>
-                    Share Medical Summary
-                </a>
-
-                <a
-                    href="<?= url(
-                        '/account/health-records/' .
-                        $profileId .
-                        '/medical-summary/shares'
-                    ) ?>"
-                    class="btn btn-outline-secondary btn-sm"
-                >
-                    <i class="bi bi-link-45deg"></i>
-                    Manage Shared Links
-                </a>
-
-            <?php endif; ?>
-
+    <header class="medical-summary-heading">
+        <div>
+            <p class="medical-summary-label mb-2">KOBI Health Record</p>
+            <h1 class="h2 mb-2">Medical Summary</h1>
+            <p class="text-muted mb-1">A concise summary of recorded health information</p>
+            <p class="small text-muted mb-0">Prepared from KOBI Health Record</p>
         </div>
+        <nav class="medical-summary-actions d-flex flex-wrap gap-2" aria-label="Medical Summary actions">
+            <a class="btn btn-outline-secondary btn-sm"
+               href="<?= e(url('/account/health-records/' . $profileId . '/timeline')) ?>">
+                <i class="bi bi-clock-history" aria-hidden="true"></i> Medical Timeline
+            </a>
+            <?php if (($profile['role'] ?? null) === 'owner'): ?>
+                <a class="btn btn-primary btn-sm"
+                   href="<?= e(url('/account/health-records/' . $profileId . '/medical-summary/share')) ?>">
+                    <i class="bi bi-share" aria-hidden="true"></i> Share Medical Summary
+                </a>
+                <a class="btn btn-outline-secondary btn-sm"
+                   href="<?= e(url('/account/health-records/' . $profileId . '/medical-summary/shares')) ?>">
+                    <i class="bi bi-link-45deg" aria-hidden="true"></i> Manage Shared Links
+                </a>
+            <?php endif; ?>
+        </nav>
+    </header>
 
-    </div>
-
-
-    <!-- A4 Medical Report -->
     <div class="medical-summary-sheet">
-
-        <!-- Header -->
-        <header
-            class="medical-summary-header
-                   border-bottom
-                   pb-3
-                   mb-4"
-        >
-
-            <div
-                class="d-flex
-                       justify-content-between
-                       align-items-start
-                       gap-3"
-            >
-
-                <div>
-
-                    <div
-                        class="small
-                               text-uppercase
-                               text-muted
-                               fw-semibold
-                               mb-1"
-                    >
-                        KOBI
-                    </div>
-
-                    <h1 class="h3 mb-1">
-                        Medical Summary
-                    </h1>
-
-                    <div class="text-muted">
-                        A concise summary of recorded
-                        health information
-                    </div>
-
-                </div>
-
-                <div
-                    class="text-end
-                           small
-                           text-muted"
-                >
-                    Prepared from KOBI Health Record
-                </div>
-
-            </div>
-
-        </header>
 
 
         <!-- Patient Information -->
-        <section class="medical-summary-section">
+        <section class="medical-summary-section medical-summary-patient">
 
             <h2 class="medical-summary-section-title">
                 Patient Information
@@ -269,7 +169,7 @@ $formatLabel =
 
             <div class="row g-3">
 
-                <div class="col-12 col-md-6">
+                <div class="col-12 col-md-3">
 
                     <div class="medical-summary-label">
                         Name
@@ -284,7 +184,7 @@ $formatLabel =
 
                 <?php if ($dob !== ''): ?>
 
-                    <div class="col-6 col-md-2">
+                    <div class="col-6 col-md-3">
 
                         <div class="medical-summary-label">
                             Date of Birth
@@ -303,7 +203,7 @@ $formatLabel =
 
                 <?php if ($age !== null): ?>
 
-                    <div class="col-6 col-md-2">
+                    <div class="col-6 col-md-3">
 
                         <div class="medical-summary-label">
                             Age
@@ -320,7 +220,7 @@ $formatLabel =
 
                 <?php if ($gender !== ''): ?>
 
-                    <div class="col-6 col-md-2">
+                    <div class="col-6 col-md-3">
 
                         <div class="medical-summary-label">
                             Gender
@@ -914,66 +814,51 @@ $formatLabel =
         <?php endif; ?>
 
 
-        <!-- Future Sections -->
-        <section
-            class="medical-summary-section
-                   medical-summary-future"
-        >
+        <section class="medical-summary-section medical-summary-navigation" aria-labelledby="summary-documents-heading">
+            <h2 class="medical-summary-section-title" id="summary-documents-heading">Reports &amp; Documents</h2>
+            <p class="text-muted mb-2">View medical reports and documents associated with this health record.</p>
+            <a class="text-decoration-none" href="<?= e(url('/account/health-records/' . $profileId . '/documents')) ?>">
+                View Reports &amp; Documents <i class="bi bi-arrow-right" aria-hidden="true"></i>
+            </a>
+        </section>
 
-            <div class="row g-3">
-
-                <div class="col-12 col-md-6">
-
-                    <div class="medical-summary-future-item">
-
-                        <div class="medical-summary-label">
-                            Reports &amp; Documents
+        <section class="medical-summary-section" aria-labelledby="summary-insurance-heading">
+            <h2 class="medical-summary-section-title" id="summary-insurance-heading">Insurance</h2>
+            <?php if (empty($insurancePolicies)): ?>
+                <p class="medical-summary-empty">No insurance information has been recorded for this health profile.</p>
+            <?php else: ?>
+                <?php foreach ($insurancePolicies as $policy): ?>
+                    <div class="medical-summary-insurance-policy">
+                        <div class="d-flex flex-wrap justify-content-between align-items-start gap-2 mb-3">
+                            <div>
+                                <h3 class="h6 mb-1 text-break"><?= e($policy['provider_name']) ?></h3>
+                                <?php if (!empty($policy['policy_name'])): ?>
+                                    <p class="small text-muted mb-0 text-break"><?= e($policy['policy_name']) ?></p>
+                                <?php endif; ?>
+                            </div>
+                            <span class="badge text-bg-light"><?= e($formatLabel($policy['status'])) ?></span>
                         </div>
-
-                        <div class="text-muted small mb-2">
-                            View medical reports and documents
-                            associated with this health record.
-                        </div>
-
-                        <a
-                            href="<?= url(
-                                '/account/health-records/' .
-                                $profileId .
-                                '/documents'
-                            ) ?>"
-                            class="text-decoration-none"
-                        >
-                            View Reports &amp; Documents
-                            <i class="bi bi-arrow-right"></i>
-                        </a>
-
+                        <dl class="row g-3 mb-0">
+                            <div class="col-12 col-sm-6 col-lg-3">
+                                <dt class="medical-summary-label">Policy Type</dt>
+                                <dd class="medical-summary-value mb-0"><?= e($formatLabel($policy['policy_type'])) ?></dd>
+                            </div>
+                            <div class="col-12 col-sm-6 col-lg-3">
+                                <dt class="medical-summary-label">Sum Insured</dt>
+                                <dd class="medical-summary-value mb-0"><?php if ($policy['sum_insured'] !== null && $policy['sum_insured'] !== ''): ?><?= e($policy['currency_code']) ?> <?= e(number_format((float) $policy['sum_insured'], 2)) ?><?php else: ?>Not specified<?php endif; ?></dd>
+                            </div>
+                            <div class="col-6 col-lg-3">
+                                <dt class="medical-summary-label">Effective Date</dt>
+                                <dd class="medical-summary-value mb-0"><?= e($formatDate($policy['start_date']) ?: 'Not specified') ?></dd>
+                            </div>
+                            <div class="col-6 col-lg-3">
+                                <dt class="medical-summary-label">Expiry Date</dt>
+                                <dd class="medical-summary-value mb-0"><?= e($formatDate($policy['expiry_date']) ?: 'Not specified') ?></dd>
+                            </div>
+                        </dl>
                     </div>
-
-                </div>
-
-
-                <div class="col-12 col-md-6">
-
-                    <div class="medical-summary-future-item">
-
-                        <div
-                            class="medical-summary-label"
-                        >
-                            Insurance
-                        </div>
-
-                        <div class="text-muted small">
-                            Insurance information will be
-                            available here when the
-                            insurance module is implemented.
-                        </div>
-
-                    </div>
-
-                </div>
-
-            </div>
-
+                <?php endforeach; ?>
+            <?php endif; ?>
         </section>
 
 
@@ -1013,154 +898,3 @@ $formatLabel =
 </div>
 
 
-<style>
-.medical-summary-sheet
-{
-    max-width: 900px;
-    margin: 0 auto;
-    padding: 2.5rem;
-    background: var(--bs-body-bg);
-    border: 1px solid var(--bs-border-color);
-    box-shadow: 0 0.25rem 1rem rgba(0, 0, 0, 0.06);
-}
-
-.medical-summary-section
-{
-    margin-bottom: 2rem;
-}
-
-.medical-summary-section-title
-{
-    margin-bottom: 1rem;
-    padding-bottom: 0.4rem;
-    border-bottom: 1px solid var(--bs-border-color);
-    font-size: 1rem;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.03em;
-}
-
-.medical-summary-label
-{
-    margin-bottom: 0.2rem;
-    font-size: 0.75rem;
-    font-weight: 600;
-    color: var(--bs-secondary-color);
-    text-transform: uppercase;
-    letter-spacing: 0.03em;
-}
-
-.medical-summary-value
-{
-    font-size: 0.95rem;
-}
-
-.medical-summary-table
-{
-    vertical-align: middle;
-}
-
-.medical-summary-table th
-{
-    font-size: 0.75rem;
-    font-weight: 600;
-    text-transform: uppercase;
-    white-space: nowrap;
-}
-
-.medical-summary-table td
-{
-    font-size: 0.875rem;
-}
-
-.medical-summary-empty
-{
-    margin-bottom: 0;
-    color: var(--bs-secondary-color);
-    font-size: 0.875rem;
-}
-
-.medical-summary-navigation
-{
-    padding-top: 0.25rem;
-}
-
-.medical-summary-future
-{
-    padding-top: 0.5rem;
-}
-
-.medical-summary-future-item
-{
-    padding: 0.9rem;
-    border: 1px solid var(--bs-border-color);
-}
-
-.medical-summary-footer
-{
-    font-size: 0.75rem;
-}
-
-@media (max-width: 767.98px)
-{
-    .medical-summary-sheet
-    {
-        padding: 1.25rem;
-    }
-
-    .medical-summary-header > div
-    {
-        flex-direction: column;
-    }
-}
-
-@media print
-{
-    body
-    {
-        background: #fff !important;
-    }
-
-    .container
-    {
-        max-width: none !important;
-        width: 100% !important;
-        padding: 0 !important;
-    }
-
-    .medical-summary-sheet
-    {
-        max-width: none;
-        margin: 0;
-        padding: 0;
-        border: 0;
-        box-shadow: none;
-    }
-
-    .medical-summary-section
-    {
-        break-inside: avoid;
-    }
-
-    .medical-summary-table
-    {
-        font-size: 10pt;
-    }
-
-    .medical-summary-table th,
-    .medical-summary-table td
-    {
-        border-color: #999 !important;
-    }
-
-    .medical-summary-navigation
-    {
-        display: none;
-    }
-
-    .medical-summary-future
-    {
-        display: none;
-    }
-}
-</style>

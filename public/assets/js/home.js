@@ -1,4 +1,5 @@
 let activeIndex = -1;
+let searchVersion = 0;
 
 const searchBox =
     document.getElementById(
@@ -10,67 +11,62 @@ const results =
         'homeSearchResults'
     );
 
-    searchBox.addEventListener(
-    'input',
-    async e =>
+const searchButton = searchBox.closest('.input-group').querySelector('button');
+
+function clearResults()
 {
-    const keyword =
-        e.target.value.trim();
+    results.replaceChildren();
+    results.style.display = 'none';
+    activeIndex = -1;
+}
 
-    if (keyword.length < 2)
-    {
-        results.innerHTML = '';
+async function searchDiseases()
+{
+    const version = ++searchVersion;
+    const keyword = searchBox.value.trim();
+    clearResults();
 
-        return;
+    if (keyword.length < 2) { return; }
+
+    const endpoint = new URL('search/suggestions', window.KOBI.apiBase.replace(/\/+$/, '') + '/');
+    endpoint.searchParams.set('q', keyword);
+
+    try {
+        const response = await fetch(endpoint);
+        if (!response.ok) { throw new Error('Disease search unavailable.'); }
+        const diseases = await response.json();
+        if (version !== searchVersion) { return; }
+        renderResults(diseases);
+    } catch (error) {
+        if (version === searchVersion) {
+            clearResults();
+            console.error('Unable to search diseases. Please retry.');
+        }
     }
+}
 
-    const response =
-        await fetch(
-
-            window.KOBI.apiBase +
-
-            '/search/suggestions?q=' +
-
-            encodeURIComponent(keyword)
-
-        );
-
-    const diseases =
-        await response.json();
-
-    renderResults(
-        diseases
-    );
-
-});
+searchBox.addEventListener('input', searchDiseases);
+searchButton.addEventListener('click', searchDiseases);
 
 function renderResults(
     diseases
 )
 {
-    //results.innerHTML = '';
-    results.style.display = 'block';
+    clearResults();
 
     diseases.forEach(
         disease =>
     {
-        results.innerHTML +=
-
-        `
-        <a
-
-            href="${window.KOBI.baseUrl}disease/${disease.slug}"
-
-            class="list-group-item list-group-item-action">
-
-            <i class="bi bi-search me-2"></i>
-
-            ${disease.disease_en}
-
-        </a>
-        `;
+        const link = document.createElement('a');
+        link.href = new URL('disease/' + encodeURIComponent(disease.slug), window.KOBI.baseUrl.replace(/\/+$/, '') + '/').href;
+        link.className = 'list-group-item list-group-item-action';
+        const icon = document.createElement('i');
+        icon.className = 'bi bi-search me-2';
+        link.append(icon, document.createTextNode(disease.disease_en));
+        results.appendChild(link);
 
     });
+    results.style.display = diseases.length ? 'block' : 'none';
 }
 
 function highlightActive(items)
@@ -100,8 +96,23 @@ searchBox.addEventListener(
     const items =
         results.querySelectorAll('a');
 
-    if (!items.length)
+    if (e.key === 'Enter') {
+        e.preventDefault();
+        if (activeIndex >= 0 && items[activeIndex] && results.style.display !== 'none') {
+            items[activeIndex].click();
+        } else {
+            searchDiseases();
+        }
         return;
+    }
+
+    if (e.key === 'Escape') {
+        ++searchVersion;
+        clearResults();
+        return;
+    }
+
+    if (!items.length) { return; }
 
     switch (e.key)
     {
@@ -128,26 +139,6 @@ searchBox.addEventListener(
                 );
 
             break;
-
-        case 'Enter':
-
-            if (activeIndex >= 0)
-            {
-                e.preventDefault();
-
-                items[activeIndex].click();
-            }
-
-            return;
-        case 'Escape':
-
-            results.innerHTML = '';
-
-            results.style.display = 'none';
-
-            activeIndex = -1;
-
-            return;
 
         default:
 

@@ -73,6 +73,8 @@ class HealthProfileService
 
         $this->validateGender($gender);
 
+        $dateOfBirth = $this->normalizeDateOfBirth($dateOfBirth);
+
         return $this->repository->createProfileWithOwner(
             'family',
             $fullName,
@@ -219,6 +221,8 @@ class HealthProfileService
             );
         }
 
+        $dateOfBirth = $this->normalizeDateOfBirth($dateOfBirth);
+
         $updated =
             $this->repository->updateProfile(
                 $profileId,
@@ -234,5 +238,28 @@ class HealthProfileService
                 'Unable to update the health profile.'
             );
         }
+    }
+
+    private function normalizeDateOfBirth(?string $value): ?string
+    {
+        $value = trim($value ?? '');
+        if ($value === '') {
+            return null;
+        }
+
+        if (!preg_match('/\A[0-9]{4}-[0-9]{2}-[0-9]{2}\z/', $value)) {
+            throw new RuntimeException('Invalid date format.');
+        }
+
+        $date = \DateTimeImmutable::createFromFormat('!Y-m-d', $value);
+        if (!$date || $date->format('Y-m-d') !== $value) {
+            throw new RuntimeException('Invalid date format.');
+        }
+
+        if ($date > new \DateTimeImmutable('today')) {
+            throw new RuntimeException('Date of birth cannot be in the future.');
+        }
+
+        return $value;
     }
 }

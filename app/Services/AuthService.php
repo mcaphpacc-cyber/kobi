@@ -5,8 +5,10 @@ declare(strict_types=1);
 namespace App\Services;
 
 use App\Core\Session;
+use App\Core\Database;
 use App\Repositories\UserRepository;
 use RuntimeException;
+use Throwable;
 
 class AuthService
 {
@@ -14,7 +16,9 @@ class AuthService
 
     public function __construct(
         private UserRepository $userRepository,
-        private Session $session
+        private Session $session,
+        private UserAuthTokenService $userAuthTokenService,
+        private Database $database
     ) {
     }
 
@@ -198,16 +202,31 @@ class AuthService
         $user = $this->userRepository
             ->findByEmail($email);
 
+        $user = $this->verifyPasswordRecord($user, $password);
+
+        /* Browser-only side effects remain at the existing login boundary. */
+        $this->session->regenerate();
+        $this->session->put(self::SESSION_USER_ID, (int) $user['id']);
+        $this->userRepository->updateLastLogin((int) $user['id']);
+        unset($user['password_hash']);
+        return $user;
+    }
+
+    /** Internal credential verification only: never starts a session or writes a user. */
+    public function verifyPasswordRecord(?array $user, string $password, bool $api = false): array
+    {
+        // Public noncredential dummy bcrypt hash: only equalizes unknown-account work.
+        $dummy = '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2uheWG/igi.';
+        $local = $user !== null && (!$api || ($user['password_set_at'] ?? null) !== null);
+        $hash = $local ? $user['password_hash'] : $dummy;
+        $verified = ($local || $api) ? password_verify($password, $hash) : false;
+
         /*
          * Use the same message for unknown users and
          * incorrect passwords.
          */
         if (
-            !$user ||
-            !password_verify(
-                $password,
-                $user['password_hash']
-            )
+            !$local || !$verified
         ) {
             throw new RuntimeException(
                 'Invalid email address or password.'
@@ -229,26 +248,6 @@ class AuthService
                 'Please verify your email address before logging in.'
             );
         }
-
-        /*
-         * Prevent session fixation after successful login.
-         */
-        $this->session->regenerate();
-
-        $this->session->put(
-            self::SESSION_USER_ID,
-            (int) $user['id']
-        );
-
-        $this->userRepository->updateLastLogin(
-            (int) $user['id']
-        );
-
-        /*
-         * Return the authenticated user without
-         * exposing the password hash.
-         */
-        unset($user['password_hash']);
 
         return $user;
     }
@@ -495,6 +494,38 @@ class AuthService
         return $user;
     }
 
+    /** Private account contact data only; this does not establish a phone identity. */
+    public function updateMobileNumber(mixed $input): void
+    {
+        $userId = $this->id();
+        if ($userId === null) {
+            throw new RuntimeException('You must be logged in to update your profile.');
+        }
+        $user = $this->userRepository->findById($userId);
+        if (!$user || $user['status'] !== 'active') {
+            throw new RuntimeException('Unable to update your mobile number. Please try again.');
+        }
+        if (!is_string($input) || strlen($input) > 64) {
+            throw new RuntimeException('Enter a mobile number of at most 64 characters.');
+        }
+        $value = trim($input);
+        $mobile = null;
+        if ($value !== '') {
+            if (!preg_match('/\A[+0-9 ()-]+\z/', $value)) {
+                throw new RuntimeException('Use digits and an international + prefix. Spaces, hyphens and parentheses are allowed.');
+            }
+            $mobile = str_replace([' ', '-', '(', ')'], '', $value);
+            if (!preg_match('/\A\+[1-9][0-9]{1,14}\z/', $mobile)) {
+                throw new RuntimeException('Enter an international number beginning with + and containing 2 to 15 digits.');
+            }
+        }
+        $this->userRepository->updateMobileNumber($userId, $mobile);
+        $saved = $this->userRepository->findById($userId);
+        if (!$saved || $saved['status'] !== 'active' || ($saved['mobile_number'] ?? null) !== $mobile) {
+            throw new RuntimeException('Unable to update your mobile number. Please try again.');
+        }
+    }
+
     /**
      * Change the current user's password.
      */
@@ -517,17 +548,7 @@ class AuthService
             );
         }
 
-        if (strlen($newPassword) < 8) {
-            throw new RuntimeException(
-                'New password must be at least 8 characters long.'
-            );
-        }
-
-        if ($newPassword !== $confirmation) {
-            throw new RuntimeException(
-                'New passwords do not match.'
-            );
-        }
+        $this->validateNewPassword($newPassword, $confirmation);
 
         $user = $this->userRepository->findByEmail(
             $this->userRepository->findById($userId)['email']
@@ -556,16 +577,11 @@ class AuthService
             );
         }
 
-        $updated = $this->userRepository->updatePassword(
+        $this->persistPassword(
             $userId,
-            $passwordHash
+            $passwordHash,
+            'Unable to update your password.'
         );
-
-        if (!$updated) {
-            throw new RuntimeException(
-                'Unable to update your password.'
-            );
-        }
 
         /*
         * Regenerate the session after a successful
@@ -704,17 +720,7 @@ class AuthService
             );
         }
 
-        if (strlen($newPassword) < 8) {
-            throw new RuntimeException(
-                'New password must be at least 8 characters long.'
-            );
-        }
-
-        if ($newPassword !== $confirmation) {
-            throw new RuntimeException(
-                'New passwords do not match.'
-            );
-        }
+        $this->validateNewPassword($newPassword, $confirmation);
 
         $user = $this->userRepository->findById(
             $userId
@@ -743,16 +749,11 @@ class AuthService
             );
         }
 
-        $updated = $this->userRepository->updatePassword(
+        $this->persistPassword(
             $userId,
-            $passwordHash
+            $passwordHash,
+            'Unable to reset your password.'
         );
-
-        if (!$updated) {
-            throw new RuntimeException(
-                'Unable to reset your password.'
-            );
-        }
 
         /*
         * A password reset should never automatically authenticate
@@ -763,5 +764,50 @@ class AuthService
         );
     }
 
+    /**
+     * Commit the password and required token invalidation together on the shared connection.
+     * Session changes happen only after this operation commits.
+     */
+    private function persistPassword(int $userId, string $passwordHash, string $failureMessage): void
+    {
+        $connection = $this->database->connection();
 
+        if (!$connection->beginTransaction()) {
+            throw new RuntimeException($failureMessage);
+        }
+
+        try {
+            if (!$this->userRepository->updatePassword($userId, $passwordHash)) {
+                throw new RuntimeException($failureMessage);
+            }
+
+            $this->userAuthTokenService->invalidateUnusedPasswordResetTokens($userId);
+
+            if (!$connection->commit()) {
+                throw new RuntimeException($failureMessage);
+            }
+        } catch (Throwable $exception) {
+            if ($connection->inTransaction()) {
+                $connection->rollBack();
+            }
+
+            throw $exception;
+        }
+    }
+
+    /**
+     * Validate password data before consuming a reset token or updating a password.
+     */
+    public function validateNewPassword(string $password, string $confirmation): void
+    {
+        if (strlen($password) < 8) {
+            throw new RuntimeException(
+                'New password must be at least 8 characters long.'
+            );
+        }
+
+        if ($password !== $confirmation) {
+            throw new RuntimeException('New passwords do not match.');
+        }
+    }
 }

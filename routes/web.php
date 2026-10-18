@@ -9,9 +9,92 @@ use App\Controllers\SymptomCheckerController;
 use App\Controllers\ComparisonController;
 use App\Controllers\AuthController;
 use App\Controllers\AccountController;
+use App\Controllers\PersonalHealthDashboardController;
+use App\Controllers\SavedSymptomCheckController;
+use App\Controllers\MedicationScheduleController;
+
+$this->router()->post('/account/profile/mobile', AccountController::class, 'updateMobileNumber');
+
 use App\Controllers\SavedDiseaseController;
 use App\Controllers\HealthInsuranceController;
 use App\Controllers\GoogleAuthController;
+use App\Controllers\TreatmentAdminController;
+use App\Controllers\TreatmentReviewController;
+use App\Controllers\MedicineOwnerBootstrapController;
+use App\Controllers\SubstanceController;
+use App\Controllers\PublicSearchController;
+use App\Controllers\PublicDiseaseApiController;
+use App\Controllers\PublicSubstanceApiController;
+use App\Controllers\ApiAuthController;
+
+$this->router()->post('/api/v1/auth/login', ApiAuthController::class, 'login');
+$this->router()->post('/api/v1/auth/refresh', ApiAuthController::class, 'refresh');
+$this->router()->post('/api/v1/auth/logout', ApiAuthController::class, 'logout');
+$this->router()->post('/api/v1/auth/logout-all', ApiAuthController::class, 'logoutAll');
+$this->router()->get('/api/v1/me', ApiAuthController::class, 'me');
+$this->router()->get('/api/v1/health-profiles', ApiAuthController::class, 'healthProfiles');
+$this->router()->get('/api/v1/health-profiles/{profileId}', ApiAuthController::class, 'healthProfile');
+$this->router()->get('/api/v1/health-profiles/{profileId}/medications', ApiAuthController::class, 'medications');
+$this->router()->get('/api/v1/health-profiles/{profileId}/medications/{medicationId}', ApiAuthController::class, 'medication');
+$this->router()->get('/api/v1/health-profiles/{profileId}/medical-summary', ApiAuthController::class, 'medicalSummary');
+$this->router()->get('/api/v1/health-profiles/{profileId}/conditions', ApiAuthController::class, 'conditions');
+$this->router()->get('/api/v1/health-profiles/{profileId}/conditions/{conditionId}', ApiAuthController::class, 'condition');
+$this->router()->get('/api/v1/health-profiles/{profileId}/medication-schedules/due-today', ApiAuthController::class, 'medicationDueToday');
+$this->router()->get('/api/v1/health-profiles/{profileId}/medication-schedules', ApiAuthController::class, 'medicationSchedules');
+$this->router()->post('/api/v1/health-profiles/{profileId}/medication-schedules/{scheduleId}/checkoff', ApiAuthController::class, 'medicationCheckoff');
+$this->router()->get('/api/v1/saved-symptom-checks', ApiAuthController::class, 'savedSymptomChecks');
+$this->router()->get('/api/v1/saved-symptom-checks/{savedCheckId}', ApiAuthController::class, 'savedSymptomCheck');
+
+$this->router()->get('/api/v1/diseases', PublicDiseaseApiController::class, 'index');
+$this->router()->get('/api/v1/diseases/search', PublicDiseaseApiController::class, 'search');
+$this->router()->get('/api/v1/diseases/{slug}', PublicDiseaseApiController::class, 'show');
+$this->router()->get('/api/v1/substances/search', PublicSubstanceApiController::class, 'search');
+
+$this->router()->get('/search', PublicSearchController::class, 'index');
+
+$this->router()->get('/medicines', SubstanceController::class, 'index');
+
+// Personal Medication schedules: profile authorization is rechecked by the service.
+$this->router()->get('/account/health-records/{profileId}/medicines/due-today', MedicationScheduleController::class, 'dueToday');
+$this->router()->get('/account/health-records/{profileId}/medicines/history', MedicationScheduleController::class, 'history');
+$this->router()->get('/account/health-records/{profileId}/medicines/{medicineId}/schedule', MedicationScheduleController::class, 'index');
+$this->router()->post('/account/health-records/{profileId}/medicines/{medicineId}/schedule', MedicationScheduleController::class, 'store');
+$this->router()->get('/account/health-records/{profileId}/medicines/{medicineId}/schedule/{slotId}/edit', MedicationScheduleController::class, 'edit');
+$this->router()->post('/account/health-records/{profileId}/medicines/{medicineId}/schedule/{slotId}/update', MedicationScheduleController::class, 'update');
+$this->router()->post('/account/health-records/{profileId}/medicines/{medicineId}/schedule/{slotId}/remove', MedicationScheduleController::class, 'remove');
+$this->router()->post('/account/health-records/{profileId}/medicines/{medicineId}/schedule/{slotId}/mark', MedicationScheduleController::class, 'mark');
+
+// Fixed owner only; GET is read-only, POST uses the existing protected service.
+$this->router()->get('/admin/medicine/owner-bootstrap', MedicineOwnerBootstrapController::class, 'show');
+$this->router()->post('/admin/medicine/owner-bootstrap', MedicineOwnerBootstrapController::class, 'store');
+
+// Internal review decisions never publish content.
+$this->router()->get('/admin/treatments/review', TreatmentReviewController::class, 'index');
+$this->router()->get('/admin/treatments/{protocolId}/review', TreatmentReviewController::class, 'show');
+$this->router()->post('/admin/treatments/{protocolId}/approve', TreatmentReviewController::class, 'approve');
+$this->router()->post('/admin/treatments/{protocolId}/changes-required', TreatmentReviewController::class, 'changesRequired');
+$this->router()->post('/admin/treatments/{protocolId}/risk-eligibility', TreatmentReviewController::class, 'riskEligibility');
+
+// Internal treatment editorial routes; every action checks scoped authorization.
+$this->router()->get('/admin/treatments', TreatmentAdminController::class, 'index');
+$this->router()->get('/admin/treatments/operations', TreatmentAdminController::class, 'operations');
+$this->router()->get('/admin/treatments/{protocolId}/operations', TreatmentAdminController::class, 'operation');
+$this->router()->post('/admin/treatments/{protocolId}/withdraw', TreatmentAdminController::class, 'withdraw');
+$this->router()->post('/admin/treatments/{protocolId}/reset-review', TreatmentAdminController::class, 'resetReview');
+$this->router()->get('/admin/treatments/create', TreatmentAdminController::class, 'create');
+$this->router()->post('/admin/treatments/create', TreatmentAdminController::class, 'store');
+$this->router()->get('/admin/treatments/{protocolId}/items/create', TreatmentAdminController::class, 'createItem');
+$this->router()->post('/admin/treatments/{protocolId}/items/create', TreatmentAdminController::class, 'storeItem');
+$this->router()->get('/admin/treatments/{protocolId}/edit', TreatmentAdminController::class, 'edit');
+$this->router()->post('/admin/treatments/{protocolId}/save', TreatmentAdminController::class, 'save');
+$this->router()->post('/admin/treatments/{protocolId}/submit', TreatmentAdminController::class, 'submit');
+$this->router()->post('/admin/treatments/{protocolId}/references', TreatmentAdminController::class, 'reference');
+$this->router()->get('/admin/treatment-sources/{systemId}', TreatmentAdminController::class, 'sources');
+$this->router()->get('/admin/treatment-sources/{systemId}/create', TreatmentAdminController::class, 'createSource');
+$this->router()->post('/admin/treatment-sources/{systemId}/create', TreatmentAdminController::class, 'storeSource');
+$this->router()->get('/admin/treatment-sources/{systemId}/{sourceId}', TreatmentAdminController::class, 'source');
+$this->router()->post('/admin/treatment-sources/{systemId}/{sourceId}/verify', TreatmentAdminController::class, 'verifySource');
+$this->router()->post('/admin/treatment-sources/{systemId}/{sourceId}/withdraw', TreatmentAdminController::class, 'withdrawSource');
 
 /*
 |--------------------------------------------------------------------------
@@ -201,6 +284,17 @@ $this->router()->post(
 );
 
 // Account
+$this->router()->get('/account/saved-symptom-checks', SavedSymptomCheckController::class, 'index');
+$this->router()->post('/account/saved-symptom-checks', SavedSymptomCheckController::class, 'store');
+$this->router()->get('/account/saved-symptom-checks/{checkId}', SavedSymptomCheckController::class, 'show');
+$this->router()->post('/account/saved-symptom-checks/{checkId}/delete', SavedSymptomCheckController::class, 'delete');
+
+$this->router()->get(
+    '/account/health-dashboard',
+    PersonalHealthDashboardController::class,
+    'index'
+);
+
 $this->router()->get(
     '/account',
     AccountController::class,

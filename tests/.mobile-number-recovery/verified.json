@@ -1,0 +1,14 @@
+{
+    "status": "RECOVERY_VERIFIED",
+    "normal_fingerprint": "32bb93259d2a3de00ec537d0d9ddaac65afe4183792a59395fb454f749745293",
+    "backup_sha256": "b1dfb5de7e09cbbeae21a534574d235eb2a37f20bb04eabecea93bf99ebccf4c",
+    "artifact_sha256": "03ab69e3932c09d0d047dc68894e5cae0ff7af23b397966d4f4afe752636330b",
+    "recovery_database": "kobi_mobile_number_recovery_20261014",
+    "expected_schema": {
+        "users": "CREATE TABLE `users` (\n  `id` int(11) NOT NULL AUTO_INCREMENT,\n  `name` varchar(100) NOT NULL,\n  `email` varchar(255) NOT NULL,\n  `password_hash` varchar(255) NOT NULL,\n  `password_set_at` datetime DEFAULT NULL,\n  `status` enum('active','inactive') NOT NULL DEFAULT 'active',\n  `email_verified_at` datetime DEFAULT NULL,\n  `last_login_at` datetime DEFAULT NULL,\n  `created_at` datetime NOT NULL DEFAULT current_timestamp(),\n  `updated_at` datetime NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),\n  `mobile_number` varchar(16) CHARACTER SET ascii COLLATE ascii_bin DEFAULT NULL,\n  PRIMARY KEY (`id`),\n  UNIQUE KEY `unique_user_email` (`email`),\n  KEY `idx_user_status` (`status`),\n  CONSTRAINT `chk_user_mobile_number` CHECK (`mobile_number` is null or `mobile_number` regexp '^[+][1-9][0-9]{1,14}$')\n) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci"
+    },
+    "sql_mode": {
+        "session_mode": "NO_ZERO_IN_DATE,NO_ZERO_DATE,NO_ENGINE_SUBSTITUTION",
+        "global_mode": "NO_ZERO_IN_DATE,NO_ZERO_DATE,NO_ENGINE_SUBSTITUTION"
+    }
+}
